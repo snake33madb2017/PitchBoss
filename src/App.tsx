@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { Scenario, SessionReport, AppSettings } from './types';
 import { AdminStorageService } from './services/adminStorageService';
+import { SubscriptionService, type UserSubscriptionState } from './services/subscriptionService';
 import { Navbar } from './components/Navbar';
 import { ScenarioCard } from './components/ScenarioCard';
 import { ScenarioModal } from './components/ScenarioModal';
@@ -9,6 +10,7 @@ import { SessionReportModal } from './components/SessionReportModal';
 import { SettingsModal } from './components/SettingsModal';
 import { AdminPinModal } from './components/AdminPinModal';
 import { AdminHubModal } from './components/AdminHubModal';
+import { SubscriptionModal } from './components/SubscriptionModal';
 import { LanguageProvider, useTranslation } from './i18n/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
 import {
@@ -21,7 +23,8 @@ import {
   Layers,
   Settings2,
   LogOut,
-  Plus
+  Plus,
+  Check
 } from 'lucide-react';
 
 function AppContent() {
@@ -46,6 +49,23 @@ function AppContent() {
   const [scenarioToEdit, setScenarioToEdit] = useState<Scenario | null>(null);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [sessionReport, setSessionReport] = useState<SessionReport | null>(null);
+
+  // User subscription state (Freemium + License Keys)
+  const [subscriptionState, setSubscriptionState] = useState<UserSubscriptionState>(() =>
+    SubscriptionService.getSubscriptionState()
+  );
+  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
+  const [activationToast, setActivationToast] = useState<string | null>(null);
+
+  // Auto-detect Magic Activation Link from URL (?key=PB-...)
+  useEffect(() => {
+    const activation = SubscriptionService.checkUrlForActivationKey();
+    if (activation.activated) {
+      setSubscriptionState(SubscriptionService.getSubscriptionState());
+      setActivationToast(activation.message || '¡Licencia activada con éxito!');
+      setTimeout(() => setActivationToast(null), 5000);
+    }
+  }, []);
 
   // App settings state
   const [settings, setSettings] = useState<AppSettings>(() => {
@@ -126,6 +146,29 @@ function AppContent() {
     setScenarios(updated);
   };
 
+  // Start simulation with subscription paywall verification
+  const handleSelectScenario = (scenario: Scenario) => {
+    // Admin has full unrestricted access for testing
+    if (isAdmin) {
+      setActiveCallScenario(scenario);
+      return;
+    }
+
+    const check = SubscriptionService.canStartSimulation();
+    if (!check.allowed) {
+      setIsSubscriptionModalOpen(true);
+      return;
+    }
+
+    // Record credit usage if on free trial
+    if (check.reason === 'free_trial') {
+      SubscriptionService.recordSimulationStarted();
+      setSubscriptionState(SubscriptionService.getSubscriptionState());
+    }
+
+    setActiveCallScenario(scenario);
+  };
+
   // Admin authentication handlers
   const handleOpenAdmin = () => {
     if (isAdmin) {
@@ -179,7 +222,23 @@ function AppContent() {
         onOpenSettings={() => setIsSettingsModalOpen(true)}
         canInstallPwa={canInstallPwa}
         onInstallPwa={handleInstallPwa}
+        subscriptionStatus={subscriptionState.status}
+        daysRemaining={subscriptionState.daysRemaining}
+        onOpenSubscriptionModal={() => setIsSubscriptionModalOpen(true)}
       />
+
+      {/* Floating Activation Toast Notification */}
+      {activationToast && (
+        <div className="fixed top-18 right-4 z-50 max-w-sm p-3.5 rounded-2xl bg-emerald-950/95 border border-emerald-500/50 text-emerald-200 shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 backdrop-blur-md">
+          <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0">
+            <Check className="w-4 h-4 text-emerald-400" />
+          </div>
+          <div>
+            <p className="font-bold text-xs text-white">¡Suscripción Activada!</p>
+            <p className="text-[11px] text-emerald-300 leading-snug">{activationToast}</p>
+          </div>
+        </div>
+      )}
 
       {/* Admin Quick Action Banner (When Admin Mode is Active) */}
       {isAdmin && (
@@ -367,7 +426,7 @@ function AppContent() {
                   key={scenario.id}
                   scenario={scenario}
                   isAdmin={isAdmin}
-                  onSelect={(s) => setActiveCallScenario(s)}
+                  onSelect={handleSelectScenario}
                   onEdit={handleOpenEditScenario}
                   onDuplicate={handleDuplicateScenario}
                   onToggleVisibility={handleToggleVisibility}
@@ -445,6 +504,14 @@ function AppContent() {
           }}
         />
       )}
+
+      {/* Subscription Paywall & License Management Modal */}
+      <SubscriptionModal
+        isOpen={isSubscriptionModalOpen}
+        onClose={() => setIsSubscriptionModalOpen(false)}
+        onSubscriptionUpdated={() => setSubscriptionState(SubscriptionService.getSubscriptionState())}
+        state={subscriptionState}
+      />
     </div>
   );
 }

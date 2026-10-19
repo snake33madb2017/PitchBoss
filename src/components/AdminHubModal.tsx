@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { Scenario, AppSettings } from '../types';
 import { AdminStorageService } from '../services/adminStorageService';
+import { SubscriptionService, type SubscriptionPlan, type LicenseInfo } from '../services/subscriptionService';
 import {
   ShieldCheck,
   X,
@@ -22,7 +23,12 @@ import {
   RotateCcw,
   Sparkles,
   Search,
-  ExternalLink
+  ExternalLink,
+  Crown,
+  MessageCircle,
+  Link as LinkIcon,
+  Ban,
+  CheckCircle2
 } from 'lucide-react';
 
 interface AdminHubModalProps {
@@ -48,11 +54,19 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
   onSaveSettings,
   onLogoutAdmin
 }) => {
-  const [activeTab, setActiveTab] = useState<'scenarios' | 'sync' | 'pwa'>('scenarios');
+  const [activeTab, setActiveTab] = useState<'scenarios' | 'licenses' | 'sync' | 'pwa'>('scenarios');
   const [searchQuery, setSearchQuery] = useState('');
   const [copied, setCopied] = useState(false);
   const [importStatus, setImportStatus] = useState<{ success?: boolean; message?: string } | null>(null);
   const [importMode, setImportMode] = useState<'merge' | 'replace'>('merge');
+
+  // License generator & management state
+  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan>('30D');
+  const [clientNotesInput, setClientNotesInput] = useState('');
+  const [lastGeneratedLicense, setLastGeneratedLicense] = useState<LicenseInfo | null>(null);
+  const [adminLicenses, setAdminLicenses] = useState<LicenseInfo[]>(() => SubscriptionService.getAdminLicenses());
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [copiedLink, setCopiedLink] = useState<string | null>(null);
 
   // PIN change state
   const [currentPinInput, setCurrentPinInput] = useState('');
@@ -176,6 +190,42 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
     setTimeout(() => setApiKeySaved(false), 2000);
   };
 
+  const handleGenerateLicense = (e: React.FormEvent) => {
+    e.preventDefault();
+    const license = SubscriptionService.generateAdminLicense(selectedPlan, clientNotesInput);
+    setLastGeneratedLicense(license);
+    setAdminLicenses(SubscriptionService.getAdminLicenses());
+    setClientNotesInput('');
+  };
+
+  const handleCopyKey = (key: string) => {
+    navigator.clipboard.writeText(key);
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 2000);
+  };
+
+  const handleCopyLink = (key: string) => {
+    const link = SubscriptionService.getMagicLink(key);
+    navigator.clipboard.writeText(link);
+    setCopiedLink(key);
+    setTimeout(() => setCopiedLink(null), 2000);
+  };
+
+  const handleRevokeLicense = (key: string) => {
+    if (window.confirm('¿Seguro que deseas revocar esta licencia? El cliente perderá el acceso de inmediato.')) {
+      SubscriptionService.revokeAdminLicense(key);
+      setAdminLicenses(SubscriptionService.getAdminLicenses());
+    }
+  };
+
+  const handleShareWhatsApp = (license: LicenseInfo) => {
+    const magicLink = SubscriptionService.getMagicLink(license.key);
+    const text = encodeURIComponent(
+      `¡Hola! Aquí tienes tu pase de acceso a PitchBoss Pro (${license.planName}).\n\nToca este enlace directo para activarlo en tu móvil:\n${magicLink}\n\nO ingresa este código manualmente en la app: ${license.key}`
+    );
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+  };
+
   const handleForcePwaUpdate = async () => {
     if (
       window.confirm(
@@ -241,6 +291,17 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
           >
             <Layers className="w-4 h-4" />
             <span>Escenarios ({scenarios.length})</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('licenses')}
+            className={`flex items-center gap-2 py-3 px-3.5 text-sm font-bold border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
+              activeTab === 'licenses'
+                ? 'border-amber-400 text-amber-400'
+                : 'border-transparent text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            <Crown className="w-4 h-4 text-amber-400" />
+            <span>Licencias & Ventas ({adminLicenses.length})</span>
           </button>
           <button
             onClick={() => setActiveTab('sync')}
@@ -398,7 +459,223 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
             </div>
           )}
 
-          {/* TAB 2: BACKUP & SYNC */}
+          {/* TAB 2: LICENSES & CLIENT SUBSCRIPTIONS */}
+          {activeTab === 'licenses' && (
+            <div className="space-y-6">
+              {/* License Generator Box */}
+              <div className="p-5 rounded-2xl border border-zinc-800 bg-zinc-950 space-y-4">
+                <div>
+                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                    <Crown className="w-4 h-4 text-amber-400" />
+                    <span>Generador de Licencias y Enlaces Mágicos</span>
+                  </h3>
+                  <p className="text-xs text-zinc-400 mt-0.5">
+                    Genera una clave y un enlace directo para enviar a tu cliente por WhatsApp o email al recibir el pago.
+                  </p>
+                </div>
+
+                <form onSubmit={handleGenerateLicense} className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
+                        Plan de Suscripción:
+                      </label>
+                      <select
+                        value={selectedPlan}
+                        onChange={(e) => setSelectedPlan(e.target.value as SubscriptionPlan)}
+                        className="w-full px-3 py-2 text-xs rounded-xl border bg-zinc-900 border-zinc-700 text-zinc-100 focus:outline-none focus:border-amber-500 cursor-pointer"
+                      >
+                        <option value="30D">Pase Mensual (30 Días - 19€)</option>
+                        <option value="90D">Pase Trimestral (90 Días - 45€)</option>
+                        <option value="365D">Pase Anual (1 Año - 120€)</option>
+                        <option value="LIFETIME">Pase Vitalicio (Ilimitado - 299€)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
+                        Cliente / Empresa / Nota:
+                      </label>
+                      <input
+                        type="text"
+                        value={clientNotesInput}
+                        onChange={(e) => setClientNotesInput(e.target.value)}
+                        placeholder="Ej: Hotel Meliá - Recepción, o Juan Pérez"
+                        className="w-full px-3 py-2 text-xs rounded-xl border bg-zinc-900 border-zinc-700 text-zinc-100 focus:outline-none focus:border-amber-500"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 font-bold text-xs flex items-center gap-2 transition-all cursor-pointer shadow-lg shadow-amber-500/10"
+                  >
+                    <Sparkles className="w-4 h-4 text-zinc-950" />
+                    <span>Generar Licencia y Enlace Mágico</span>
+                  </button>
+                </form>
+
+                {/* Newly Generated License Card */}
+                {lastGeneratedLicense && (
+                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-3 animate-in fade-in">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                        <span>¡Licencia lista para entregar!</span>
+                      </span>
+                      <span className="text-[10px] text-zinc-400">
+                        Expira el: {new Date(lastGeneratedLicense.expiresAt).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    <div className="space-y-2">
+                      {/* Key */}
+                      <div>
+                        <span className="text-[10px] text-zinc-400 block mb-0.5">Código de Licencia:</span>
+                        <div className="flex items-center gap-2">
+                          <code className="flex-1 bg-zinc-900 px-3 py-1.5 rounded-xl font-mono text-xs text-amber-300 border border-zinc-800">
+                            {lastGeneratedLicense.key}
+                          </code>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyKey(lastGeneratedLicense.key)}
+                            className="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-white transition-colors cursor-pointer flex items-center gap-1"
+                          >
+                            {copiedKey === lastGeneratedLicense.key ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                            <span>{copiedKey === lastGeneratedLicense.key ? 'Copiado' : 'Copiar'}</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Magic Link */}
+                      <div>
+                        <span className="text-[10px] text-zinc-400 block mb-0.5">Enlace Mágico de Activación Directa:</span>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            readOnly
+                            value={SubscriptionService.getMagicLink(lastGeneratedLicense.key)}
+                            className="flex-1 bg-zinc-900 px-3 py-1.5 rounded-xl font-mono text-[11px] text-zinc-300 border border-zinc-800 truncate"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleCopyLink(lastGeneratedLicense.key)}
+                            className="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-white transition-colors cursor-pointer flex items-center gap-1"
+                          >
+                            {copiedLink === lastGeneratedLicense.key ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <LinkIcon className="w-3.5 h-3.5" />}
+                            <span>{copiedLink === lastGeneratedLicense.key ? 'Copiado' : 'Copiar Link'}</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleShareWhatsApp(lastGeneratedLicense)}
+                            className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition-colors cursor-pointer flex items-center gap-1 shadow-sm"
+                          >
+                            <MessageCircle className="w-3.5 h-3.5" />
+                            <span>WhatsApp</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Table of Issued Licenses */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                    Historial de Licencias Emitidas ({adminLicenses.length})
+                  </h3>
+                </div>
+
+                {adminLicenses.length === 0 ? (
+                  <div className="p-8 text-center text-xs text-zinc-500 border border-zinc-800/80 rounded-2xl bg-zinc-950/40">
+                    Aún no has generado ninguna licencia. Utiliza el generador arriba para crear tu primer pase Pro.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-950">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-zinc-900/80 border-b border-zinc-800 text-[11px] font-bold text-zinc-400">
+                        <tr>
+                          <th className="px-4 py-3">Código</th>
+                          <th className="px-4 py-3">Cliente / Nota</th>
+                          <th className="px-4 py-3">Plan</th>
+                          <th className="px-4 py-3">Vence</th>
+                          <th className="px-4 py-3">Estado</th>
+                          <th className="px-4 py-3 text-right">Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-zinc-800/60">
+                        {adminLicenses.map((lic) => {
+                          const isExpired = Date.now() > lic.expiresAt;
+                          return (
+                            <tr key={lic.key} className="hover:bg-zinc-900/40 transition-colors">
+                              <td className="px-4 py-3 font-mono text-[11px] text-amber-300 font-semibold">
+                                {lic.key}
+                              </td>
+                              <td className="px-4 py-3 text-zinc-200">
+                                {lic.clientNotes || 'Directo'}
+                              </td>
+                              <td className="px-4 py-3 text-zinc-300 font-medium">
+                                {lic.planName}
+                              </td>
+                              <td className="px-4 py-3 text-zinc-400">
+                                {new Date(lic.expiresAt).toLocaleDateString()}
+                              </td>
+                              <td className="px-4 py-3">
+                                {lic.isRevoked ? (
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                                    Revocada
+                                  </span>
+                                ) : isExpired ? (
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-800 text-zinc-400">
+                                    Vencida
+                                  </span>
+                                ) : (
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                    Activa
+                                  </span>
+                                )}
+                              </td>
+                              <td className="px-4 py-3 text-right">
+                                <div className="flex items-center justify-end gap-1.5">
+                                  <button
+                                    onClick={() => handleCopyLink(lic.key)}
+                                    title="Copiar Enlace Mágico"
+                                    className="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                                  >
+                                    <LinkIcon className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleShareWhatsApp(lic)}
+                                    title="Enviar por WhatsApp"
+                                    className="p-1.5 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-400 transition-colors cursor-pointer"
+                                  >
+                                    <MessageCircle className="w-3.5 h-3.5" />
+                                  </button>
+                                  {!lic.isRevoked && (
+                                    <button
+                                      onClick={() => handleRevokeLicense(lic.key)}
+                                      title="Revocar Licencia"
+                                      className="p-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/40 text-rose-400 transition-colors cursor-pointer"
+                                    >
+                                      <Ban className="w-3.5 h-3.5" />
+                                    </button>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: BACKUP & SYNC */}
           {activeTab === 'sync' && (
             <div className="space-y-6">
               <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 text-xs text-zinc-300 space-y-1">

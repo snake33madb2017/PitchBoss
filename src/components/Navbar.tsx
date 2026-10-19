@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Plus, Settings, Download, ChevronDown, Check, ShieldCheck, Shield } from 'lucide-react';
+import { Plus, Settings, Download, ChevronDown, Check, ShieldCheck, Shield, Crown, Sparkles, Lock } from 'lucide-react';
 import { useTranslation } from '../i18n/LanguageContext';
 
 interface NavbarProps {
@@ -9,6 +9,9 @@ interface NavbarProps {
   onOpenSettings: () => void;
   canInstallPwa: boolean;
   onInstallPwa: () => void;
+  subscriptionStatus: 'active' | 'free_trial' | 'expired';
+  daysRemaining?: number;
+  onOpenSubscriptionModal: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -17,7 +20,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenNewScenario,
   onOpenSettings,
   canInstallPwa,
-  onInstallPwa
+  onInstallPwa,
+  subscriptionStatus,
+  daysRemaining,
+  onOpenSubscriptionModal
 }) => {
   const { t, language, setLanguage, currentLanguageOption, allLanguages } = useTranslation();
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
@@ -58,6 +64,39 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Actions */}
       <div className="flex items-center gap-2 sm:gap-2.5">
+        {/* Subscription Status Pill */}
+        {subscriptionStatus === 'active' ? (
+          <button
+            onClick={onOpenSubscriptionModal}
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-bold transition-all cursor-pointer shadow-sm shadow-amber-500/10"
+            title="Suscripción Pro Activa"
+          >
+            <Crown className="w-3.5 h-3.5 text-amber-400" />
+            <span className="hidden xs:inline">PRO</span>
+            <span className="text-[10px] text-amber-400 font-mono">({daysRemaining}d)</span>
+          </button>
+        ) : subscriptionStatus === 'free_trial' ? (
+          <button
+            onClick={onOpenSubscriptionModal}
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-medium transition-colors cursor-pointer"
+            title="Prueba gratuita disponible"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span className="hidden sm:inline">1 Prueba Gratis</span>
+            <span className="sm:hidden text-[11px]">Gratis</span>
+          </button>
+        ) : (
+          <button
+            onClick={onOpenSubscriptionModal}
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 text-xs font-bold transition-colors cursor-pointer animate-pulse"
+            title="Activa tu pase Pro"
+          >
+            <Lock className="w-3.5 h-3.5 text-rose-400" />
+            <span className="hidden sm:inline">Activar Pro</span>
+            <span className="sm:hidden text-[11px]">Pro</span>
+          </button>
+        )}
+
         {/* Admin Button */}
         {isAdmin ? (
           <button
