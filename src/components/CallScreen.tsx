@@ -131,7 +131,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, onEndCall, onE
     setCallState('user_listening');
 
     SpeechService.startListening({
-      lang: 'es-ES',
+      lang: 'en-US',
       onTranscript: (text) => {
         setInterimTranscript(text);
       },
@@ -154,8 +154,8 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, onEndCall, onE
     SpeechService.stopListening();
     setInterimTranscript('');
 
-    const trimmed = text.trim();
-    if (!trimmed || trimmed.length < 2) {
+    const cleaned = SpeechService.cleanDuplicatePhrases(text.trim());
+    if (!cleaned || cleaned.length < 2) {
       setCallState('idle');
       return;
     }
@@ -163,10 +163,10 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, onEndCall, onE
     // Acoustic Echo Guard
     const lastAi = [...messages].reverse().find((m) => m.sender === 'ai');
     if (lastAi) {
-      const lowerUser = trimmed.toLowerCase();
+      const lowerUser = cleaned.toLowerCase();
       const lowerAi = lastAi.text.toLowerCase();
       if (lowerUser.length > 8 && lowerAi.includes(lowerUser)) {
-        console.warn('Acoustic echo detected from speakers, ignoring turn:', trimmed);
+        console.warn('Acoustic echo detected from speakers, ignoring turn:', cleaned);
         setCallState('idle');
         return;
       }
@@ -175,7 +175,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, onEndCall, onE
     const userMsg: Message = {
       id: 'msg-' + Date.now(),
       sender: 'user',
-      text: trimmed,
+      text: cleaned,
       timestamp: Date.now()
     };
 
@@ -187,7 +187,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, onEndCall, onE
       const response = await GeminiService.sendTurn({
         scenario,
         conversationHistory: updatedHistory,
-        userMessageText: trimmed
+        userMessageText: cleaned
       });
 
       // Update objectives if satisfied

@@ -43,10 +43,52 @@ export class SpeechService {
   }
 
   /**
-   * Starts speech recognition listening for input
+   * Cleans stuttered or looped duplicate phrases caused by Android WebSpeech buffer re-triggers
+   */
+  public static cleanDuplicatePhrases(text: string): string {
+    if (!text || text.length < 3) return text;
+
+    let words = text.split(/\s+/).filter(Boolean);
+    if (words.length <= 1) return text;
+
+    // 1. Remove immediate consecutive single-word duplicates: "good good morning" -> "good morning"
+    const singleDeduped: string[] = [];
+    for (let i = 0; i < words.length; i++) {
+      if (i === 0 || words[i].toLowerCase() !== words[i - 1].toLowerCase()) {
+        singleDeduped.push(words[i]);
+      }
+    }
+    words = singleDeduped;
+
+    // 2. Remove consecutive multi-word repeating loops (e.g. "good morning good morning" -> "good morning")
+    let changed = true;
+    let iterations = 0;
+    while (changed && iterations < 10) {
+      changed = false;
+      iterations++;
+      const n = words.length;
+      for (let phraseLen = Math.floor(n / 2); phraseLen >= 2; phraseLen--) {
+        for (let i = 0; i <= n - 2 * phraseLen; i++) {
+          const phrase1 = words.slice(i, i + phraseLen).map((w) => w.toLowerCase()).join(' ');
+          const phrase2 = words.slice(i + phraseLen, i + 2 * phraseLen).map((w) => w.toLowerCase()).join(' ');
+          if (phrase1 === phrase2) {
+            words.splice(i + phraseLen, phraseLen);
+            changed = true;
+            break;
+          }
+        }
+        if (changed) break;
+      }
+    }
+
+    return words.join(' ');
+  }
+
+  /**
+   * Starts speech recognition listening for input (defaults to en-US for English training)
    */
   public static startListening({
-    lang = 'es-ES',
+    lang = 'en-US',
     onTranscript,
     onSpeechEnd,
     onError
@@ -72,33 +114,38 @@ export class SpeechService {
     this.recognition.interimResults = true;
     this.recognition.maxAlternatives = 1;
 
-    let accumulatedFinal = '';
-
     this.recognition.onstart = () => {
       this.isListening = true;
     };
 
     this.recognition.onresult = (event: any) => {
-      let interim = '';
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          accumulatedFinal += ' ' + transcript;
+      let finalTranscript = '';
+      let interimTranscript = '';
+
+      // Re-evaluate from results array to prevent compounding duplicates on Android Chrome
+      for (let i = 0; i < event.results.length; ++i) {
+        const item = event.results[i];
+        if (!item || !item[0]) continue;
+        const piece = (item[0].transcript || '').trim();
+        if (item.isFinal) {
+          finalTranscript += (finalTranscript ? ' ' : '') + piece;
         } else {
-          interim += transcript;
+          interimTranscript += (interimTranscript ? ' ' : '') + piece;
         }
       }
 
-      const currentText = (accumulatedFinal + ' ' + interim).trim();
+      const rawText = (finalTranscript + ' ' + interimTranscript).trim();
+      const currentText = SpeechService.cleanDuplicatePhrases(rawText);
+
       onTranscript(currentText, false);
 
-      // Reset auto-silence timer: when user pauses for 1.4 seconds, treat as complete turn
+      // Auto-silence trigger: when speaker pauses for 1.3 seconds, finalize submission
       clearTimeout(this.silenceTimer);
       if (currentText.length > 0) {
         this.silenceTimer = setTimeout(() => {
           this.stopListening();
           onSpeechEnd(currentText);
-        }, 1400);
+        }, 1300);
       }
     };
 
