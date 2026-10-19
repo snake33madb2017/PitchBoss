@@ -84,18 +84,27 @@ export class SpeechService {
     return words.join(' ');
   }
 
+  private static latestTranscript: string = '';
+
+  public static getLatestTranscript(): string {
+    return this.latestTranscript;
+  }
+
   /**
    * Starts speech recognition listening for input (defaults to en-US for English training)
+   * enableAutoSilence: false for Walkie-Talkie (hold to speak, release to send)
    */
   public static startListening({
     lang = 'en-US',
+    enableAutoSilence = false,
     onTranscript,
     onSpeechEnd,
     onError
   }: {
     lang?: string;
+    enableAutoSilence?: boolean;
     onTranscript: (text: string, isFinal: boolean) => void;
-    onSpeechEnd: (finalTranscript: string) => void;
+    onSpeechEnd?: (finalTranscript: string) => void;
     onError?: (error: string) => void;
   }): void {
     if (!this.isRecognitionSupported()) {
@@ -106,6 +115,8 @@ export class SpeechService {
     if (this.isListening) {
       this.stopListening();
     }
+
+    this.latestTranscript = '';
 
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     this.recognition = new SpeechRecognition();
@@ -136,16 +147,19 @@ export class SpeechService {
 
       const rawText = (finalTranscript + ' ' + interimTranscript).trim();
       const currentText = SpeechService.cleanDuplicatePhrases(rawText);
+      this.latestTranscript = currentText;
 
       onTranscript(currentText, false);
 
-      // Auto-silence trigger: when speaker pauses for 1.3 seconds, finalize submission
-      clearTimeout(this.silenceTimer);
-      if (currentText.length > 0) {
-        this.silenceTimer = setTimeout(() => {
-          this.stopListening();
-          onSpeechEnd(currentText);
-        }, 1300);
+      // In hands-free mode, auto-detect silence. In Walkie-talkie mode, wait for user button release!
+      if (enableAutoSilence) {
+        clearTimeout(this.silenceTimer);
+        if (currentText.length > 0) {
+          this.silenceTimer = setTimeout(() => {
+            this.stopListening();
+            if (onSpeechEnd) onSpeechEnd(currentText);
+          }, 1300);
+        }
       }
     };
 
@@ -167,9 +181,9 @@ export class SpeechService {
   }
 
   /**
-   * Stops listening
+   * Stops listening and returns the latest captured transcript
    */
-  public static stopListening(): void {
+  public static stopListening(): string {
     clearTimeout(this.silenceTimer);
     if (this.recognition && this.isListening) {
       try {
@@ -179,6 +193,7 @@ export class SpeechService {
       }
     }
     this.isListening = false;
+    return this.latestTranscript;
   }
 
   /**
