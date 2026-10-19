@@ -19,7 +19,7 @@ export const translations: Record<SupportedLanguage, Record<string, string>> = {
   es: {
     // Navbar
     'nav.brandSubtitle': 'Domina el pitch en cualquier industria',
-    'nav.badge': 'AI ROLEPLAY',
+    'nav.badge': 'By Marco Daza',
     'nav.installPwa': 'Instalar PWA',
     'nav.newScenario': 'Nuevo Escenario',
     'nav.settings': 'Ajustes',
@@ -142,7 +142,7 @@ export const translations: Record<SupportedLanguage, Record<string, string>> = {
   },
   en: {
     'nav.brandSubtitle': 'Master the pitch in any industry',
-    'nav.badge': 'AI ROLEPLAY',
+    'nav.badge': 'By Marco Daza',
     'nav.installPwa': 'Install PWA',
     'nav.newScenario': 'New Scenario',
     'nav.settings': 'Settings',
@@ -258,7 +258,7 @@ export const translations: Record<SupportedLanguage, Record<string, string>> = {
   },
   pt: {
     'nav.brandSubtitle': 'Domine o pitch em qualquer indústria',
-    'nav.badge': 'AI ROLEPLAY',
+    'nav.badge': 'By Marco Daza',
     'nav.installPwa': 'Instalar PWA',
     'nav.newScenario': 'Novo Cenário',
     'nav.settings': 'Configurações',
@@ -374,7 +374,7 @@ export const translations: Record<SupportedLanguage, Record<string, string>> = {
   },
   fr: {
     'nav.brandSubtitle': 'Maîtrisez le pitch dans tous les secteurs',
-    'nav.badge': 'AI ROLEPLAY',
+    'nav.badge': 'By Marco Daza',
     'nav.installPwa': 'Installer PWA',
     'nav.newScenario': 'Nouveau Scénario',
     'nav.settings': 'Paramètres',
@@ -490,7 +490,7 @@ export const translations: Record<SupportedLanguage, Record<string, string>> = {
   },
   de: {
     'nav.brandSubtitle': 'Meistern Sie den Pitch in jeder Branche',
-    'nav.badge': 'AI ROLEPLAY',
+    'nav.badge': 'By Marco Daza',
     'nav.installPwa': 'PWA Installieren',
     'nav.newScenario': 'Neues Szenario',
     'nav.settings': 'Einstellungen',
@@ -606,7 +606,7 @@ export const translations: Record<SupportedLanguage, Record<string, string>> = {
   },
   it: {
     'nav.brandSubtitle': 'Domina il pitch in qualsiasi settore',
-    'nav.badge': 'AI ROLEPLAY',
+    'nav.badge': 'By Marco Daza',
     'nav.installPwa': 'Installa PWA',
     'nav.newScenario': 'Nuovo Scenario',
     'nav.settings': 'Impostazioni',

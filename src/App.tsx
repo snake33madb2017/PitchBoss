@@ -468,6 +468,8 @@ function AppContent() {
         settings={settings}
         onSaveSettings={handleSaveSettings}
         onOpenAdmin={handleOpenAdmin}
+        canInstallPwa={canInstallPwa}
+        onInstallPwa={handleInstallPwa}
       />
 
       {/* Admin PIN Prompt Modal */}

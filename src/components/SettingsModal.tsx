@@ -3,7 +3,7 @@ import type { AppSettings } from '../types';
 import { GeminiService } from '../services/geminiService';
 import { SpeechService } from '../services/speechService';
 import { useTranslation } from '../i18n/LanguageContext';
-import { Settings, Key, Volume2, Mic, Check, X, ExternalLink } from 'lucide-react';
+import { Settings, Key, Volume2, Mic, Check, X, ExternalLink, Download } from 'lucide-react';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -11,6 +11,8 @@ interface SettingsModalProps {
   settings: AppSettings;
   onSaveSettings: (settings: AppSettings) => void;
   onOpenAdmin?: () => void;
+  canInstallPwa?: boolean;
+  onInstallPwa?: () => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -18,7 +20,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
   settings,
   onSaveSettings,
-  onOpenAdmin
+  onOpenAdmin,
+  canInstallPwa,
+  onInstallPwa
 }) => {
   const { t } = useTranslation();
 
@@ -160,6 +164,30 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               />
             </button>
           </div>
+
+          {/* PWA Install Quick Action */}
+          {canInstallPwa && onInstallPwa && (
+            <div className="p-3.5 rounded-2xl border border-zinc-700/80 bg-zinc-800/40 flex items-center justify-between">
+              <div className="space-y-0.5">
+                <span className="text-xs font-bold text-zinc-200 flex items-center gap-1.5">
+                  <Download className="w-4 h-4 text-amber-400" /> Instalar Aplicación PWA
+                </span>
+                <p className="text-[11px] text-zinc-400">
+                  Añade PitchBoss a tu dispositivo como una App nativa.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onInstallPwa();
+                }}
+                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-100 hover:bg-white text-zinc-950 transition-colors cursor-pointer shadow-sm"
+              >
+                Instalar
+              </button>
+            </div>
+          )}
 
           {/* Admin Panel Quick Access */}
           {onOpenAdmin && (
