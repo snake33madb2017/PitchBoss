@@ -398,7 +398,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, onEndCall, onE
       )}
 
       {/* Main Center Stage: Scrollable, clean, breathing layout */}
-      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-3 sm:py-6 flex flex-col items-center justify-start space-y-4 max-w-xl mx-auto w-full scrollbar-thin">
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-2 sm:py-6 flex flex-col items-center justify-start space-y-3 sm:space-y-4 max-w-xl mx-auto w-full scrollbar-thin pb-8">
         {/* Visualizer & Orb */}
         <div
           onClick={() => {
@@ -412,15 +412,15 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, onEndCall, onE
               startListeningForUser();
             }
           }}
-          className="relative cursor-pointer group shrink-0 pt-2"
+          className="relative cursor-pointer group shrink-0 pt-1"
           title={callState === 'ai_speaking' ? 'Toca para interrumpir y hablar' : 'Toca para hablar'}
         >
           <AudioVisualizer state={callState} />
 
           {/* Character Avatar inside Orb */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-zinc-900 border-2 border-zinc-700/80 group-hover:border-amber-400 flex items-center justify-center shadow-2xl shadow-black/80 backdrop-blur-md transition-all">
-              <span className="text-2xl sm:text-3xl" role="img">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-zinc-900 border-2 border-zinc-700/80 group-hover:border-amber-400 flex items-center justify-center shadow-2xl shadow-black/80 backdrop-blur-md transition-all">
+              <span className="text-xl sm:text-3xl" role="img">
                 {scenario.aiCharacter.avatar}
               </span>
             </div>
