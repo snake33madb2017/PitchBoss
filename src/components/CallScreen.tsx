@@ -296,9 +296,9 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, onEndCall, onE
   const lastAiTip = lastAiMsg?.tip || scenario.initialTip;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-black text-zinc-100 select-none overflow-hidden">
+    <div className="fixed inset-0 z-50 flex flex-col bg-black text-zinc-100 overflow-hidden">
       {/* Top Bar Header */}
-      <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-zinc-800/80 bg-zinc-950/90 backdrop-blur-md">
+      <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-zinc-800/80 bg-zinc-950/95 backdrop-blur-md shrink-0 z-20">
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-10 h-10 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0">
             <span className="text-xl" role="img">{scenario.aiCharacter.avatar}</span>
@@ -400,8 +400,8 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, onEndCall, onE
         </div>
       )}
 
-      {/* Central Visualizer & Avatar Area */}
-      <div className="flex-1 flex flex-col items-center justify-center relative px-4 py-2">
+      {/* Central Visualizer & Avatar Area (Scrollable on mobile) */}
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-3 sm:py-6 flex flex-col items-center justify-start sm:justify-center relative space-y-3.5 scrollbar-thin">
         {/* Visualizer Canvas - Clickable to speak or interrupt */}
         <div 
           onClick={() => {
@@ -415,15 +415,15 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, onEndCall, onE
               startListeningForUser();
             }
           }}
-          className="relative cursor-pointer group"
+          className="relative cursor-pointer group shrink-0"
           title={callState === 'ai_speaking' ? 'Toca para interrumpir y hablar' : 'Toca para hablar'}
         >
           <AudioVisualizer state={callState} />
           
           {/* Inner Character Avatar in center */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-20 h-20 rounded-full bg-zinc-900 border-2 border-zinc-700/80 group-hover:border-zinc-500 flex items-center justify-center shadow-2xl shadow-black/80 backdrop-blur-md transition-all">
-              <span className="text-4xl" role="img">{scenario.aiCharacter.avatar}</span>
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-zinc-900 border-2 border-zinc-700/80 group-hover:border-zinc-500 flex items-center justify-center shadow-2xl shadow-black/80 backdrop-blur-md transition-all">
+              <span className="text-3xl sm:text-4xl" role="img">{scenario.aiCharacter.avatar}</span>
             </div>
           </div>
         </div>
@@ -583,7 +583,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, onEndCall, onE
       )}
 
       {/* Bottom Floating Call Controls */}
-      <div className="px-6 py-4 bg-zinc-950/90 border-t border-zinc-800/80 backdrop-blur-md flex items-center justify-between max-w-lg mx-auto w-full">
+      <div className="px-6 py-3 sm:py-4 bg-zinc-950/95 border-t border-zinc-800/80 backdrop-blur-md flex items-center justify-between max-w-lg mx-auto w-full shrink-0 z-20">
         {/* Lifeline / Hint button */}
         <button
           onClick={fetchLiveHints}

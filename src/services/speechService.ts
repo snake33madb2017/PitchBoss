@@ -9,9 +9,9 @@ export class SpeechService {
   private static isListening: boolean = false;
   private static silenceTimer: any = null;
   private static activeUtterance: SpeechSynthesisUtterance | null = null;
-  private static keepAliveTimer: any = null;
-  private static watchdogTimer: any = null;
+  private static utteranceQueue: Array<{ text: string; lang: 'es-ES' | 'en-US' }> = [];
   private static isSpeakingNow: boolean = false;
+  private static chunkWatchdogTimer: any = null;
 
   public static isRecognitionSupported(): boolean {
     return typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window);
@@ -22,7 +22,7 @@ export class SpeechService {
   }
 
   /**
-   * Returns available English voices from the browser synthesis engine
+   * Returns available English and Spanish voices
    */
   public static getEnglishVoices(): Promise<SpeechSynthesisVoice[]> {
     return new Promise((resolve) => {
@@ -32,20 +32,18 @@ export class SpeechService {
 
       let voices = window.speechSynthesis.getVoices();
       if (voices.length > 0) {
-        const enVoices = voices.filter(v => v.lang.startsWith('en'));
-        return resolve(enVoices.length > 0 ? enVoices : voices);
+        return resolve(voices);
       }
 
       window.speechSynthesis.onvoiceschanged = () => {
         voices = window.speechSynthesis.getVoices();
-        const enVoices = voices.filter(v => v.lang.startsWith('en'));
-        resolve(enVoices.length > 0 ? enVoices : voices);
+        resolve(voices);
       };
     });
   }
 
   /**
-   * Starts speech recognition listening for input (Spanish or English)
+   * Starts speech recognition listening for input
    */
   public static startListening({
     lang = 'es-ES',
@@ -59,7 +57,7 @@ export class SpeechService {
     onError?: (error: string) => void;
   }): void {
     if (!this.isRecognitionSupported()) {
-      if (onError) onError('Speech recognition is not supported in this browser. Please use Google Chrome, Edge, or Safari.');
+      if (onError) onError('Speech recognition is not supported in this browser.');
       return;
     }
 
@@ -136,19 +134,61 @@ export class SpeechService {
     this.isListening = false;
   }
 
-  private static clearSpeechTimers(): void {
-    if (this.keepAliveTimer) {
-      clearInterval(this.keepAliveTimer);
-      this.keepAliveTimer = null;
-    }
-    if (this.watchdogTimer) {
-      clearTimeout(this.watchdogTimer);
-      this.watchdogTimer = null;
-    }
+  /**
+   * Cleans text: strips markdown, brackets, quotes
+   */
+  private static cleanText(text: string): string {
+    return text
+      .replace(/[*_#~`]/g, '')
+      .replace(/\[.*?\]/g, '') // Remove bracketed phonetic tips
+      .replace(/\(.*?\)/g, '') // Remove parentheses
+      .replace(/["“”«»]/g, '')
+      .trim();
   }
 
   /**
-   * Speaks text out loud with GC safety and watchdog protection
+   * Splits text into short natural sentence chunks
+   * Chrome/Android TTS cuts off if a single utterance exceeds ~150 chars.
+   */
+  private static splitIntoChunks(text: string): Array<{ text: string; lang: 'es-ES' | 'en-US' }> {
+    const rawChunks = text
+      .split(/(?<=[.?!:\n])\s+/)
+      .map(c => this.cleanText(c))
+      .filter(c => c.length > 0);
+
+    const result: Array<{ text: string; lang: 'es-ES' | 'en-US' }> = [];
+
+    for (const chunk of rawChunks) {
+      // If a single chunk is still too long (> 160 chars), split by comma or conjunction
+      if (chunk.length > 160) {
+        const subParts = chunk.split(/(?<=[,;])\s+/).filter(p => p.trim().length > 0);
+        for (const sub of subParts) {
+          result.push({
+            text: sub.trim(),
+            lang: this.detectLang(sub)
+          });
+        }
+      } else {
+        result.push({
+          text: chunk.trim(),
+          lang: this.detectLang(chunk)
+        });
+      }
+    }
+
+    return result.length > 0 ? result : [{ text: this.cleanText(text), lang: this.detectLang(text) }];
+  }
+
+  /**
+   * Detects whether a sentence is in Spanish or English
+   */
+  private static detectLang(text: string): 'es-ES' | 'en-US' {
+    const isSpanish = /[áéíóúñ¿¡]|\b(hola|bienvenido|entro|camarero|bartender|tutor|practicaremos|empecemos|situación|mostrador|atención|buenas|noches|tardes|días|mesa|barra|cuenta|por favor|tienes|tienen|puedes|decir|excelente|trabajas|visitas|recepción|oficina)\b/i.test(text);
+    return isSpanish ? 'es-ES' : 'en-US';
+  }
+
+  /**
+   * Speaks text chunk by chunk sequentially to eliminate the 15-second Chrome cutoff bug.
    */
   public static speakText({
     text,
@@ -174,116 +214,107 @@ export class SpeechService {
       return;
     }
 
-    // Stop any ongoing speech cleanly
+    // Stop any existing speech cleanly
     this.cancelSpeech();
 
-    // Clean text of markdown, asterisks, brackets, parentheticals
-    const cleanText = text
-      .replace(/\*+/g, '')
-      .replace(/\[.*?\]/g, '')
-      .replace(/\(.*?\)/g, '')
-      .trim();
-
-    if (!cleanText) {
+    const chunks = this.splitIntoChunks(text);
+    if (chunks.length === 0) {
       if (onEnd) onEnd();
       return;
     }
 
-    // Detect language if auto
-    let targetLang = lang;
-    if (!targetLang || targetLang === 'auto') {
-      const isSpanish = /[áéíóúñ¿¡]|\b(hola|vamos|escenario|coctel|cóctel|bar|camarero|perfecto|listo|empezar|tienes|tienen|puedes|decir|buenas|tardes|noches|por favor|bienvenido|mesa|barra|cuenta|excelente|trabajas|bartender|recepcion)\b/i.test(cleanText);
-      targetLang = isSpanish ? 'es-ES' : 'en-US';
-    }
-
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    this.activeUtterance = utterance; // Retain globally to prevent Chromium GC bug
+    this.utteranceQueue = chunks;
     this.isSpeakingNow = true;
 
-    utterance.lang = targetLang;
-    utterance.rate = Math.max(0.7, Math.min(1.4, rate));
-    utterance.pitch = Math.max(0.8, Math.min(1.2, pitch));
+    if (onStart) onStart();
 
-    // Match preferred voice or best language voice
     const voices = window.speechSynthesis.getVoices();
-    if (voiceName) {
-      const match = voices.find(v => v.name === voiceName);
-      if (match) utterance.voice = match;
-    } else {
-      if (targetLang.startsWith('es')) {
-        const esVoice = voices.find(
-          v => v.lang.startsWith('es') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Pablo') || v.name.includes('Laura') || v.name.includes('Jorge') || v.name.includes('Monica') || v.name.includes('Paulina'))
-        ) || voices.find(v => v.lang.startsWith('es'));
-        if (esVoice) utterance.voice = esVoice;
+
+    const speakNextChunk = (index: number) => {
+      if (index >= this.utteranceQueue.length || !this.isSpeakingNow) {
+        this.isSpeakingNow = false;
+        this.activeUtterance = null;
+        if (this.chunkWatchdogTimer) clearTimeout(this.chunkWatchdogTimer);
+        if (onEnd) onEnd();
+        return;
+      }
+
+      const item = this.utteranceQueue[index];
+      const targetLang = lang === 'auto' ? item.lang : lang;
+
+      const utterance = new SpeechSynthesisUtterance(item.text);
+      this.activeUtterance = utterance; // Retain globally so GC never collects it
+      utterance.lang = targetLang;
+      utterance.rate = Math.max(0.75, Math.min(1.25, rate));
+      utterance.pitch = Math.max(0.85, Math.min(1.15, pitch));
+
+      // Match voice for this chunk's language
+      if (voiceName) {
+        const match = voices.find(v => v.name === voiceName);
+        if (match) utterance.voice = match;
       } else {
-        const naturalVoice = voices.find(
-          v => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Daniel'))
-        ) || voices.find(v => v.lang.startsWith('en'));
-        if (naturalVoice) utterance.voice = naturalVoice;
-      }
-    }
-
-    let hasEnded = false;
-    const finishUtterance = () => {
-      if (hasEnded) return;
-      hasEnded = true;
-      this.clearSpeechTimers();
-      this.activeUtterance = null;
-      this.isSpeakingNow = false;
-      if (onEnd) onEnd();
-    };
-
-    utterance.onstart = () => {
-      if (onStart) onStart();
-      // Keep-alive for Chrome/Edge (speechSynthesis pauses without wake)
-      this.keepAliveTimer = setInterval(() => {
-        if (window.speechSynthesis.speaking) {
-          window.speechSynthesis.pause();
-          window.speechSynthesis.resume();
+        if (targetLang.startsWith('es')) {
+          const esVoice = voices.find(
+            v => v.lang.startsWith('es') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Pablo') || v.name.includes('Laura') || v.name.includes('Jorge') || v.name.includes('Monica'))
+          ) || voices.find(v => v.lang.startsWith('es'));
+          if (esVoice) utterance.voice = esVoice;
+        } else {
+          const enVoice = voices.find(
+            v => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Daniel') || v.name.includes('David'))
+          ) || voices.find(v => v.lang.startsWith('en'));
+          if (enVoice) utterance.voice = enVoice;
         }
-      }, 4000);
-    };
-
-    utterance.onend = () => {
-      finishUtterance();
-    };
-
-    utterance.onerror = (e) => {
-      console.warn('Speech synthesis utterance error:', e);
-      if (onError) onError(e);
-      finishUtterance();
-    };
-
-    // Watchdog timer: If browser never fires onend, release state automatically
-    const words = cleanText.split(/\s+/).length;
-    const watchdogMs = Math.max(3000, words * 500 + 2500);
-    this.watchdogTimer = setTimeout(() => {
-      if (this.isSpeakingNow && !hasEnded) {
-        console.warn('SpeechSynthesis watchdog triggered: releasing speech state');
-        try {
-          window.speechSynthesis.cancel();
-        } catch (e) {
-          // ignore
-        }
-        finishUtterance();
       }
-    }, watchdogMs);
 
-    try {
-      window.speechSynthesis.speak(utterance);
-    } catch (e) {
-      console.error('Failed to execute window.speechSynthesis.speak:', e);
-      finishUtterance();
-    }
+      let chunkHandled = false;
+      const advance = () => {
+        if (chunkHandled) return;
+        chunkHandled = true;
+        if (this.chunkWatchdogTimer) clearTimeout(this.chunkWatchdogTimer);
+        speakNextChunk(index + 1);
+      };
+
+      utterance.onend = () => {
+        advance();
+      };
+
+      utterance.onerror = (e) => {
+        console.warn('Utterance chunk error, advancing:', e);
+        advance();
+      };
+
+      // Watchdog per chunk: 10s is plenty for a 1-sentence chunk
+      if (this.chunkWatchdogTimer) clearTimeout(this.chunkWatchdogTimer);
+      this.chunkWatchdogTimer = setTimeout(() => {
+        if (!chunkHandled && this.isSpeakingNow) {
+          console.warn('Chunk watchdog expired, advancing to next sentence');
+          advance();
+        }
+      }, 10000);
+
+      try {
+        window.speechSynthesis.speak(utterance);
+      } catch (err) {
+        console.error('Failed to speak chunk:', err);
+        advance();
+      }
+    };
+
+    // Begin speaking the first chunk
+    speakNextChunk(0);
   }
 
   /**
-   * Stops any ongoing audio speech
+   * Cancels any ongoing speech immediately
    */
   public static cancelSpeech(): void {
-    this.clearSpeechTimers();
-    this.activeUtterance = null;
+    this.utteranceQueue = [];
     this.isSpeakingNow = false;
+    this.activeUtterance = null;
+    if (this.chunkWatchdogTimer) {
+      clearTimeout(this.chunkWatchdogTimer);
+      this.chunkWatchdogTimer = null;
+    }
     if (this.isSynthesisSupported()) {
       try {
         window.speechSynthesis.cancel();

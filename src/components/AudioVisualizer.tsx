@@ -79,7 +79,7 @@ export const AudioVisualizer: React.FC<AudioVisualizerProps> = ({ state }) => {
   }, [state]);
 
   return (
-    <div className="relative flex items-center justify-center w-64 h-64 sm:w-72 sm:h-72 mx-auto">
+    <div className="relative flex items-center justify-center w-40 h-40 sm:w-60 sm:h-60 mx-auto shrink-0">
       <canvas
         ref={canvasRef}
         width={320}
