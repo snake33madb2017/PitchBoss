@@ -239,33 +239,33 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-black/85 backdrop-blur-md overflow-hidden">
-      <div className="relative w-full max-w-4xl rounded-3xl border border-zinc-800 bg-[#0f0f13] text-zinc-100 shadow-2xl shadow-black/95 flex flex-col h-[94vh] sm:h-auto sm:max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95">
+      <div className="relative w-full max-w-4xl rounded-2xl sm:rounded-3xl border border-zinc-800 bg-[#0f0f13] text-zinc-100 shadow-2xl shadow-black/95 flex flex-col h-[94vh] sm:h-auto sm:max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95">
         {/* Top Header */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-zinc-800 bg-zinc-950/95 shrink-0 z-10">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+        <div className="flex items-center justify-between px-3 sm:px-6 py-2.5 sm:py-3.5 border-b border-zinc-800 bg-zinc-950/95 shrink-0 z-10">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
               <ShieldCheck className="w-4 h-4 text-amber-400" />
             </div>
             <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-bold text-white truncate">Panel de Administración</h2>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold uppercase tracking-wider shrink-0">
-                  Admin
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <h2 className="text-sm sm:text-lg font-bold text-white truncate">Panel Admin</h2>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold uppercase tracking-wider shrink-0">
+                  ADMIN
                 </span>
               </div>
-              <p className="text-xs text-zinc-400 truncate">
-                Gestiona escenarios, copias de seguridad y PWA
+              <p className="text-xs text-zinc-400 truncate hidden xs:block">
+                Gestiona escenarios, ventas y PWA
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <button
               onClick={() => {
                 onLogoutAdmin();
                 onClose();
               }}
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-500/10 border border-rose-500/20 transition-colors cursor-pointer"
+              className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-500/10 border border-rose-500/20 transition-colors cursor-pointer"
               title="Cerrar sesión de Administrador"
             >
               Salir
@@ -328,7 +328,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
         </div>
 
         {/* Main Tab Content */}
-        <div className="p-6 overflow-y-auto flex-1 space-y-6">
+        <div className="p-3.5 sm:p-6 overflow-y-auto flex-1 space-y-5 sm:space-y-6">
           {/* TAB 1: SCENARIOS */}
           {activeTab === 'scenarios' && (
             <div className="space-y-4">
@@ -517,29 +517,29 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
 
                 {/* Newly Generated License Card */}
                 {lastGeneratedLicense && (
-                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-3 animate-in fade-in">
-                    <div className="flex items-center justify-between">
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-3 animate-in fade-in">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                       <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                         <span>¡Licencia lista para entregar!</span>
                       </span>
-                      <span className="text-[10px] text-zinc-400">
+                      <span className="text-[11px] text-zinc-400">
                         Expira el: {new Date(lastGeneratedLicense.expiresAt).toLocaleDateString()}
                       </span>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {/* Key */}
                       <div>
-                        <span className="text-[10px] text-zinc-400 block mb-0.5">Código de Licencia:</span>
+                        <span className="text-xs text-zinc-400 block mb-1">Código de Licencia:</span>
                         <div className="flex items-center gap-2">
-                          <code className="flex-1 bg-zinc-900 px-3 py-1.5 rounded-xl font-mono text-xs text-amber-300 border border-zinc-800">
+                          <code className="flex-1 min-w-0 bg-zinc-900 px-3 py-2 rounded-xl font-mono text-xs text-amber-300 border border-zinc-800 truncate">
                             {lastGeneratedLicense.key}
                           </code>
                           <button
                             type="button"
                             onClick={() => handleCopyKey(lastGeneratedLicense.key)}
-                            className="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-white transition-colors cursor-pointer flex items-center gap-1"
+                            className="px-3.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold text-white transition-colors cursor-pointer flex items-center gap-1.5 shrink-0"
                           >
                             {copiedKey === lastGeneratedLicense.key ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                             <span>{copiedKey === lastGeneratedLicense.key ? 'Copiado' : 'Copiar'}</span>
@@ -549,30 +549,32 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
 
                       {/* Magic Link */}
                       <div>
-                        <span className="text-[10px] text-zinc-400 block mb-0.5">Enlace Mágico de Activación Directa:</span>
-                        <div className="flex items-center gap-2">
+                        <span className="text-xs text-zinc-400 block mb-1">Enlace Mágico de Activación Directa:</span>
+                        <div className="space-y-2">
                           <input
                             type="text"
                             readOnly
                             value={SubscriptionService.getMagicLink(lastGeneratedLicense.key)}
-                            className="flex-1 bg-zinc-900 px-3 py-1.5 rounded-xl font-mono text-[11px] text-zinc-300 border border-zinc-800 truncate"
+                            className="w-full bg-zinc-900 px-3 py-2 rounded-xl font-mono text-xs text-zinc-300 border border-zinc-800 truncate"
                           />
-                          <button
-                            type="button"
-                            onClick={() => handleCopyLink(lastGeneratedLicense.key)}
-                            className="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-white transition-colors cursor-pointer flex items-center gap-1"
-                          >
-                            {copiedLink === lastGeneratedLicense.key ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <LinkIcon className="w-3.5 h-3.5" />}
-                            <span>{copiedLink === lastGeneratedLicense.key ? 'Copiado' : 'Copiar Link'}</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleShareWhatsApp(lastGeneratedLicense)}
-                            className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition-colors cursor-pointer flex items-center gap-1 shadow-sm"
-                          >
-                            <MessageCircle className="w-3.5 h-3.5" />
-                            <span>WhatsApp</span>
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleCopyLink(lastGeneratedLicense.key)}
+                              className="flex-1 py-2 px-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold text-white transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                            >
+                              {copiedLink === lastGeneratedLicense.key ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <LinkIcon className="w-3.5 h-3.5" />}
+                              <span>{copiedLink === lastGeneratedLicense.key ? 'Copiado' : 'Copiar Link'}</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleShareWhatsApp(lastGeneratedLicense)}
+                              className="flex-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-emerald-600/20"
+                            >
+                              <MessageCircle className="w-4 h-4" />
+                              <span>WhatsApp</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -589,87 +591,158 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                 </div>
 
                 {adminLicenses.length === 0 ? (
-                  <div className="p-8 text-center text-xs text-zinc-500 border border-zinc-800/80 rounded-2xl bg-zinc-950/40">
+                  <div className="p-6 text-center text-xs text-zinc-500 border border-zinc-800/80 rounded-2xl bg-zinc-950/40">
                     Aún no has generado ninguna licencia. Utiliza el generador arriba para crear tu primer pase Pro.
                   </div>
                 ) : (
-                  <div className="overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-950">
-                    <table className="w-full text-left text-xs">
-                      <thead className="bg-zinc-900/80 border-b border-zinc-800 text-[11px] font-bold text-zinc-400">
-                        <tr>
-                          <th className="px-4 py-3">Código</th>
-                          <th className="px-4 py-3">Cliente / Nota</th>
-                          <th className="px-4 py-3">Plan</th>
-                          <th className="px-4 py-3">Vence</th>
-                          <th className="px-4 py-3">Estado</th>
-                          <th className="px-4 py-3 text-right">Acciones</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-zinc-800/60">
-                        {adminLicenses.map((lic) => {
-                          const isExpired = Date.now() > lic.expiresAt;
-                          return (
-                            <tr key={lic.key} className="hover:bg-zinc-900/40 transition-colors">
-                              <td className="px-4 py-3 font-mono text-[11px] text-amber-300 font-semibold">
-                                {lic.key}
-                              </td>
-                              <td className="px-4 py-3 text-zinc-200">
-                                {lic.clientNotes || 'Directo'}
-                              </td>
-                              <td className="px-4 py-3 text-zinc-300 font-medium">
-                                {lic.planName}
-                              </td>
-                              <td className="px-4 py-3 text-zinc-400">
-                                {new Date(lic.expiresAt).toLocaleDateString()}
-                              </td>
-                              <td className="px-4 py-3">
+                  <>
+                    {/* Mobile License Cards View (sm:hidden) */}
+                    <div className="space-y-2.5 sm:hidden">
+                      {adminLicenses.map((lic) => {
+                        const isExpired = Date.now() > lic.expiresAt;
+                        return (
+                          <div key={lic.key} className="p-3.5 rounded-2xl border border-zinc-800 bg-zinc-950/90 space-y-2.5">
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-1.5 min-w-0">
+                                <span className="font-bold text-xs text-white truncate">{lic.planName}</span>
                                 {lic.isRevoked ? (
-                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20 shrink-0">
                                     Revocada
                                   </span>
                                 ) : isExpired ? (
-                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-800 text-zinc-400">
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-800 text-zinc-400 shrink-0">
                                     Vencida
                                   </span>
                                 ) : (
-                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
                                     Activa
                                   </span>
                                 )}
-                              </td>
-                              <td className="px-4 py-3 text-right">
-                                <div className="flex items-center justify-end gap-1.5">
-                                  <button
-                                    onClick={() => handleCopyLink(lic.key)}
-                                    title="Copiar Enlace Mágico"
-                                    className="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
-                                  >
-                                    <LinkIcon className="w-3.5 h-3.5" />
-                                  </button>
-                                  <button
-                                    onClick={() => handleShareWhatsApp(lic)}
-                                    title="Enviar por WhatsApp"
-                                    className="p-1.5 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-400 transition-colors cursor-pointer"
-                                  >
-                                    <MessageCircle className="w-3.5 h-3.5" />
-                                  </button>
-                                  {!lic.isRevoked && (
-                                    <button
-                                      onClick={() => handleRevokeLicense(lic.key)}
-                                      title="Revocar Licencia"
-                                      className="p-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/40 text-rose-400 transition-colors cursor-pointer"
-                                    >
-                                      <Ban className="w-3.5 h-3.5" />
-                                    </button>
+                              </div>
+                              <span className="text-[11px] text-zinc-400 shrink-0">
+                                {new Date(lic.expiresAt).toLocaleDateString()}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center justify-between gap-2 text-xs">
+                              <span className="text-zinc-400 truncate text-[11px]">{lic.clientNotes || 'Cliente Directo'}</span>
+                              <code className="font-mono text-[11px] text-amber-300 bg-zinc-900 px-2 py-0.5 rounded-lg border border-zinc-800 shrink-0">
+                                {lic.key}
+                              </code>
+                            </div>
+
+                            <div className="flex items-center gap-2 pt-1 border-t border-zinc-800/60">
+                              <button
+                                type="button"
+                                onClick={() => handleCopyLink(lic.key)}
+                                className="flex-1 py-1.5 px-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-xs font-semibold text-zinc-200 border border-zinc-800 flex items-center justify-center gap-1 cursor-pointer"
+                              >
+                                <LinkIcon className="w-3.5 h-3.5 text-zinc-400" />
+                                <span>Copiar</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleShareWhatsApp(lic)}
+                                className="flex-1 py-1.5 px-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white flex items-center justify-center gap-1 shadow-sm cursor-pointer"
+                              >
+                                <MessageCircle className="w-3.5 h-3.5" />
+                                <span>WhatsApp</span>
+                              </button>
+                              {!lic.isRevoked && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleRevokeLicense(lic.key)}
+                                  title="Revocar Licencia"
+                                  className="p-1.5 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 text-rose-400 border border-rose-500/20 cursor-pointer"
+                                >
+                                  <Ban className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Desktop Table View (hidden sm:block) */}
+                    <div className="hidden sm:block overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-950">
+                      <table className="w-full text-left text-xs">
+                        <thead className="bg-zinc-900/80 border-b border-zinc-800 text-[11px] font-bold text-zinc-400">
+                          <tr>
+                            <th className="px-4 py-3">Código</th>
+                            <th className="px-4 py-3">Cliente / Nota</th>
+                            <th className="px-4 py-3">Plan</th>
+                            <th className="px-4 py-3">Vence</th>
+                            <th className="px-4 py-3">Estado</th>
+                            <th className="px-4 py-3 text-right">Acciones</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-zinc-800/60">
+                          {adminLicenses.map((lic) => {
+                            const isExpired = Date.now() > lic.expiresAt;
+                            return (
+                              <tr key={lic.key} className="hover:bg-zinc-900/40 transition-colors">
+                                <td className="px-4 py-3 font-mono text-[11px] text-amber-300 font-semibold">
+                                  {lic.key}
+                                </td>
+                                <td className="px-4 py-3 text-zinc-200">
+                                  {lic.clientNotes || 'Directo'}
+                                </td>
+                                <td className="px-4 py-3 text-zinc-300 font-medium">
+                                  {lic.planName}
+                                </td>
+                                <td className="px-4 py-3 text-zinc-400">
+                                  {new Date(lic.expiresAt).toLocaleDateString()}
+                                </td>
+                                <td className="px-4 py-3">
+                                  {lic.isRevoked ? (
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                                      Revocada
+                                    </span>
+                                  ) : isExpired ? (
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-800 text-zinc-400">
+                                      Vencida
+                                    </span>
+                                  ) : (
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                      Activa
+                                    </span>
                                   )}
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
+                                </td>
+                                <td className="px-4 py-3 text-right">
+                                  <div className="flex items-center justify-end gap-1.5">
+                                    <button
+                                      onClick={() => handleCopyLink(lic.key)}
+                                      title="Copiar Enlace Mágico"
+                                      className="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                                    >
+                                      <LinkIcon className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleShareWhatsApp(lic)}
+                                      title="Enviar por WhatsApp"
+                                      className="p-1.5 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-400 transition-colors cursor-pointer"
+                                    >
+                                      <MessageCircle className="w-3.5 h-3.5" />
+                                    </button>
+                                    {!lic.isRevoked && (
+                                      <button
+                                        onClick={() => handleRevokeLicense(lic.key)}
+                                        title="Revocar Licencia"
+                                        className="p-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/40 text-rose-400 transition-colors cursor-pointer"
+                                      >
+                                        <Ban className="w-3.5 h-3.5" />
+                                      </button>
+                                    )}
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
                 )}
               </div>
             </div>
@@ -703,10 +776,10 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 pt-2">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-2">
                   <button
                     onClick={handleExportJson}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-zinc-950 bg-emerald-400 hover:bg-emerald-300 transition-all cursor-pointer shadow-md shadow-emerald-500/20"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-zinc-950 bg-emerald-400 hover:bg-emerald-300 transition-all cursor-pointer shadow-md shadow-emerald-500/20"
                   >
                     <Download className="w-4 h-4" />
                     <span>Descargar archivo JSON</span>
@@ -714,7 +787,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
 
                   <button
                     onClick={handleCopyJson}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 transition-colors cursor-pointer"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 transition-colors cursor-pointer"
                   >
                     {copied ? (
                       <>
@@ -732,7 +805,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               </div>
 
               {/* Import Box */}
-              <div className="p-5 rounded-2xl border border-zinc-800 bg-zinc-950 space-y-3">
+              <div className="p-3.5 sm:p-5 rounded-2xl border border-zinc-800 bg-zinc-950 space-y-3">
                 <div>
                   <h3 className="text-xs font-bold text-white flex items-center gap-2">
                     <Upload className="w-4 h-4 text-amber-400" />
@@ -744,7 +817,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                 </div>
 
                 {/* Import Mode Radio */}
-                <div className="flex items-center gap-4 text-xs pt-1">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs pt-1">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
@@ -893,17 +966,17 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                   </a>
                 </div>
 
-                <div className="flex gap-2 max-w-md">
+                <div className="flex flex-col sm:flex-row gap-2 max-w-md">
                   <input
                     type="password"
                     value={apiKeyInput}
                     onChange={(e) => setApiKeyInput(e.target.value)}
                     placeholder="AIzaSy..."
-                    className="flex-1 px-3 py-2 text-xs font-mono rounded-xl border bg-zinc-900 border-zinc-800 text-zinc-100 focus:outline-none focus:border-amber-500 transition-colors"
+                    className="flex-1 min-w-0 px-3 py-2 text-xs font-mono rounded-xl border bg-zinc-900 border-zinc-800 text-zinc-100 focus:outline-none focus:border-amber-500 transition-colors"
                   />
                   <button
                     onClick={handleSaveApiKey}
-                    className="px-4 py-2 rounded-xl text-xs font-bold text-zinc-950 bg-amber-400 hover:bg-amber-300 transition-colors cursor-pointer flex items-center gap-1.5"
+                    className="px-4 py-2 rounded-xl text-xs font-bold text-zinc-950 bg-amber-400 hover:bg-amber-300 transition-colors cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
                   >
                     {apiKeySaved ? <Check className="w-3.5 h-3.5 text-zinc-950" /> : null}
                     <span>{apiKeySaved ? 'Guardada' : 'Guardar'}</span>

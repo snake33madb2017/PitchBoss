@@ -196,25 +196,25 @@ ${report.executiveSummary}`;
         </div>
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-between p-6 border-t border-zinc-800 bg-zinc-950">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 sm:p-6 border-t border-zinc-800 bg-zinc-950">
           <button
             onClick={copyToClipboard}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl border text-xs font-semibold transition-colors cursor-pointer bg-zinc-900 hover:bg-zinc-800 border-zinc-800 text-zinc-300"
+            className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl border text-xs font-semibold transition-colors cursor-pointer bg-zinc-900 hover:bg-zinc-800 border-zinc-800 text-zinc-300"
           >
             <Share2 className="w-3.5 h-3.5" />
-            {t('report.share')}
+            <span>{t('report.share')}</span>
           </button>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 justify-end">
             <button
               onClick={onRestart}
-              className="px-4 py-2.5 rounded-xl border text-xs font-semibold transition-colors cursor-pointer border-zinc-700 hover:bg-zinc-800 text-white"
+              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl border text-xs font-semibold transition-colors cursor-pointer border-zinc-700 hover:bg-zinc-800 text-white text-center"
             >
               {t('report.again')}
             </button>
             <button
               onClick={onClose}
-              className="px-5 py-2.5 rounded-xl text-xs font-bold shadow-lg transition-all cursor-pointer bg-zinc-100 hover:bg-white text-zinc-950 shadow-black/40"
+              className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl text-xs font-bold shadow-lg transition-all cursor-pointer bg-zinc-100 hover:bg-white text-zinc-950 shadow-black/40 text-center"
             >
               {t('report.done')}
             </button>

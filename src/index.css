@@ -50,3 +50,35 @@ html.light-theme ::-webkit-scrollbar-thumb {
 html.light-theme ::-webkit-scrollbar-thumb:hover {
   background: #a1a1aa;
 }
+
+/* Mobile typography legibility enhancements across the whole PWA */
+@media (max-width: 640px) {
+  html {
+    font-size: 16.5px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Upgrade micro-fonts that become unreadable on mobile screens */
+  .text-\[9px\] {
+    font-size: 0.6875rem !important; /* ~11.3px */
+    line-height: 0.95rem !important;
+  }
+  .text-\[10px\] {
+    font-size: 0.75rem !important; /* ~12.4px */
+    line-height: 1.05rem !important;
+  }
+  .text-\[11px\] {
+    font-size: 0.8125rem !important; /* ~13.4px */
+    line-height: 1.15rem !important;
+  }
+  .text-xs {
+    font-size: 0.8125rem !important; /* ~13.4px */
+    line-height: 1.2rem !important;
+  }
+
+  /* Prevent auto-zoom on iOS inputs while keeping text comfortably legible */
+  input, select, textarea {
+    font-size: 14px !important;
+  }
+}
+
