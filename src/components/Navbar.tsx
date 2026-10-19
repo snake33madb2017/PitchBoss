@@ -43,16 +43,22 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="sticky top-0 z-30 border-b border-zinc-800/80 bg-[#09090b]/90 backdrop-blur-md px-3 sm:px-8 py-2.5 sm:py-3 flex items-center justify-between transition-colors">
       {/* Brand */}
-      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl border border-zinc-800 bg-zinc-950 p-0.5 overflow-hidden flex items-center justify-center shadow-lg shadow-black/50 shrink-0">
+      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl border border-zinc-800 bg-zinc-950 p-0.5 overflow-hidden flex items-center justify-center shadow-lg shadow-black/50 shrink-0">
           <img src="/logo-icon.png" alt="PitchBoss Logo" className="w-full h-full object-cover rounded-lg sm:rounded-xl" />
         </div>
-        <div className="min-w-0">
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <h1 className="text-sm sm:text-lg font-black tracking-tight flex items-center text-white shrink-0">
+        <div className="flex flex-col justify-center min-w-0">
+          <div className="flex items-center gap-2">
+            <h1 className="text-base sm:text-lg font-black tracking-tight flex items-center text-white shrink-0 leading-tight">
               Pitch<span className="text-amber-400 ml-0.5">Boss</span>
             </h1>
-            <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 font-bold text-[9px] sm:text-[11px] whitespace-nowrap shadow-sm shadow-amber-500/10 tracking-tight">
+            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 font-bold text-[10px] sm:text-[11px] whitespace-nowrap shadow-sm shadow-amber-500/10 tracking-tight">
+              By Marco Daza
+            </span>
+          </div>
+          {/* Mobile: Placed neatly underneath the brand title */}
+          <div className="sm:hidden flex items-center mt-0.5">
+            <span className="inline-flex items-center px-1.5 py-0.2 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 font-bold text-[9px] whitespace-nowrap shadow-sm shadow-amber-500/10 tracking-tight">
               By Marco Daza
             </span>
           </div>
