@@ -12,6 +12,7 @@ export class SpeechService {
   private static utteranceQueue: Array<{ text: string; lang: 'es-ES' | 'en-US' }> = [];
   private static isSpeakingNow: boolean = false;
   private static chunkWatchdogTimer: any = null;
+  private static speechSessionId: number = 0;
 
   public static isRecognitionSupported(): boolean {
     return typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window);
@@ -221,7 +222,6 @@ export class SpeechService {
     const result: Array<{ text: string; lang: 'es-ES' | 'en-US' }> = [];
 
     for (const chunk of rawChunks) {
-      // If a single chunk is still too long (> 160 chars), split by comma or conjunction
       if (chunk.length > 160) {
         const subParts = chunk.split(/(?<=[,;])\s+/).filter(p => p.trim().length > 0);
         for (const sub of subParts) {
@@ -250,7 +250,8 @@ export class SpeechService {
   }
 
   /**
-   * Speaks text chunk by chunk sequentially to eliminate the 15-second Chrome cutoff bug.
+   * Speaks text chunk by chunk sequentially.
+   * Completely immune to duplicate loops and race conditions via speechSessionId token gating.
    */
   public static speakText({
     text,
@@ -276,8 +277,9 @@ export class SpeechService {
       return;
     }
 
-    // Stop any existing speech cleanly
+    // Cancel existing speech session and generate a new unique session ID
     this.cancelSpeech();
+    const currentSessionId = ++this.speechSessionId;
 
     const chunks = this.splitIntoChunks(text);
     if (chunks.length === 0) {
@@ -293,11 +295,14 @@ export class SpeechService {
     const voices = window.speechSynthesis.getVoices();
 
     const speakNextChunk = (index: number) => {
-      if (index >= this.utteranceQueue.length || !this.isSpeakingNow) {
-        this.isSpeakingNow = false;
-        this.activeUtterance = null;
-        if (this.chunkWatchdogTimer) clearTimeout(this.chunkWatchdogTimer);
-        if (onEnd) onEnd();
+      // Gate check: If session has changed or speaking was cancelled, abort immediately
+      if (currentSessionId !== this.speechSessionId || !this.isSpeakingNow || index >= this.utteranceQueue.length) {
+        if (currentSessionId === this.speechSessionId) {
+          this.isSpeakingNow = false;
+          this.activeUtterance = null;
+          if (this.chunkWatchdogTimer) clearTimeout(this.chunkWatchdogTimer);
+          if (onEnd) onEnd();
+        }
         return;
       }
 
@@ -305,7 +310,7 @@ export class SpeechService {
       const targetLang = lang === 'auto' ? item.lang : lang;
 
       const utterance = new SpeechSynthesisUtterance(item.text);
-      this.activeUtterance = utterance; // Retain globally so GC never collects it
+      this.activeUtterance = utterance;
       utterance.lang = targetLang;
       utterance.rate = Math.max(0.75, Math.min(1.25, rate));
       utterance.pitch = Math.max(0.85, Math.min(1.15, pitch));
@@ -333,23 +338,29 @@ export class SpeechService {
         if (chunkHandled) return;
         chunkHandled = true;
         if (this.chunkWatchdogTimer) clearTimeout(this.chunkWatchdogTimer);
-        speakNextChunk(index + 1);
+
+        // Only advance if this session is still the active one
+        if (currentSessionId === this.speechSessionId) {
+          speakNextChunk(index + 1);
+        }
       };
 
       utterance.onend = () => {
+        if (currentSessionId !== this.speechSessionId) return;
         advance();
       };
 
       utterance.onerror = (e) => {
+        if (currentSessionId !== this.speechSessionId) return;
         console.warn('Utterance chunk error, advancing:', e);
         advance();
       };
 
-      // Watchdog per chunk: 10s is plenty for a 1-sentence chunk
+      // Watchdog per chunk: 10s maximum
       if (this.chunkWatchdogTimer) clearTimeout(this.chunkWatchdogTimer);
       this.chunkWatchdogTimer = setTimeout(() => {
-        if (!chunkHandled && this.isSpeakingNow) {
-          console.warn('Chunk watchdog expired, advancing to next sentence');
+        if (!chunkHandled && currentSessionId === this.speechSessionId && this.isSpeakingNow) {
+          console.warn('Chunk watchdog expired, advancing');
           advance();
         }
       }, 10000);
@@ -362,21 +373,34 @@ export class SpeechService {
       }
     };
 
-    // Begin speaking the first chunk
-    speakNextChunk(0);
+    // Small 30ms micro-pause allows Chrome/OS audio buffer to completely flush before starting new audio
+    setTimeout(() => {
+      if (currentSessionId === this.speechSessionId) {
+        speakNextChunk(0);
+      }
+    }, 30);
   }
 
   /**
-   * Cancels any ongoing speech immediately
+   * Cancels any ongoing speech immediately and invalidates all pending callbacks
    */
   public static cancelSpeech(): void {
+    // Invalidate current speech session token so pending onend/onerror callbacks are ignored
+    this.speechSessionId++;
     this.utteranceQueue = [];
     this.isSpeakingNow = false;
-    this.activeUtterance = null;
+
+    if (this.activeUtterance) {
+      this.activeUtterance.onend = null;
+      this.activeUtterance.onerror = null;
+      this.activeUtterance = null;
+    }
+
     if (this.chunkWatchdogTimer) {
       clearTimeout(this.chunkWatchdogTimer);
       this.chunkWatchdogTimer = null;
     }
+
     if (this.isSynthesisSupported()) {
       try {
         window.speechSynthesis.cancel();

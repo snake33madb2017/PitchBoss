@@ -63,6 +63,10 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
 
   // Walkie-Talkie Push-To-Talk state
   const [isHoldingMic, setIsHoldingMic] = useState(false);
+  const isHoldingMicRef = useRef(false);
+  const isSubmittingRef = useRef(false);
+  const hasSpokenInitialRef = useRef(false);
+  const walkieTimeoutRef = useRef<any>(null);
   const [walkieTalkieTip, setWalkieTalkieTip] = useState<string | null>(null);
   const transcriptRef = useRef('');
   const pressStartTimeRef = useRef(0);
@@ -116,6 +120,12 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
         SpeechService.stopListening();
       };
     }
+
+    // Guard against React double-invoking mount effect in dev/StrictMode
+    if (hasSpokenInitialRef.current) {
+      return;
+    }
+    hasSpokenInitialRef.current = true;
 
     const initialMsg: Message = {
       id: 'msg-0',
@@ -172,7 +182,12 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
       e.stopPropagation();
     }
 
-    if (callState === 'processing') return;
+    if (callState === 'processing' || isSubmittingRef.current || isHoldingMicRef.current) return;
+
+    if (walkieTimeoutRef.current) {
+      clearTimeout(walkieTimeoutRef.current);
+      walkieTimeoutRef.current = null;
+    }
 
     // Interrupt AI audio immediately if it is currently speaking
     if (callState === 'ai_speaking') {
@@ -191,6 +206,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
     pressStartTimeRef.current = Date.now();
     transcriptRef.current = '';
     setInterimTranscript('');
+    isHoldingMicRef.current = true;
     setIsHoldingMic(true);
     setWalkieTalkieTip(null);
     setCallState('user_listening');
@@ -214,8 +230,14 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
       e.stopPropagation();
     }
 
-    if (!isHoldingMic) return;
+    if (!isHoldingMicRef.current) return;
+    isHoldingMicRef.current = false;
     setIsHoldingMic(false);
+
+    if (walkieTimeoutRef.current) {
+      clearTimeout(walkieTimeoutRef.current);
+      walkieTimeoutRef.current = null;
+    }
 
     // Subtle release haptic buzz
     if (typeof window !== 'undefined' && 'vibrate' in navigator) {
@@ -233,7 +255,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
     }
 
     // Allow 180ms grace period for browser speech buffer to flush last syllables
-    setTimeout(() => {
+    walkieTimeoutRef.current = setTimeout(() => {
       const raw = (transcriptRef.current || SpeechService.getLatestTranscript()).trim();
       const cleaned = SpeechService.cleanDuplicatePhrases(raw);
 
@@ -251,39 +273,42 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
 
   // Process user speech or typed text
   const handleUserSubmission = async (text: string) => {
-    SpeechService.stopListening();
-    setInterimTranscript('');
+    if (isSubmittingRef.current || callState === 'processing') return;
+    isSubmittingRef.current = true;
 
-    const cleaned = SpeechService.cleanDuplicatePhrases(text.trim());
-    if (!cleaned || cleaned.length < 2) {
-      setCallState('idle');
-      return;
-    }
+    try {
+      SpeechService.stopListening();
+      setInterimTranscript('');
 
-    // Acoustic Echo Guard
-    const lastAi = [...messages].reverse().find((m) => m.sender === 'ai');
-    if (lastAi) {
-      const lowerUser = cleaned.toLowerCase();
-      const lowerAi = lastAi.text.toLowerCase();
-      if (lowerUser.length > 8 && lowerAi.includes(lowerUser)) {
-        console.warn('Acoustic echo detected from speakers, ignoring turn:', cleaned);
+      const cleaned = SpeechService.cleanDuplicatePhrases(text.trim());
+      if (!cleaned || cleaned.length < 2) {
         setCallState('idle');
         return;
       }
-    }
 
-    const userMsg: Message = {
-      id: 'msg-' + Date.now(),
-      sender: 'user',
-      text: cleaned,
-      timestamp: Date.now()
-    };
+      // Acoustic Echo Guard
+      const lastAi = [...messages].reverse().find((m) => m.sender === 'ai');
+      if (lastAi) {
+        const lowerUser = cleaned.toLowerCase();
+        const lowerAi = lastAi.text.toLowerCase();
+        if (lowerUser.length > 8 && lowerAi.includes(lowerUser)) {
+          console.warn('Acoustic echo detected from speakers, ignoring turn:', cleaned);
+          setCallState('idle');
+          return;
+        }
+      }
 
-    const updatedHistory = [...messages, userMsg];
-    setMessages(updatedHistory);
-    setCallState('processing');
+      const userMsg: Message = {
+        id: 'msg-' + Date.now(),
+        sender: 'user',
+        text: cleaned,
+        timestamp: Date.now()
+      };
 
-    try {
+      const updatedHistory = [...messages, userMsg];
+      setMessages(updatedHistory);
+      setCallState('processing');
+
       const response = await GeminiService.sendTurn({
         scenario,
         conversationHistory: updatedHistory,
@@ -348,6 +373,8 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
     } catch (e) {
       console.error(e);
       setCallState('idle');
+    } finally {
+      isSubmittingRef.current = false;
     }
   };
 
