@@ -1,54 +1,68 @@
 @import "tailwindcss";
 
-:root {
-  --bg-app: #09090b;
-  --bg-card: rgba(18, 18, 21, 0.85);
-  --border-card: #27272a;
-  --border-hover: #3f3f46;
-  --text-main: #f4f4f5;
-  --text-sub: #a1a1aa;
+@theme {
+  --color-midnight-bg: #12161F;
+  --color-midnight-surface: #1C2331;
+  --color-midnight-surface-elevated: #242D3E;
+  --color-midnight-border: #2A344A;
+  --color-midnight-border-light: #3D4A66;
+  --color-midnight-text: #E2E8F0;
+  --color-midnight-muted: #94A3B8;
+  --color-midnight-cyan: #0EA5E9;
+  --color-midnight-cyan-light: #38BDF8;
+  --color-midnight-amber: #FBBF24;
 }
 
-html.light-theme {
-  --bg-app: #f4f4f5;
-  --bg-card: rgba(255, 255, 255, 0.95);
-  --border-card: #e4e4e7;
-  --border-hover: #d4d4d8;
-  --text-main: #09090b;
-  --text-sub: #52525b;
+:root {
+  --bg-app: #12161f;
+  --bg-card: #1c2331;
+  --bg-card-elevated: #242d3e;
+  --border-card: #2a344a;
+  --border-hover: #3d4a66;
+  --text-main: #e2e8f0;
+  --text-sub: #94a3b8;
+  --accent-primary: #0ea5e9;
+  --accent-primary-hover: #38bdf8;
+  --accent-secondary: #fbbf24;
+}
+
+html {
+  background-color: #12161f;
+  color: #e2e8f0;
 }
 
 body {
   margin: 0;
-  background-color: var(--bg-app);
-  color: var(--text-main);
+  background-color: #12161f;
+  color: #e2e8f0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  line-height: 1.6;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.25s ease, color 0.25s ease;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom Executive Hairline Scrollbar */
+/* Ergonomic Reading Typography */
+p, li, blockquote, span.prose-text {
+  line-height: 1.6;
+  color: #e2e8f0;
+}
+
+/* Custom Ergonomic Midnight Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #12161f;
 }
 ::-webkit-scrollbar-thumb {
-  background: #3f3f46;
+  background: #2a344a;
   border-radius: 9999px;
+  border: 1px solid #1c2331;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #52525b;
-}
-
-html.light-theme ::-webkit-scrollbar-thumb {
-  background: #d4d4d8;
-}
-html.light-theme ::-webkit-scrollbar-thumb:hover {
-  background: #a1a1aa;
+  background: #3d4a66;
 }
 
 /* Mobile typography legibility enhancements across the whole PWA */
@@ -61,19 +75,19 @@ html.light-theme ::-webkit-scrollbar-thumb:hover {
   /* Upgrade micro-fonts that become unreadable on mobile screens */
   .text-\[9px\] {
     font-size: 0.6875rem !important; /* ~11.3px */
-    line-height: 0.95rem !important;
+    line-height: 1rem !important;
   }
   .text-\[10px\] {
     font-size: 0.75rem !important; /* ~12.4px */
-    line-height: 1.05rem !important;
+    line-height: 1.15rem !important;
   }
   .text-\[11px\] {
     font-size: 0.8125rem !important; /* ~13.4px */
-    line-height: 1.15rem !important;
+    line-height: 1.25rem !important;
   }
   .text-xs {
     font-size: 0.8125rem !important; /* ~13.4px */
-    line-height: 1.2rem !important;
+    line-height: 1.3rem !important;
   }
 
   /* Prevent auto-zoom on iOS inputs while keeping text comfortably legible */
@@ -81,4 +95,3 @@ html.light-theme ::-webkit-scrollbar-thumb:hover {
     font-size: 14px !important;
   }
 }
-

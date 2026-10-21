@@ -19,7 +19,7 @@ export class GeminiService {
     if (fromStorage && fromStorage.trim().length > 0) {
       return fromStorage.trim();
     }
-    // Also check Vite env variable if provided
+    // Check Vite env variable if provided
     return (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
   }
 
@@ -32,73 +32,142 @@ export class GeminiService {
   }
 
   /**
-   * Generates a complete scenario from a simple user description in any business niche
+   * Dual-channel execution:
+   * 1. Attempts to route via Backend Proxy (/api/gemini/chat) to protect API keys in production B2B.
+   * 2. Falls back to direct client-side Gemini REST call if proxy is unavailable or running static.
    */
-  public static async generateScenarioFromPrompt(prompt: string): Promise<Partial<Scenario>> {
-    const apiKey = this.getApiKey();
-    if (!apiKey) {
-      return this.mockGenerateScenario(prompt);
+  private static async executeGeminiCall(geminiPayload: any): Promise<any> {
+    const model = this.getModel();
+    const clientApiKey = this.getApiKey();
+
+    // Channel 1: Attempt secure backend proxy first
+    try {
+      const proxyRes = await fetch('/api/gemini/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model,
+          clientApiKey,
+          geminiPayload
+        })
+      });
+
+      if (proxyRes.ok) {
+        const data = await proxyRes.json();
+        const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (candidateText) {
+          return JSON.parse(candidateText);
+        }
+      }
+    } catch {
+      // Backend proxy unavailable in pure static mode, fallback to direct client call
     }
 
-    const systemPrompt = `You are an expert executive coach and roleplay curriculum designer. 
-Convert the user's prompt into a high-stakes, realistic English professional roleplay scenario.
-Respond strictly in valid JSON matching this schema:
-{
-  "title": "Short punchy scenario title",
-  "niche": "Industry / Niche name",
-  "aiCharacter": {
-    "name": "Character full name",
-    "role": "Job title and company",
-    "avatar": "Single representative emoji",
-    "personality": "Behavior, tone, skepticism level",
-    "voiceGender": "male" or "female"
-  },
-  "userRole": "Specific professional role the user plays",
-  "context": "Clear 2-sentence background setup of the situation",
-  "initialGreeting": "The character's first realistic opening spoken line in English (1-2 sentences)",
-  "initialTranslation": "Spanish translation of the greeting",
-  "initialTip": "Friendly coaching tip in Spanish with phonetic pronunciation in brackets [like this]",
-  "difficulty": "easy" | "medium" | "hard" | "hostile",
-  "targetEnglishLevel": "A1" | "A2" | "B1" | "B2" | "C1" | "C2",
-  "objectives": [
-    {"id": "obj-1", "description": "Specific business goal 1", "completed": false},
-    {"id": "obj-2", "description": "Specific business goal 2", "completed": false},
-    {"id": "obj-3", "description": "Specific business goal 3", "completed": false}
-  ],
-  "commonObjections": ["Objection 1", "Objection 2", "Objection 3"],
-  "nicheVocabulary": ["Term 1", "Term 2", "Term 3", "Term 4", "Term 5"]
-}`;
+    // Channel 2: Direct client-side call if client key exists
+    if (clientApiKey) {
+      const directUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${clientApiKey}`;
+      const directRes = await fetch(directUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(geminiPayload)
+      });
 
-    try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${this.getModel()}:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [
-              {
-                role: 'user',
-                parts: [
-                  { text: `${systemPrompt}\n\nUser request: "${prompt}". Return ONLY raw JSON without markdown codeblocks.` }
-                ]
-              }
-            ],
-            generationConfig: {
-              temperature: 0.7,
-              responseMimeType: 'application/json'
-            }
-          })
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Gemini API error: ${response.statusText}`);
+      if (!directRes.ok) {
+        throw new Error(`Direct Gemini API error: ${directRes.status} ${directRes.statusText}`);
       }
 
-      const data = await response.json();
+      const data = await directRes.json();
       const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      const parsed = JSON.parse(rawText);
+      if (rawText) {
+        return JSON.parse(rawText);
+      }
+    }
+
+    throw new Error('No API Key or Proxy available');
+  }
+
+  /**
+   * Generates a complete scenario from a simple user description in any business niche.
+   * Uses Gemini with temperature 0.25 and strict responseSchema.
+   */
+  public static async generateScenarioFromPrompt(prompt: string): Promise<Partial<Scenario>> {
+    const systemInstructionText = `You are an expert executive coach and roleplay curriculum designer.
+Convert the user's prompt into a high-stakes, realistic English professional roleplay scenario.
+Be realistic, industry-specific, and calibrate difficulties and vocabulary accurately.`;
+
+    const payload = {
+      systemInstruction: {
+        parts: [{ text: systemInstructionText }]
+      },
+      contents: [
+        {
+          role: 'user',
+          parts: [{ text: `Create a professional business English roleplay scenario for: "${prompt}".` }]
+        }
+      ],
+      generationConfig: {
+        temperature: 0.25,
+        topP: 0.9,
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: 'OBJECT',
+          properties: {
+            title: { type: 'STRING' },
+            niche: { type: 'STRING' },
+            aiCharacter: {
+              type: 'OBJECT',
+              properties: {
+                name: { type: 'STRING' },
+                role: { type: 'STRING' },
+                avatar: { type: 'STRING' },
+                personality: { type: 'STRING' },
+                voiceGender: { type: 'STRING', enum: ['male', 'female'] }
+              },
+              required: ['name', 'role', 'avatar', 'personality', 'voiceGender']
+            },
+            userRole: { type: 'STRING' },
+            context: { type: 'STRING' },
+            initialGreeting: { type: 'STRING' },
+            initialTranslation: { type: 'STRING' },
+            initialTip: { type: 'STRING' },
+            difficulty: { type: 'STRING', enum: ['easy', 'medium', 'hard', 'hostile'] },
+            targetEnglishLevel: { type: 'STRING', enum: ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] },
+            objectives: {
+              type: 'ARRAY',
+              items: {
+                type: 'OBJECT',
+                properties: {
+                  id: { type: 'STRING' },
+                  description: { type: 'STRING' },
+                  completed: { type: 'BOOLEAN' }
+                },
+                required: ['id', 'description', 'completed']
+              }
+            },
+            commonObjections: { type: 'ARRAY', items: { type: 'STRING' } },
+            nicheVocabulary: { type: 'ARRAY', items: { type: 'STRING' } }
+          },
+          required: [
+            'title',
+            'niche',
+            'aiCharacter',
+            'userRole',
+            'context',
+            'initialGreeting',
+            'initialTranslation',
+            'initialTip',
+            'difficulty',
+            'targetEnglishLevel',
+            'objectives',
+            'commonObjections',
+            'nicheVocabulary'
+          ]
+        }
+      }
+    };
+
+    try {
+      const parsed = await this.executeGeminiCall(payload);
       return {
         ...parsed,
         id: 'custom-' + Date.now(),
@@ -106,16 +175,17 @@ Respond strictly in valid JSON matching this schema:
         createdAt: Date.now()
       };
     } catch (err) {
-      console.warn('AI Generation failed, falling back to dynamic template:', err);
+      console.warn('AI Generation failed, using dynamic template:', err);
       return this.mockGenerateScenario(prompt);
     }
   }
 
   /**
    * Main conversational turn:
-   * Dynamically adapts to ANY business niche, role, objectives, and CEFR English Level.
-   * Keeps replies concise for natural spoken dialogue (1-2 sentences).
-   * Extracts grammar corrections and tracks completed objectives.
+   * Operates in 'God Mode':
+   * - temperature: 0.25 for deterministic, professional roleplay without hallucinations.
+   * - Strict Grounding directive: never breaks character, never invents non-existent company facts.
+   * - Hardware-enforced JSON schema via responseSchema.
    */
   public static async sendTurn({
     scenario,
@@ -132,12 +202,6 @@ Respond strictly in valid JSON matching this schema:
     corrections?: { originalText: string; improvedText: string; explanation: string }[];
     completedObjectiveIds?: string[];
   }> {
-    const apiKey = this.getApiKey();
-
-    if (!apiKey) {
-      return this.mockSendTurn(scenario, userMessageText, conversationHistory);
-    }
-
     const pendingObjectives = scenario.objectives.filter((o) => !o.completed);
     const recentMessages = conversationHistory.slice(-10);
 
@@ -160,15 +224,15 @@ The user is playing the professional role of: "${scenario.userRole}".
 Common business objections in this situation:
 ${scenario.commonObjections.map((o) => `- ${o}`).join('\n')}
 
-Specialized industry vocabulary to practice:
+Specialized industry vocabulary:
 ${scenario.nicheVocabulary.map((v) => `- ${v}`).join('\n')}
 
 Pending Business Objectives to achieve:
 ${pendingObjectives.map((o) => `- [${o.id}] ${o.description}`).join('\n')}
 
-ROLEPLAY & ADAPTATION RULES:
-1. Stay 100% in character as ${scenario.aiCharacter.name}. Do NOT break character or act as an external chatbot.
-2. The user is ALREADY playing the role of ${scenario.userRole}. Never ask them to choose a role or ask if they are ready. Engage them directly in the dialogue.
+GROUNDING & ZERO-HALLUCINATION RULES:
+1. Stay 100% in character as ${scenario.aiCharacter.name}. Never break character or refer to yourself as an AI model.
+2. STRICT GROUNDING: Strictly confine your knowledge to the scenario context, industry domain, and established business facts. NEVER invent imaginary company policies, non-existent warranty clauses, or hallucinated prices. If asked about unknown technical or legal details, state in character that you will verify with your executive board.
 3. Keep spoken replies concise and natural for audio playback (1 to 2 spoken sentences maximum).
 4. CEFR Level Guidance:
    ${
@@ -178,25 +242,8 @@ ROLEPLAY & ADAPTATION RULES:
        ? '- The user is at Intermediate level (' + scenario.targetEnglishLevel + '). Speak naturally as a business professional with realistic objections. The "tip" field should be in Spanish with strategic business phrasing.'
        : '- The user is at Advanced Executive level (' + scenario.targetEnglishLevel + '). Challenge claims with rigor, evaluate ROI and risk, and speak in native executive English.'
    }
-5. Check if the user's latest response fulfilled any of the pending objectives listed above. If so, include their IDs in "completedObjectiveIds".
-6. Detect any notable English grammar, pronunciation or vocabulary mistakes and provide discrete suggestions in "corrections".
-
-STRICT OUTPUT FORMAT:
-You MUST respond strictly in valid JSON matching this schema:
-{
-  "reply": "Spoken character dialogue in English",
-  "translation": "Spanish translation of your spoken reply",
-  "tip": "Coaching tip in Spanish advising the user what to reply next in English${isBeginner ? ' with phonetic pronunciation guide in brackets' : ''}",
-  "corrections": [
-    {
-      "originalText": "Mistake or Spanish phrase the user said",
-      "improvedText": "${isBeginner ? 'Easy English phrase with Spanish pronunciation guide in brackets' : 'More professional native business phrasing'}",
-      "explanation": "Brief explanation in Spanish to help the user remember"
-    }
-  ],
-  "completedObjectiveIds": ["obj-id-fulfilled"]
-}
-If the user made no significant mistakes, leave "corrections" as an empty array [].
+5. Check if the user's latest response fulfilled any pending objectives. If so, include their exact IDs in "completedObjectiveIds".
+6. Detect any notable English grammar, pronunciation or vocabulary mistakes and provide discrete suggestions in "corrections". If the user spoke well, return an empty array [].
 `;
 
     // Format contents alternating user and model roles, starting with user
@@ -219,33 +266,45 @@ If the user made no significant mistakes, leave "corrections" as an empty array 
       }
     }
 
-    try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${this.getModel()}:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            system_instruction: {
-              parts: [{ text: systemInstructions }]
+    const payload = {
+      systemInstruction: {
+        parts: [{ text: systemInstructions }]
+      },
+      contents: formattedContents,
+      generationConfig: {
+        temperature: 0.25,
+        topP: 0.9,
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: 'OBJECT',
+          properties: {
+            reply: { type: 'STRING' },
+            translation: { type: 'STRING' },
+            tip: { type: 'STRING' },
+            corrections: {
+              type: 'ARRAY',
+              items: {
+                type: 'OBJECT',
+                properties: {
+                  originalText: { type: 'STRING' },
+                  improvedText: { type: 'STRING' },
+                  explanation: { type: 'STRING' }
+                },
+                required: ['originalText', 'improvedText', 'explanation']
+              }
             },
-            contents: formattedContents,
-            generationConfig: {
-              temperature: 0.6,
-              responseMimeType: 'application/json'
+            completedObjectiveIds: {
+              type: 'ARRAY',
+              items: { type: 'STRING' }
             }
-          })
+          },
+          required: ['reply', 'translation', 'tip', 'corrections', 'completedObjectiveIds']
         }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Gemini turn error: ${response.statusText}`);
       }
+    };
 
-      const data = await response.json();
-      const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      const parsed = JSON.parse(rawText);
-
+    try {
+      const parsed = await this.executeGeminiCall(payload);
       return {
         reply: parsed.reply || "Thank you. Let's proceed with our meeting.",
         translation: parsed.translation || '',
@@ -254,7 +313,7 @@ If the user made no significant mistakes, leave "corrections" as an empty array 
         completedObjectiveIds: parsed.completedObjectiveIds || []
       };
     } catch (err) {
-      console.error('Gemini turn error, using intelligent fallback:', err);
+      console.warn('Gemini turn fallback triggered:', err);
       return this.mockSendTurn(scenario, userMessageText, conversationHistory);
     }
   }
@@ -263,30 +322,18 @@ If the user made no significant mistakes, leave "corrections" as an empty array 
    * Generates live suggestions/hints when the user is stuck during a call
    */
   public static async getLiveHints(scenario: Scenario, conversationHistory: Message[]): Promise<string[]> {
-    const apiKey = this.getApiKey();
-
-    if (!apiKey) {
-      return this.getMockHints(scenario);
-    }
-
     const lastAiMessage =
       [...conversationHistory].reverse().find((m) => m.sender === 'ai')?.text || scenario.initialGreeting;
 
     const isBeginner = scenario.targetEnglishLevel === 'A1' || scenario.targetEnglishLevel === 'A2';
 
-    try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${this.getModel()}:generateContent?key=${apiKey}`,
+    const payload = {
+      contents: [
         {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [
-              {
-                role: 'user',
-                parts: [
-                  {
-                    text: `The user is practicing spoken English in this scenario:
+          role: 'user',
+          parts: [
+            {
+              text: `The user is practicing spoken English in this scenario:
 Scenario: ${scenario.title} (${scenario.niche})
 User role: ${scenario.userRole}
 Level: ${scenario.targetEnglishLevel}
@@ -294,22 +341,25 @@ AI Character last said: "${lastAiMessage}"
 Vocabulary to practice: ${scenario.nicheVocabulary.slice(0, 5).join(', ')}
 
 Provide 3 short, easy, natural spoken English sentences suitable for a ${scenario.userRole}${
-                      isBeginner ? ' including Spanish phonetic pronunciation in brackets like [Jáu can ai jelp iu?]' : ''
-                    } that the user could say right now to reply.
-Respond strictly in JSON array of strings: ["suggestion 1", "suggestion 2", "suggestion 3"]`
-                  }
-                ]
-              }
-            ],
-            generationConfig: {
-              responseMimeType: 'application/json'
+                isBeginner ? ' including Spanish phonetic pronunciation in brackets like [Jáu can ai jelp iu?]' : ''
+              } that the user could say right now to reply.`
             }
-          })
+          ]
         }
-      );
+      ],
+      generationConfig: {
+        temperature: 0.2,
+        topP: 0.9,
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: 'ARRAY',
+          items: { type: 'STRING' }
+        }
+      }
+    };
 
-      const data = await response.json();
-      const parsed = JSON.parse(data.candidates?.[0]?.content?.parts?.[0]?.text);
+    try {
+      const parsed = await this.executeGeminiCall(payload);
       return Array.isArray(parsed) && parsed.length > 0 ? parsed : this.getMockHints(scenario);
     } catch {
       return this.getMockHints(scenario);
@@ -336,7 +386,6 @@ Respond strictly in JSON array of strings: ["suggestion 1", "suggestion 2", "sug
       ];
     }
 
-    // Dynamic hints from scenario vocabulary
     if (scenario.nicheVocabulary && scenario.nicheVocabulary.length >= 3) {
       return [
         `Regarding our ${scenario.nicheVocabulary[0]}, let me walk you through our solution.`,
@@ -364,11 +413,10 @@ Respond strictly in JSON array of strings: ["suggestion 1", "suggestion 2", "sug
     conversationHistory: Message[];
     durationSeconds: number;
   }): Promise<SessionReport> {
-    const apiKey = this.getApiKey();
     const completedObj = scenario.objectives.filter((o) => o.completed).map((o) => o.description);
     const pendingObj = scenario.objectives.filter((o) => !o.completed).map((o) => o.description);
 
-    if (!apiKey || conversationHistory.length < 3) {
+    if (conversationHistory.length < 3) {
       return this.mockGenerateReport(scenario, conversationHistory, durationSeconds, completedObj, pendingObj);
     }
 
@@ -386,37 +434,50 @@ Duration: ${Math.round(durationSeconds / 60)} minutes
 Transcript:
 ${transcript}
 
-Provide an executive performance review in JSON with this structure:
-{
-  "businessScore": 0-100,
-  "englishScore": 0-100,
-  "executiveSummary": "Concise 2-3 sentence overview of the conversation in Spanish",
-  "keyStrengths": ["Strength 1 in Spanish", "Strength 2 in Spanish", "Strength 3 in Spanish"],
-  "areasForImprovement": ["Improvement 1 in Spanish", "Improvement 2 in Spanish", "Improvement 3 in Spanish"],
-  "vocabularyUsed": ["term1", "term2"],
-  "suggestedPhrases": [
-    {
-      "original": "Actual phrase the user said or weak phrasing",
-      "better": "High-impact native executive English alternative",
-      "reason": "Why this conveys more authority or precision in Spanish"
-    }
-  ]
-}`;
+Provide an executive performance review in Spanish evaluating business outcomes and English fluency.`;
 
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${this.getModel()}:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: { responseMimeType: 'application/json' }
-          })
+      const payload = {
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.2,
+          topP: 0.9,
+          responseMimeType: 'application/json',
+          responseSchema: {
+            type: 'OBJECT',
+            properties: {
+              businessScore: { type: 'INTEGER' },
+              englishScore: { type: 'INTEGER' },
+              executiveSummary: { type: 'STRING' },
+              keyStrengths: { type: 'ARRAY', items: { type: 'STRING' } },
+              areasForImprovement: { type: 'ARRAY', items: { type: 'STRING' } },
+              vocabularyUsed: { type: 'ARRAY', items: { type: 'STRING' } },
+              suggestedPhrases: {
+                type: 'ARRAY',
+                items: {
+                  type: 'OBJECT',
+                  properties: {
+                    original: { type: 'STRING' },
+                    better: { type: 'STRING' },
+                    reason: { type: 'STRING' }
+                  },
+                  required: ['original', 'better', 'reason']
+                }
+              }
+            },
+            required: [
+              'businessScore',
+              'englishScore',
+              'executiveSummary',
+              'keyStrengths',
+              'areasForImprovement',
+              'vocabularyUsed',
+              'suggestedPhrases'
+            ]
+          }
         }
-      );
+      };
 
-      const data = await response.json();
-      const parsed = JSON.parse(data.candidates?.[0]?.content?.parts?.[0]?.text);
+      const parsed = await this.executeGeminiCall(payload);
 
       return {
         scenarioId: scenario.id,

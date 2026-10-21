@@ -33,44 +33,44 @@ export const LevelAssessmentModal: React.FC<LevelAssessmentModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md overflow-hidden">
-      <div className="relative w-full max-w-2xl rounded-3xl border border-zinc-800 bg-[#0d0e14] text-zinc-100 shadow-2xl shadow-black/95 flex flex-col h-[92vh] sm:h-auto sm:max-h-[88vh] overflow-hidden animate-in fade-in zoom-in-95">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md overflow-hidden">
+      <div className="relative w-full max-w-2xl rounded-3xl border border-[#2A344A] bg-[#1C2331] text-[#E2E8F0] shadow-2xl flex flex-col h-[92vh] sm:h-auto sm:max-h-[88vh] overflow-hidden animate-in fade-in zoom-in-95">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 sm:px-7 py-4 border-b border-zinc-800 bg-zinc-950/95 shrink-0">
+        <div className="flex items-center justify-between px-5 sm:px-7 py-4 border-b border-[#2A344A] bg-[#12161F] shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+            <div className="w-10 h-10 rounded-2xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-[#38BDF8] shrink-0">
               <Award className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-black text-white">
-                  Evaluación y <span className="text-amber-400">Nivel de Inglés</span>
+                <h2 className="text-base sm:text-lg font-black text-[#E2E8F0]">
+                  Evaluación y <span className="text-[#38BDF8]">Nivel de Inglés</span>
                 </h2>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 font-bold uppercase tracking-wider">
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-sky-500/15 border border-sky-500/30 text-[#38BDF8] font-bold uppercase tracking-wider">
                   CEFR {progress.currentLevel}
                 </span>
               </div>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-[#94A3B8]">
                 Auditoría continua de dominio lingüístico y criterio de promoción
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 transition-colors cursor-pointer"
+            className="p-2 rounded-xl bg-[#1C2331] hover:bg-[#202838] text-[#94A3B8] hover:text-[#E2E8F0] border border-[#2A344A] transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Tab Navigator */}
-        <div className="flex items-center gap-2 px-5 sm:px-7 pt-3 pb-2 border-b border-zinc-800/80 bg-zinc-950/40 shrink-0 text-xs">
+        <div className="flex items-center gap-2 px-5 sm:px-7 pt-3 pb-2 border-b border-[#2A344A] bg-[#12161F]/60 shrink-0 text-xs">
           <button
             onClick={() => setSelectedTab('status')}
             className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer ${
               selectedTab === 'status'
-                ? 'bg-amber-500 text-zinc-950'
-                : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+                ? 'bg-[#0EA5E9] text-slate-950 font-bold'
+                : 'bg-[#12161F] text-[#94A3B8] hover:text-[#E2E8F0] border border-[#2A344A]'
             }`}
           >
             Mi Progreso Actual
@@ -79,8 +79,8 @@ export const LevelAssessmentModal: React.FC<LevelAssessmentModalProps> = ({
             onClick={() => setSelectedTab('levels')}
             className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer ${
               selectedTab === 'levels'
-                ? 'bg-amber-500 text-zinc-950'
-                : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+                ? 'bg-[#0EA5E9] text-slate-950 font-bold'
+                : 'bg-[#12161F] text-[#94A3B8] hover:text-[#E2E8F0] border border-[#2A344A]'
             }`}
           >
             Escala de Niveles
@@ -89,8 +89,8 @@ export const LevelAssessmentModal: React.FC<LevelAssessmentModalProps> = ({
             onClick={() => setSelectedTab('history')}
             className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer ${
               selectedTab === 'history'
-                ? 'bg-amber-500 text-zinc-950'
-                : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+                ? 'bg-[#0EA5E9] text-slate-950 font-bold'
+                : 'bg-[#12161F] text-[#94A3B8] hover:text-[#E2E8F0] border border-[#2A344A]'
             }`}
           >
             Historial de Ascensos ({progress.history.length})
@@ -102,38 +102,38 @@ export const LevelAssessmentModal: React.FC<LevelAssessmentModalProps> = ({
           {selectedTab === 'status' && (
             <div className="space-y-5">
               {/* Current Level Main Card */}
-              <div className="p-5 rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900/90 to-zinc-950 border border-zinc-800 space-y-4">
+              <div className="p-5 rounded-2xl bg-[#12161F] border border-[#2A344A] space-y-4">
                 <div className="flex items-start justify-between">
                   <div>
-                    <span className="text-[11px] text-zinc-400 font-bold uppercase tracking-wider block">
+                    <span className="text-[11px] text-[#94A3B8] font-bold uppercase tracking-wider block">
                       Tu Nivel Actual Certificado
                     </span>
-                    <h3 className="text-xl sm:text-2xl font-black text-white mt-0.5">
+                    <h3 className="text-xl sm:text-2xl font-black text-[#E2E8F0] mt-0.5">
                       {currentDesc.title}
                     </h3>
                   </div>
-                  <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-xl font-black text-amber-400">
+                  <div className="w-12 h-12 rounded-2xl bg-sky-500/15 border border-sky-500/40 flex items-center justify-center text-xl font-black text-[#38BDF8]">
                     {progress.currentLevel}
                   </div>
                 </div>
 
-                <p className="text-xs text-zinc-300 leading-relaxed">
+                <p className="text-xs text-[#E2E8F0] leading-relaxed">
                   {currentDesc.profile}
                 </p>
 
                 {/* Next Level Progression Bar */}
                 {nextLevel && (
-                  <div className="space-y-2 pt-2 border-t border-zinc-800">
+                  <div className="space-y-2 pt-2 border-t border-[#2A344A]">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-zinc-300 font-medium">
-                        Progreso hacia el <strong className="text-amber-400">Nivel {nextLevel}</strong>:
+                      <span className="text-[#E2E8F0] font-medium">
+                        Progreso hacia el <strong className="text-[#38BDF8]">Nivel {nextLevel}</strong>:
                       </span>
-                      <span className="font-mono font-bold text-amber-400">{progress.masteryScore}%</span>
+                      <span className="font-mono font-bold text-[#38BDF8]">{progress.masteryScore}%</span>
                     </div>
 
-                    <div className="w-full bg-zinc-800/80 rounded-full h-2.5 overflow-hidden">
+                    <div className="w-full bg-[#1C2331] rounded-full h-2.5 overflow-hidden">
                       <div
-                        className="bg-gradient-to-r from-amber-500 to-amber-300 h-2.5 rounded-full transition-all duration-500"
+                        className="bg-gradient-to-r from-[#0EA5E9] to-[#38BDF8] h-2.5 rounded-full transition-all duration-500"
                         style={{ width: `${progress.masteryScore}%` }}
                       />
                     </div>
@@ -142,41 +142,41 @@ export const LevelAssessmentModal: React.FC<LevelAssessmentModalProps> = ({
               </div>
 
               {/* Promotion Requirements Checklist */}
-              <div className="p-4 rounded-2xl bg-zinc-950 border border-zinc-800 space-y-3">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+              <div className="p-4 rounded-2xl bg-[#12161F] border border-[#2A344A] space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#38BDF8] flex items-center gap-1.5">
                   <Target className="w-4 h-4" /> Requisitos para el Siguiente Ascenso
                 </h4>
 
                 <div className="space-y-2 text-xs">
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-900/70 border border-zinc-800/70">
-                    <span className="text-zinc-300">Prácticas consecutivas aprobadas (&ge;75% fluidez):</span>
-                    <span className="font-bold text-amber-400">
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#1C2331] border border-[#2A344A]">
+                    <span className="text-[#E2E8F0]">Prácticas consecutivas aprobadas (&ge;75% fluidez):</span>
+                    <span className="font-bold text-[#38BDF8]">
                       {progress.consecutivePassingSessions} de 2 necesarias
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-900/70 border border-zinc-800/70">
-                    <span className="text-zinc-300">Cumplimiento de metas de negocio por llamada:</span>
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#1C2331] border border-[#2A344A]">
+                    <span className="text-[#E2E8F0]">Cumplimiento de metas de negocio por llamada:</span>
                     <span className="font-bold text-emerald-400">&ge; 2 objetivos</span>
                   </div>
 
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-900/70 border border-zinc-800/70">
-                    <span className="text-zinc-300">Evaluaciones completadas registradas:</span>
-                    <span className="font-bold text-white">{progress.totalCompletedEvaluations}</span>
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#1C2331] border border-[#2A344A]">
+                    <span className="text-[#E2E8F0]">Evaluaciones completadas registradas:</span>
+                    <span className="font-bold text-[#E2E8F0]">{progress.totalCompletedEvaluations}</span>
                   </div>
                 </div>
               </div>
 
               {/* Behavior in Calls */}
-              <div className="p-4 rounded-2xl bg-zinc-900/50 border border-zinc-800 space-y-1.5 text-xs text-zinc-300">
-                <span className="font-bold text-white block">Comportamiento del Interlocutor de IA en este nivel:</span>
-                <p className="leading-relaxed text-zinc-400">{currentDesc.aiBehavior}</p>
+              <div className="p-4 rounded-2xl bg-[#12161F]/60 border border-[#2A344A] space-y-1.5 text-xs text-[#E2E8F0]">
+                <span className="font-bold text-[#E2E8F0] block">Comportamiento del Interlocutor de IA en este nivel:</span>
+                <p className="leading-relaxed text-[#94A3B8]">{currentDesc.aiBehavior}</p>
               </div>
 
               {/* Admin quick switch override */}
               {isAdmin && (
-                <div className="p-3.5 rounded-2xl border border-amber-500/20 bg-amber-500/5 space-y-2">
-                  <span className="text-xs font-bold text-amber-400 block">
+                <div className="p-3.5 rounded-2xl border border-sky-500/20 bg-sky-500/5 space-y-2">
+                  <span className="text-xs font-bold text-[#38BDF8] block">
                     🛡️ Ajuste Rápido de Nivel (Modo Administrador)
                   </span>
                   <div className="flex flex-wrap gap-1.5">
@@ -186,8 +186,8 @@ export const LevelAssessmentModal: React.FC<LevelAssessmentModalProps> = ({
                         onClick={() => handleManualLevelChange(lvl)}
                         className={`px-3 py-1 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
                           progress.currentLevel === lvl
-                            ? 'bg-amber-400 text-zinc-950'
-                            : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
+                            ? 'bg-[#0EA5E9] text-slate-950'
+                            : 'bg-[#1C2331] text-[#E2E8F0] hover:bg-[#202838]'
                         }`}
                       >
                         Nivel {lvl}
@@ -209,25 +209,25 @@ export const LevelAssessmentModal: React.FC<LevelAssessmentModalProps> = ({
                     key={lvl}
                     className={`p-4 rounded-2xl border transition-all ${
                       isCurrent
-                        ? 'bg-amber-500/10 border-amber-500/40 shadow-lg shadow-amber-500/5'
-                        : 'bg-zinc-900/60 border-zinc-800'
+                        ? 'bg-sky-500/10 border-sky-500/40 shadow-lg shadow-sky-950/20'
+                        : 'bg-[#12161F] border-[#2A344A]'
                     }`}
                   >
                     <div className="flex items-center justify-between pb-1">
                       <div className="flex items-center gap-2">
-                        <span className="w-8 h-8 rounded-xl bg-zinc-800 border border-zinc-700 font-black text-amber-400 text-xs flex items-center justify-center">
+                        <span className="w-8 h-8 rounded-xl bg-[#1C2331] border border-[#2A344A] font-black text-[#38BDF8] text-xs flex items-center justify-center">
                           {lvl}
                         </span>
-                        <h4 className="text-xs font-bold text-white">{desc.title}</h4>
+                        <h4 className="text-xs font-bold text-[#E2E8F0]">{desc.title}</h4>
                       </div>
                       {isCurrent && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500 text-zinc-950 font-bold uppercase">
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#0EA5E9] text-slate-950 font-bold uppercase">
                           Tu Nivel Actual
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-zinc-300 mt-2 leading-relaxed">{desc.profile}</p>
-                    <p className="text-[11px] text-zinc-400 mt-1 italic">IA: {desc.aiBehavior}</p>
+                    <p className="text-xs text-[#E2E8F0] mt-2 leading-relaxed">{desc.profile}</p>
+                    <p className="text-[11px] text-[#94A3B8] mt-1 italic">IA: {desc.aiBehavior}</p>
                   </div>
                 );
               })}
@@ -239,23 +239,23 @@ export const LevelAssessmentModal: React.FC<LevelAssessmentModalProps> = ({
               {progress.history.length === 0 ? (
                 <div className="text-center py-10 space-y-2">
                   <Award className="w-10 h-10 text-zinc-600 mx-auto" />
-                  <p className="text-xs text-zinc-400">Aún no se han registrado eventos de ascenso de nivel.</p>
+                  <p className="text-xs text-[#94A3B8]">Aún no se han registrado eventos de ascenso de nivel.</p>
                   <p className="text-[11px] text-zinc-500">
                     Completa sesiones de simulación con nota superior al 75% para ascender.
                   </p>
                 </div>
               ) : (
                 progress.history.map((ev, i) => (
-                  <div key={i} className="p-4 rounded-2xl bg-zinc-900/70 border border-zinc-800 space-y-1.5 text-xs">
+                  <div key={i} className="p-4 rounded-2xl bg-[#12161F] border border-[#2A344A] space-y-1.5 text-xs">
                     <div className="flex items-center justify-between font-bold">
-                      <span className="text-amber-400">
+                      <span className="text-[#38BDF8]">
                         Ascenso: Nivel {ev.fromLevel} → Nivel {ev.toLevel}
                       </span>
-                      <span className="text-zinc-500 text-[11px] font-mono">
+                      <span className="text-[#94A3B8] text-[11px] font-mono">
                         {new Date(ev.date).toLocaleDateString('es-ES')}
                       </span>
                     </div>
-                    <p className="text-zinc-300 text-[11px]">{ev.reason}</p>
+                    <p className="text-[#E2E8F0] text-[11px]">{ev.reason}</p>
                     <div className="text-[10px] text-emerald-400 font-semibold pt-1">
                       Escenario: {ev.scenarioTitle} | Fluidez: {ev.englishScore}% | Negocio: {ev.businessScore}%
                     </div>

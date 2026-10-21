@@ -238,22 +238,22 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-black/85 backdrop-blur-md overflow-hidden">
-      <div className="relative w-full max-w-4xl rounded-2xl sm:rounded-3xl border border-zinc-800 bg-[#0f0f13] text-zinc-100 shadow-2xl shadow-black/95 flex flex-col h-[94vh] sm:h-auto sm:max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-black/80 backdrop-blur-md overflow-hidden">
+      <div className="relative w-full max-w-4xl rounded-2xl sm:rounded-3xl border border-[#2A344A] bg-[#1C2331] text-[#E2E8F0] shadow-2xl flex flex-col h-[94vh] sm:h-auto sm:max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95">
         {/* Top Header */}
-        <div className="flex items-center justify-between px-3 sm:px-6 py-2.5 sm:py-3.5 border-b border-zinc-800 bg-zinc-950/95 shrink-0 z-10">
+        <div className="flex items-center justify-between px-3 sm:px-6 py-2.5 sm:py-3.5 border-b border-[#2A344A] bg-[#12161F] shrink-0 z-10">
           <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
-              <ShieldCheck className="w-4 h-4 text-amber-400" />
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-4 h-4 text-[#38BDF8]" />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 sm:gap-2">
-                <h2 className="text-sm sm:text-lg font-bold text-white truncate">Panel Admin</h2>
+                <h2 className="text-sm sm:text-lg font-bold text-[#E2E8F0] truncate">Panel Admin</h2>
                 <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold uppercase tracking-wider shrink-0">
                   ADMIN
                 </span>
               </div>
-              <p className="text-xs text-zinc-400 truncate hidden xs:block">
+              <p className="text-xs text-[#94A3B8] truncate hidden xs:block">
                 Gestiona escenarios, ventas y PWA
               </p>
             </div>
@@ -272,7 +272,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
             </button>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
+              className="p-1.5 rounded-xl text-[#94A3B8] hover:text-[#E2E8F0] hover:bg-[#12161F] transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -280,13 +280,13 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center border-b border-zinc-800 bg-zinc-950/50 px-4 sm:px-6 shrink-0 overflow-x-auto scrollbar-none">
+        <div className="flex items-center border-b border-[#2A344A] bg-[#12161F]/60 px-4 sm:px-6 shrink-0 overflow-x-auto scrollbar-none">
           <button
             onClick={() => setActiveTab('scenarios')}
             className={`flex items-center gap-2 py-3 px-3.5 text-sm font-bold border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
               activeTab === 'scenarios'
-                ? 'border-amber-400 text-amber-400'
-                : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                ? 'border-[#38BDF8] text-[#38BDF8]'
+                : 'border-transparent text-[#94A3B8] hover:text-[#E2E8F0]'
             }`}
           >
             <Layers className="w-4 h-4" />
@@ -296,19 +296,19 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
             onClick={() => setActiveTab('licenses')}
             className={`flex items-center gap-2 py-3 px-3.5 text-sm font-bold border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
               activeTab === 'licenses'
-                ? 'border-amber-400 text-amber-400'
-                : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                ? 'border-[#38BDF8] text-[#38BDF8]'
+                : 'border-transparent text-[#94A3B8] hover:text-[#E2E8F0]'
             }`}
           >
-            <Crown className="w-4 h-4 text-amber-400" />
+            <Crown className="w-4 h-4 text-[#FBBF24]" />
             <span>Licencias & Ventas ({adminLicenses.length})</span>
           </button>
           <button
             onClick={() => setActiveTab('sync')}
             className={`flex items-center gap-2 py-3 px-3.5 text-sm font-bold border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
               activeTab === 'sync'
-                ? 'border-amber-400 text-amber-400'
-                : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                ? 'border-[#38BDF8] text-[#38BDF8]'
+                : 'border-transparent text-[#94A3B8] hover:text-[#E2E8F0]'
             }`}
           >
             <FileJson className="w-4 h-4" />
@@ -318,8 +318,8 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
             onClick={() => setActiveTab('pwa')}
             className={`flex items-center gap-2 py-3 px-3.5 text-sm font-bold border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
               activeTab === 'pwa'
-                ? 'border-amber-400 text-amber-400'
-                : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                ? 'border-[#38BDF8] text-[#38BDF8]'
+                : 'border-transparent text-[#94A3B8] hover:text-[#E2E8F0]'
             }`}
           >
             <Settings className="w-4 h-4" />

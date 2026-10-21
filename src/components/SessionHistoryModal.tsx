@@ -77,72 +77,72 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-black/85 backdrop-blur-md overflow-hidden">
-      <div className="relative w-full max-w-4xl rounded-3xl border border-zinc-800 bg-[#0c0d12] text-zinc-100 shadow-2xl shadow-black/95 flex flex-col h-[94vh] sm:h-auto sm:max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-black/80 backdrop-blur-md overflow-hidden">
+      <div className="relative w-full max-w-4xl rounded-3xl border border-[#2A344A] bg-[#1C2331] text-[#E2E8F0] shadow-2xl flex flex-col h-[94vh] sm:h-auto sm:max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 sm:px-7 py-4 border-b border-zinc-800 bg-zinc-950/95 shrink-0">
+        <div className="flex items-center justify-between px-5 sm:px-7 py-4 border-b border-[#2A344A] bg-[#12161F] shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+            <div className="w-10 h-10 rounded-2xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-[#38BDF8] shrink-0">
               <History className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-black text-white">
-                  Historial de <span className="text-amber-400">Conversaciones</span>
+                <h2 className="text-base sm:text-lg font-black text-[#E2E8F0]">
+                  Historial de <span className="text-[#38BDF8]">Conversaciones</span>
                 </h2>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 font-mono">
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#1C2331] text-[#94A3B8] border border-[#2A344A] font-mono">
                   {sessions.length} registradas
                 </span>
               </div>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-[#94A3B8]">
                 Retoma charlas previas y audita las transcripciones de cada práctica
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 transition-colors cursor-pointer"
+            className="p-2 rounded-xl bg-[#1C2331] hover:bg-[#202838] text-[#94A3B8] hover:text-[#E2E8F0] border border-[#2A344A] transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Global Performance Summary Strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 sm:p-5 border-b border-zinc-800/80 bg-zinc-950/50 shrink-0">
-          <div className="p-3 rounded-2xl bg-zinc-900/60 border border-zinc-800/80">
-            <span className="text-[11px] text-zinc-400 block">Total Prácticas</span>
-            <span className="text-lg font-black text-white mt-0.5 block">{metrics.totalSessions}</span>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3 sm:p-5 border-b border-[#2A344A] bg-[#12161F]/60 shrink-0">
+          <div className="p-3 rounded-2xl bg-[#1C2331] border border-[#2A344A]">
+            <span className="text-[11px] text-[#94A3B8] block">Total Prácticas</span>
+            <span className="text-lg font-black text-[#E2E8F0] mt-0.5 block">{metrics.totalSessions}</span>
           </div>
-          <div className="p-3 rounded-2xl bg-zinc-900/60 border border-zinc-800/80">
-            <span className="text-[11px] text-zinc-400 block">Tiempo en Voz</span>
-            <span className="text-lg font-black text-amber-400 mt-0.5 block">
+          <div className="p-3 rounded-2xl bg-[#1C2331] border border-[#2A344A]">
+            <span className="text-[11px] text-[#94A3B8] block">Tiempo en Voz</span>
+            <span className="text-lg font-black text-[#38BDF8] mt-0.5 block">
               {formatDuration(metrics.totalDurationSeconds)}
             </span>
           </div>
-          <div className="p-3 rounded-2xl bg-zinc-900/60 border border-zinc-800/80">
-            <span className="text-[11px] text-zinc-400 block">Nota Negocio Media</span>
+          <div className="p-3 rounded-2xl bg-[#1C2331] border border-[#2A344A]">
+            <span className="text-[11px] text-[#94A3B8] block">Nota Negocio Media</span>
             <span className="text-lg font-black text-emerald-400 mt-0.5 block">
               {metrics.averageBusinessScore > 0 ? `${metrics.averageBusinessScore}%` : '—'}
             </span>
           </div>
-          <div className="p-3 rounded-2xl bg-zinc-900/60 border border-zinc-800/80">
-            <span className="text-[11px] text-zinc-400 block">Fluidez Inglés Media</span>
-            <span className="text-lg font-black text-blue-400 mt-0.5 block">
+          <div className="p-3 rounded-2xl bg-[#1C2331] border border-[#2A344A]">
+            <span className="text-[11px] text-[#94A3B8] block">Fluidez Inglés Media</span>
+            <span className="text-lg font-black text-[#FBBF24] mt-0.5 block">
               {metrics.averageEnglishScore > 0 ? `${metrics.averageEnglishScore}%` : '—'}
             </span>
           </div>
         </div>
 
         {/* Search & Filters */}
-        <div className="p-3 sm:p-5 border-b border-zinc-800/80 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0">
+        <div className="p-3 sm:p-5 border-b border-[#2A344A] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar por escenario o industria..."
-              className="w-full border rounded-xl pl-10 pr-4 py-2 text-xs focus:outline-none focus:border-amber-500 bg-zinc-900/90 border-zinc-800 text-zinc-200 placeholder:text-zinc-500"
+              className="w-full border rounded-xl pl-10 pr-4 py-2 text-xs focus:outline-none focus:border-[#38BDF8] bg-[#12161F] border-[#2A344A] text-[#E2E8F0] placeholder:text-[#94A3B8]"
             />
           </div>
 
@@ -151,8 +151,8 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
               onClick={() => setFilterStatus('all')}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
                 filterStatus === 'all'
-                  ? 'bg-amber-500 text-zinc-950 font-bold'
-                  : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+                  ? 'bg-[#0EA5E9] text-slate-950 font-bold'
+                  : 'bg-[#12161F] text-[#94A3B8] hover:text-[#E2E8F0] border border-[#2A344A]'
               }`}
             >
               Todas
@@ -161,8 +161,8 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
               onClick={() => setFilterStatus('in_progress')}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
                 filterStatus === 'in_progress'
-                  ? 'bg-amber-500 text-zinc-950 font-bold'
-                  : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+                  ? 'bg-[#0EA5E9] text-slate-950 font-bold'
+                  : 'bg-[#12161F] text-[#94A3B8] hover:text-[#E2E8F0] border border-[#2A344A]'
               }`}
             >
               En Curso
@@ -171,8 +171,8 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
               onClick={() => setFilterStatus('completed')}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
                 filterStatus === 'completed'
-                  ? 'bg-amber-500 text-zinc-950 font-bold'
-                  : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+                  ? 'bg-[#0EA5E9] text-slate-950 font-bold'
+                  : 'bg-[#12161F] text-[#94A3B8] hover:text-[#E2E8F0] border border-[#2A344A]'
               }`}
             >
               Completadas
@@ -185,10 +185,10 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
           {selectedSessionForTranscript ? (
             /* Transcript Detail View */
             <div className="space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
+              <div className="flex items-center justify-between pb-3 border-b border-[#2A344A]">
                 <button
                   onClick={() => setSelectedSessionForTranscript(null)}
-                  className="flex items-center gap-1 text-xs text-amber-400 hover:underline cursor-pointer font-bold"
+                  className="flex items-center gap-1 text-xs text-[#38BDF8] hover:underline cursor-pointer font-bold"
                 >
                   ← Volver al listado de sesiones
                 </button>
@@ -199,7 +199,7 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
                         onClose();
                         onResumeSession(selectedSessionForTranscript);
                       }}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 text-zinc-950 text-xs font-bold hover:bg-amber-400 transition-colors cursor-pointer shadow-md"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0EA5E9] hover:bg-[#38BDF8] text-slate-950 text-xs font-bold transition-colors cursor-pointer shadow-md"
                     >
                       <Play className="w-3.5 h-3.5 fill-current" />
                       Continuar esta charla
@@ -208,9 +208,9 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
                   {selectedSessionForTranscript.report && (
                     <button
                       onClick={() => onViewReport(selectedSessionForTranscript)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold border border-zinc-700 transition-colors cursor-pointer"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#12161F] hover:bg-[#202838] text-[#E2E8F0] text-xs font-semibold border border-[#2A344A] transition-colors cursor-pointer"
                     >
-                      <FileText className="w-3.5 h-3.5 text-amber-400" />
+                      <FileText className="w-3.5 h-3.5 text-[#38BDF8]" />
                       Ver Informe de Evaluación
                     </button>
                   )}
@@ -218,20 +218,20 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
               </div>
 
               {/* Session Overview Card */}
-              <div className="p-4 rounded-2xl bg-zinc-950 border border-zinc-800 space-y-2">
+              <div className="p-4 rounded-2xl bg-[#12161F] border border-[#2A344A] space-y-2">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-white text-sm">{selectedSessionForTranscript.scenarioTitle}</h3>
+                  <h3 className="font-bold text-[#E2E8F0] text-sm">{selectedSessionForTranscript.scenarioTitle}</h3>
                   <span
                     className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                       selectedSessionForTranscript.status === 'in_progress'
-                        ? 'bg-amber-500/10 text-amber-300 border border-amber-500/20'
+                        ? 'bg-sky-500/10 text-[#38BDF8] border border-sky-500/20'
                         : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
                     }`}
                   >
                     {selectedSessionForTranscript.status === 'in_progress' ? '🟢 En Curso' : '✅ Completada'}
                   </span>
                 </div>
-                <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-400">
+                <div className="flex flex-wrap items-center gap-4 text-xs text-[#94A3B8]">
                   <span className="flex items-center gap-1">
                     <Calendar className="w-3.5 h-3.5 text-zinc-500" /> {formatDate(selectedSessionForTranscript.updatedAt)}
                   </span>
@@ -251,7 +251,7 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
 
               {/* Message Transcript Log */}
               <div className="space-y-3 pt-2">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#94A3B8]">
                   Transcripción de la Conversación ({selectedSessionForTranscript.messages.length} turnos)
                 </h4>
 
@@ -263,15 +263,15 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
                         key={msg.id || index}
                         className={`p-3.5 rounded-2xl text-xs space-y-1.5 ${
                           isAi
-                            ? 'bg-zinc-900/90 border border-zinc-800 text-zinc-200'
-                            : 'bg-amber-500/10 border border-amber-500/20 text-zinc-100 ml-4 sm:ml-8'
+                            ? 'bg-[#12161F] border border-[#2A344A] text-[#E2E8F0]'
+                            : 'bg-sky-500/10 border border-sky-500/20 text-[#E2E8F0] ml-4 sm:ml-8'
                         }`}
                       >
                         <div className="flex items-center justify-between text-[11px] font-bold">
-                          <span className={isAi ? 'text-amber-400' : 'text-zinc-300'}>
+                          <span className={isAi ? 'text-[#38BDF8]' : 'text-[#94A3B8]'}>
                             {isAi ? '🤖 Interlocutor IA' : '👤 Tú (Voz)'}
                           </span>
-                          <span className="text-zinc-500 font-mono text-[10px]">
+                          <span className="text-[#94A3B8] font-mono text-[10px]">
                             {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </div>
@@ -280,22 +280,22 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
 
                         {/* Translation if available */}
                         {msg.translation && (
-                          <p className="text-[11px] text-zinc-400 italic pt-1 border-t border-zinc-800/60">
+                          <p className="text-[11px] text-[#94A3B8] italic pt-1 border-t border-[#2A344A]">
                             Traducción: {msg.translation}
                           </p>
                         )}
 
                         {/* Grammar / Vocabulary Corrections */}
                         {msg.corrections && msg.corrections.length > 0 && (
-                          <div className="p-2.5 rounded-xl bg-zinc-950/80 border border-amber-500/30 text-[11px] space-y-1 mt-1.5">
-                            <span className="font-bold text-amber-400 block">💡 Sugerencia Ejecutiva:</span>
+                          <div className="p-2.5 rounded-xl bg-[#1C2331] border border-amber-500/30 text-[11px] space-y-1 mt-1.5">
+                            <span className="font-bold text-[#FBBF24] block">💡 Sugerencia Ejecutiva:</span>
                             {msg.corrections.map((c, ci) => (
                               <div key={ci} className="space-y-0.5">
-                                <p className="text-zinc-300">
+                                <p className="text-[#E2E8F0]">
                                   Dijiste: <span className="line-through text-rose-400">{c.originalText}</span> →{' '}
                                   <strong className="text-emerald-400">{c.improvedText}</strong>
                                 </p>
-                                <p className="text-zinc-400 text-[10px]">{c.explanation}</p>
+                                <p className="text-[#94A3B8] text-[10px]">{c.explanation}</p>
                               </div>
                             ))}
                           </div>
@@ -309,11 +309,11 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
           ) : filteredSessions.length === 0 ? (
             /* Empty state */
             <div className="text-center py-12 space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center mx-auto text-zinc-500">
+              <div className="w-12 h-12 rounded-2xl bg-[#12161F] border border-[#2A344A] flex items-center justify-center mx-auto text-[#94A3B8]">
                 <History className="w-6 h-6" />
               </div>
-              <h3 className="text-sm font-bold text-white">No hay sesiones en el historial</h3>
-              <p className="text-xs text-zinc-400 max-w-sm mx-auto">
+              <h3 className="text-sm font-bold text-[#E2E8F0]">No hay sesiones en el historial</h3>
+              <p className="text-xs text-[#94A3B8] max-w-sm mx-auto">
                 Las conversaciones que realices se guardarán automáticamente aquí para que puedas retomarlas o revisar tus correcciones.
               </p>
             </div>
@@ -326,27 +326,27 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
                   <div
                     key={s.id}
                     onClick={() => setSelectedSessionForTranscript(s)}
-                    className="p-4 rounded-2xl bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-800/80 hover:border-zinc-700 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
+                    className="p-4 rounded-2xl bg-[#12161F] hover:bg-[#202838] border border-[#2A344A] hover:border-[#38BDF8]/60 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
                   >
                     <div className="space-y-1.5 min-w-0">
                       <div className="flex items-center gap-2">
                         <span
                           className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                             isInProgress
-                              ? 'bg-amber-500/10 text-amber-300 border border-amber-500/20'
+                              ? 'bg-sky-500/10 text-[#38BDF8] border border-sky-500/20'
                               : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
                           }`}
                         >
                           {isInProgress ? '🟢 En Curso' : '✅ Completada'}
                         </span>
-                        <span className="text-xs font-bold text-zinc-400 truncate">{s.scenarioNiche}</span>
+                        <span className="text-xs font-bold text-[#94A3B8] truncate">{s.scenarioNiche}</span>
                       </div>
 
-                      <h3 className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors truncate">
+                      <h3 className="text-sm font-bold text-[#E2E8F0] group-hover:text-[#38BDF8] transition-colors truncate">
                         {s.scenarioTitle}
                       </h3>
 
-                      <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400">
+                      <div className="flex flex-wrap items-center gap-3 text-xs text-[#94A3B8]">
                         <span className="flex items-center gap-1 text-[11px]">
                           <Calendar className="w-3.5 h-3.5 text-zinc-500" /> {formatDate(s.updatedAt)}
                         </span>
@@ -374,7 +374,7 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
                             onClose();
                             onResumeSession(s);
                           }}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold text-xs transition-colors cursor-pointer shadow-sm"
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0EA5E9] hover:bg-[#38BDF8] text-slate-950 font-bold text-xs transition-colors cursor-pointer shadow-sm"
                           title="Continuar conversación donde se dejó"
                         >
                           <Play className="w-3 h-3 fill-current" />
@@ -387,10 +387,10 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
                             e.stopPropagation();
                             onViewReport(s);
                           }}
-                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs text-zinc-200 border border-zinc-700 transition-colors cursor-pointer"
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#1C2331] hover:bg-[#242D3E] text-xs text-[#E2E8F0] border border-[#2A344A] transition-colors cursor-pointer"
                           title="Ver evaluación"
                         >
-                          <FileText className="w-3 h-3 text-amber-400" />
+                          <FileText className="w-3 h-3 text-[#38BDF8]" />
                           <span className="hidden sm:inline">Informe</span>
                         </button>
                       )}
@@ -398,13 +398,13 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
                       <button
                         type="button"
                         onClick={(e) => handleDelete(s.id, e)}
-                        className="p-1.5 rounded-xl text-zinc-500 hover:text-rose-400 hover:bg-zinc-800 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-xl text-zinc-500 hover:text-rose-400 hover:bg-[#1C2331] transition-colors cursor-pointer"
                         title="Eliminar sesión"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
 
-                      <ChevronRight className="w-4 h-4 text-zinc-600 group-hover:text-white transition-colors" />
+                      <ChevronRight className="w-4 h-4 text-zinc-600 group-hover:text-[#E2E8F0] transition-colors" />
                     </div>
                   </div>
                 );

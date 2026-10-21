@@ -434,24 +434,24 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
   const lastAiTip = lastAiMsg?.tip || scenario.initialTip;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-[#070709] text-zinc-100 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex flex-col bg-[#12161F] text-[#E2E8F0] overflow-hidden">
       {/* Top Bar Header - Clean, non-wrapping single line */}
-      <div className="flex items-center justify-between px-4 sm:px-6 py-2.5 sm:py-3 border-b border-zinc-800/80 bg-zinc-950/95 backdrop-blur-md shrink-0 z-20">
+      <div className="flex items-center justify-between px-4 sm:px-6 py-2.5 sm:py-3 border-b border-[#2A344A] bg-[#12161F]/95 backdrop-blur-md shrink-0 z-20">
         {/* Left: Avatar + Character Name */}
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#1C2331] border border-[#2A344A] flex items-center justify-center shrink-0">
             <span className="text-base sm:text-lg" role="img">
               {scenario.aiCharacter.avatar}
             </span>
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <h2 className="text-xs sm:text-sm font-bold text-white truncate max-w-[130px] sm:max-w-[220px]">
+              <h2 className="text-xs sm:text-sm font-bold text-[#E2E8F0] truncate max-w-[130px] sm:max-w-[220px]">
                 {scenario.aiCharacter.name}
               </h2>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
             </div>
-            <p className="text-[10px] text-zinc-400 truncate max-w-[140px] sm:max-w-none">
+            <p className="text-[10px] text-[#94A3B8] truncate max-w-[140px] sm:max-w-none">
               {scenario.userRole}
             </p>
           </div>
@@ -468,7 +468,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
             className={`p-1.5 rounded-xl border transition-colors cursor-pointer ${
               isMuted
                 ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
-                : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white'
+                : 'bg-[#1C2331] border-[#2A344A] text-[#94A3B8] hover:text-[#E2E8F0]'
             }`}
             title={isMuted ? 'Activar sonido' : 'Silenciar voz'}
           >
@@ -476,15 +476,15 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
           </button>
 
           {/* Timer pill */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-zinc-900 border border-zinc-800 text-xs font-mono font-medium text-amber-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#1C2331] border border-[#2A344A] text-xs font-mono font-medium text-[#FBBF24]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#FBBF24] animate-pulse" />
             <span>{formatDuration(durationSeconds)}</span>
           </div>
 
           {/* Objectives Toggle */}
           <button
             onClick={() => setShowObjectives(!showObjectives)}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-medium text-zinc-300 transition-colors cursor-pointer"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#1C2331] hover:bg-[#202838] border border-[#2A344A] text-xs font-medium text-[#E2E8F0] transition-colors cursor-pointer"
             title="Ver objetivos"
           >
             <span>
@@ -496,7 +496,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
           {/* Exit without report */}
           <button
             onClick={handleExitWithAutoSave}
-            className="p-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl bg-[#1C2331] hover:bg-[#202838] border border-[#2A344A] text-[#94A3B8] hover:text-[#E2E8F0] transition-colors cursor-pointer"
             title="Guardar y Salir"
           >
             <X className="w-3.5 h-3.5" />
@@ -506,8 +506,8 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
 
       {/* Floating Objectives Drawer */}
       {showObjectives && (
-        <div className="bg-zinc-950/95 border-b border-zinc-800 px-4 sm:px-6 py-3 space-y-2 backdrop-blur-md shrink-0 z-20 animate-in fade-in slide-in-from-top-2">
-          <p className="text-[11px] font-bold text-amber-400 uppercase tracking-wider">
+        <div className="bg-[#1C2331] border-b border-[#2A344A] px-4 sm:px-6 py-3 space-y-2 backdrop-blur-md shrink-0 z-20 animate-in fade-in slide-in-from-top-2">
+          <p className="text-[11px] font-bold text-[#38BDF8] uppercase tracking-wider">
             Objetivos de la Simulación
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -516,8 +516,8 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
                 key={obj.id}
                 className={`flex items-start gap-2 p-2 rounded-xl text-xs border ${
                   obj.completed
-                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-300 font-medium'
-                    : 'bg-zinc-900 border-zinc-800 text-zinc-400'
+                    ? 'bg-sky-500/10 border-sky-500/30 text-[#38BDF8] font-medium'
+                    : 'bg-[#12161F] border-[#2A344A] text-[#94A3B8]'
                 }`}
               >
                 {obj.completed ? (
@@ -548,10 +548,10 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
           {/* Character Avatar inside Orb */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div
-              className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-zinc-900 border-2 transition-all flex items-center justify-center shadow-2xl shadow-black/80 backdrop-blur-md ${
+              className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-[#1C2331] border-2 transition-all flex items-center justify-center shadow-2xl backdrop-blur-md ${
                 isHoldingMic
                   ? 'border-rose-500 scale-110 shadow-rose-500/50'
-                  : 'border-zinc-700/80 group-hover:border-amber-400'
+                  : 'border-[#2A344A] group-hover:border-[#38BDF8]'
               }`}
             >
               <span className="text-xl sm:text-3xl" role="img">
@@ -569,12 +569,12 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
                 SpeechService.cancelSpeech();
                 setCallState('idle');
               }}
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30 cursor-pointer transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/10 text-[#38BDF8] border border-sky-500/30 cursor-pointer transition-colors"
               title="Toca para interrumpir"
             >
               <Volume2 className="w-3.5 h-3.5 animate-pulse" />
               <span>Hablando...</span>
-              <span className="text-[10px] text-zinc-400 underline ml-1">Interrumpir</span>
+              <span className="text-[10px] text-[#94A3B8] underline ml-1">Interrumpir</span>
             </button>
           )}
 
@@ -586,21 +586,21 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
           )}
 
           {callState === 'processing' && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-zinc-900 text-zinc-300 border border-zinc-700">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-spin" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#1C2331] text-[#E2E8F0] border border-[#2A344A]">
+              <Sparkles className="w-3.5 h-3.5 text-[#38BDF8] animate-spin" />
               <span>Pensando respuesta...</span>
             </span>
           )}
 
           {callState === 'idle' && (
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-zinc-900/90 text-zinc-300 border border-zinc-800 shadow-sm">
-              <Radio className="w-3 h-3 text-amber-400 animate-pulse" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-[#1C2331] text-[#E2E8F0] border border-[#2A344A] shadow-sm">
+              <Radio className="w-3 h-3 text-[#38BDF8] animate-pulse" />
               <span>Walkie-Talkie: Mantén presionado para hablar</span>
             </div>
           )}
 
           {walkieTalkieTip && (
-            <span className="text-[11px] font-medium text-amber-300 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-xl animate-in fade-in">
+            <span className="text-[11px] font-medium text-[#FBBF24] bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-xl animate-in fade-in">
               {walkieTalkieTip}
             </span>
           )}
@@ -608,38 +608,38 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
 
         {/* User live speech bubble (if actively speaking) */}
         {interimTranscript && (
-          <div className="w-full rounded-2xl p-3.5 bg-zinc-900/90 border border-amber-500/30 text-center animate-in fade-in">
-            <p className="text-[10px] text-amber-400 font-bold uppercase tracking-wider mb-1">
+          <div className="w-full rounded-2xl p-3.5 bg-[#1C2331] border border-sky-500/40 text-center animate-in fade-in">
+            <p className="text-[10px] text-[#38BDF8] font-bold uppercase tracking-wider mb-1">
               Tu voz en directo:
             </p>
-            <p className="text-sm font-medium text-white italic">"{interimTranscript}"</p>
+            <p className="text-sm font-medium text-[#E2E8F0] italic">"{interimTranscript}"</p>
           </div>
         )}
 
-        {/* Clean Dialogue Card: Spacious & Elegant */}
-        <div className="w-full rounded-3xl bg-zinc-950/90 border border-zinc-800/90 p-4 sm:p-5 shadow-2xl backdrop-blur-md space-y-3 shrink-0">
+        {/* Clean Dialogue Card: Spacious & Ergonomic */}
+        <div className="w-full rounded-3xl bg-[#1C2331] border border-[#2A344A] p-4 sm:p-5 shadow-2xl backdrop-blur-md space-y-3 shrink-0">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-wider text-amber-400/90 mb-1">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-[#38BDF8] mb-1">
               {scenario.aiCharacter.name}:
             </p>
-            <p className="text-sm sm:text-base text-zinc-100 font-medium leading-relaxed whitespace-pre-line">
+            <p className="text-sm sm:text-base text-[#E2E8F0] font-medium leading-relaxed whitespace-pre-line">
               "{lastAiMessage}"
             </p>
           </div>
 
-          {/* Interactive Help Pills: Expand on demand, no screen clutter! */}
-          <div className="flex items-center gap-2 pt-2 border-t border-zinc-800/80 flex-wrap">
+          {/* Interactive Help Pills */}
+          <div className="flex items-center gap-2 pt-2 border-t border-[#2A344A] flex-wrap">
             {lastAiTranslation && (
               <button
                 type="button"
                 onClick={() => setShowTranslation(!showTranslation)}
                 className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium border transition-colors cursor-pointer ${
                   showTranslation
-                    ? 'bg-amber-500/15 border-amber-500/40 text-amber-300'
-                    : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200'
+                    ? 'bg-sky-500/15 border-sky-500/40 text-[#38BDF8]'
+                    : 'bg-[#12161F] border-[#2A344A] text-[#94A3B8] hover:text-[#E2E8F0]'
                 }`}
               >
-                <Languages className="w-3 h-3 text-amber-400" />
+                <Languages className="w-3 h-3 text-[#38BDF8]" />
                 <span>{showTranslation ? 'Ocultar traducción' : '🇪🇸 Ver traducción'}</span>
               </button>
             )}
@@ -650,11 +650,11 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
                 onClick={() => setShowTip(!showTip)}
                 className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium border transition-colors cursor-pointer ${
                   showTip
-                    ? 'bg-amber-500/15 border-amber-500/40 text-amber-300'
-                    : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200'
+                    ? 'bg-amber-500/15 border-amber-500/40 text-[#FBBF24]'
+                    : 'bg-[#12161F] border-[#2A344A] text-[#94A3B8] hover:text-[#E2E8F0]'
                 }`}
               >
-                <Lightbulb className="w-3 h-3 text-amber-400" />
+                <Lightbulb className="w-3 h-3 text-[#FBBF24]" />
                 <span>{showTip ? 'Ocultar sugerencia' : '💡 ¿Cómo responder?'}</span>
               </button>
             )}
@@ -662,8 +662,8 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
 
           {/* Expanded Spanish Translation Card */}
           {showTranslation && lastAiTranslation && (
-            <div className="p-3 rounded-2xl bg-zinc-900/90 border border-zinc-800 text-xs text-zinc-300 italic animate-in fade-in slide-in-from-top-1 leading-relaxed">
-              <span className="font-semibold text-zinc-400 not-italic block text-[10px] uppercase mb-0.5">
+            <div className="p-3 rounded-2xl bg-[#12161F] border border-[#2A344A] text-xs text-[#E2E8F0] italic animate-in fade-in slide-in-from-top-1 leading-relaxed">
+              <span className="font-semibold text-[#94A3B8] not-italic block text-[10px] uppercase mb-0.5">
                 Traducción:
               </span>
               "{lastAiTranslation}"
@@ -673,40 +673,40 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
           {/* Expanded Pronunciation Tip & Phonetics Card */}
           {showTip && lastAiTip && (
             <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200 animate-in fade-in slide-in-from-top-1 leading-relaxed">
-              <div className="flex items-center gap-1.5 font-bold text-amber-400 text-[11px] mb-1">
+              <div className="flex items-center gap-1.5 font-bold text-[#FBBF24] text-[11px] mb-1">
                 <Lightbulb className="w-3.5 h-3.5 shrink-0" />
                 <span>Consejo de respuesta y fonética:</span>
               </div>
-              <p className="leading-snug">{lastAiTip}</p>
+              <p className="leading-relaxed">{lastAiTip}</p>
             </div>
           )}
         </div>
 
-        {/* Real-time Coach Correction Toast (Dismissable, never overlapping) */}
+        {/* Real-time Coach Correction Toast */}
         {latestCorrection && (
-          <div className="w-full rounded-2xl bg-[#141419] border border-amber-500/30 p-3.5 text-xs animate-in fade-in slide-in-from-bottom-2 shadow-xl space-y-1.5 shrink-0">
+          <div className="w-full rounded-2xl bg-[#1C2331] border border-[#2A344A] p-3.5 text-xs animate-in fade-in slide-in-from-bottom-2 shadow-xl space-y-1.5 shrink-0">
             <div className="flex items-center justify-between">
-              <span className="font-bold text-amber-400 flex items-center gap-1.5 text-[11px]">
+              <span className="font-bold text-[#38BDF8] flex items-center gap-1.5 text-[11px]">
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>Consejo de Fluidez:</span>
               </span>
               <button
                 onClick={() => setLatestCorrection(null)}
-                className="text-zinc-400 hover:text-white p-0.5 cursor-pointer"
+                className="text-[#94A3B8] hover:text-[#E2E8F0] p-0.5 cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
             </div>
 
             <div className="space-y-1 text-[11px]">
-              <p className="text-zinc-400">
+              <p className="text-[#94A3B8]">
                 <span className="text-rose-400 font-semibold">Dijiste:</span> "{latestCorrection.originalText}"
               </p>
-              <p className="text-zinc-200">
+              <p className="text-[#E2E8F0]">
                 <span className="text-emerald-400 font-semibold">Más natural:</span> "{latestCorrection.improvedText}"
               </p>
             </div>
-            <p className="text-[10px] text-zinc-400 pt-1 border-t border-zinc-800">
+            <p className="text-[10px] text-[#94A3B8] pt-1 border-t border-[#2A344A]">
               {latestCorrection.explanation}
             </p>
           </div>
@@ -715,15 +715,15 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
 
       {/* Expandable Chat Log Drawer */}
       {showChatLog && (
-        <div className="absolute inset-x-0 bottom-24 top-14 bg-black/95 border-t border-zinc-800 p-4 overflow-y-auto z-40 backdrop-blur-lg flex flex-col justify-between">
+        <div className="absolute inset-x-0 bottom-24 top-14 bg-[#12161F]/95 border-t border-[#2A344A] p-4 overflow-y-auto z-40 backdrop-blur-lg flex flex-col justify-between">
           <div className="space-y-3 max-w-xl mx-auto w-full">
-            <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+            <div className="flex items-center justify-between pb-2 border-b border-[#2A344A]">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#94A3B8]">
                 {t('call.transcriptTitle')}
               </h3>
               <button
                 onClick={() => setShowChatLog(false)}
-                className="text-zinc-400 hover:text-white cursor-pointer"
+                className="text-[#94A3B8] hover:text-[#E2E8F0] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -733,14 +733,14 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
                 key={m.id}
                 className={`flex flex-col ${m.sender === 'user' ? 'items-end' : 'items-start'}`}
               >
-                <span className="text-[10px] text-zinc-500 mb-0.5">
+                <span className="text-[10px] text-[#94A3B8] mb-0.5">
                   {m.sender === 'user' ? 'Tú' : scenario.aiCharacter.name}
                 </span>
                 <div
                   className={`max-w-[85%] rounded-2xl px-3.5 py-2 text-xs leading-relaxed ${
                     m.sender === 'user'
-                      ? 'bg-zinc-100 text-zinc-950 font-medium rounded-br-none'
-                      : 'bg-zinc-900 text-zinc-200 rounded-bl-none border border-zinc-800'
+                      ? 'bg-[#0EA5E9] text-slate-950 font-medium rounded-br-none'
+                      : 'bg-[#1C2331] text-[#E2E8F0] rounded-bl-none border border-[#2A344A]'
                   }`}
                 >
                   {m.text}
@@ -754,7 +754,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
 
       {/* Text Input Drawer */}
       {showTextInput && (
-        <div className="px-4 py-2.5 bg-zinc-950 border-t border-zinc-800 flex items-center gap-2 max-w-xl mx-auto w-full shrink-0 z-30">
+        <div className="px-4 py-2.5 bg-[#1C2331] border-t border-[#2A344A] flex items-center gap-2 max-w-xl mx-auto w-full shrink-0 z-30">
           <input
             type="text"
             value={textInput}
@@ -766,7 +766,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
               }
             }}
             placeholder="Escribe tu respuesta en inglés..."
-            className="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+            className="flex-1 bg-[#12161F] border border-[#2A344A] rounded-xl px-3.5 py-2 text-xs text-[#E2E8F0] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#38BDF8]"
           />
           <button
             onClick={() => {
@@ -775,7 +775,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
                 setTextInput('');
               }
             }}
-            className="p-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 font-bold cursor-pointer"
+            className="p-2 rounded-xl bg-[#0EA5E9] hover:bg-[#38BDF8] text-slate-950 font-bold cursor-pointer"
           >
             <Send className="w-4 h-4" />
           </button>
@@ -783,14 +783,14 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
       )}
 
       {/* Bottom Floating Call Dock (Apple / ChatGPT style) */}
-      <div className="px-4 sm:px-6 py-3 bg-zinc-950/95 border-t border-zinc-800/80 backdrop-blur-md flex items-center justify-between max-w-md mx-auto w-full shrink-0 z-20">
+      <div className="px-4 sm:px-6 py-3 bg-[#12161F]/95 border-t border-[#2A344A] backdrop-blur-md flex items-center justify-between max-w-md mx-auto w-full shrink-0 z-20">
         {/* Lifeline / Hint button */}
         <button
           onClick={fetchLiveHints}
-          className="flex flex-col items-center gap-1 text-zinc-400 hover:text-amber-400 transition-colors cursor-pointer"
+          className="flex flex-col items-center gap-1 text-[#94A3B8] hover:text-[#38BDF8] transition-colors cursor-pointer"
           title="Pedir ideas de respuesta"
         >
-          <div className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 hover:border-amber-500/40 flex items-center justify-center transition-all">
+          <div className="w-10 h-10 rounded-full bg-[#1C2331] border border-[#2A344A] hover:border-[#38BDF8]/40 flex items-center justify-center transition-all">
             <Lightbulb className="w-4 h-4" />
           </div>
           <span className="text-[10px] font-medium">Pista</span>
@@ -799,10 +799,10 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
         {/* Repeat audio button */}
         <button
           onClick={repeatLastAiStatement}
-          className="flex flex-col items-center gap-1 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+          className="flex flex-col items-center gap-1 text-[#94A3B8] hover:text-[#E2E8F0] transition-colors cursor-pointer"
           title="Escuchar de nuevo"
         >
-          <div className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 flex items-center justify-center transition-all">
+          <div className="w-10 h-10 rounded-full bg-[#1C2331] border border-[#2A344A] hover:border-[#3D4A66] flex items-center justify-center transition-all">
             <RotateCcw className="w-4 h-4" />
           </div>
           <span className="text-[10px] font-medium">Repetir</span>
@@ -819,19 +819,19 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
             className={`w-15 h-15 rounded-full flex items-center justify-center transition-all duration-150 cursor-pointer touch-none select-none relative ${
               isHoldingMic
                 ? 'bg-rose-600 text-white ring-8 ring-rose-500/30 scale-110 shadow-2xl shadow-rose-600/50'
-                : 'bg-amber-400 hover:bg-amber-300 text-zinc-950 shadow-lg shadow-amber-500/20 active:scale-95'
+                : 'bg-[#0EA5E9] hover:bg-[#38BDF8] text-slate-950 shadow-lg shadow-sky-950/40 active:scale-95'
             }`}
             title="Mantén presionado para hablar, suelta para enviar"
           >
             {isHoldingMic ? (
               <Mic className="w-7 h-7 text-white animate-pulse" />
             ) : (
-              <Mic className="w-6 h-6 text-zinc-950" />
+              <Mic className="w-6 h-6 text-slate-950" />
             )}
           </button>
           <span
             className={`text-[10px] font-semibold tracking-tight transition-colors ${
-              isHoldingMic ? 'text-rose-400 font-bold animate-pulse' : 'text-zinc-400'
+              isHoldingMic ? 'text-rose-400 font-bold animate-pulse' : 'text-[#94A3B8]'
             }`}
           >
             {isHoldingMic ? '¡Suelta para enviar!' : 'Mantén presionado'}
@@ -842,11 +842,11 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
         <button
           onClick={() => setShowTextInput(!showTextInput)}
           className={`flex flex-col items-center gap-1 transition-colors cursor-pointer ${
-            showTextInput ? 'text-amber-400' : 'text-zinc-400 hover:text-white'
+            showTextInput ? 'text-[#38BDF8]' : 'text-[#94A3B8] hover:text-[#E2E8F0]'
           }`}
           title="Escribir texto"
         >
-          <div className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center transition-all">
+          <div className="w-10 h-10 rounded-full bg-[#1C2331] border border-[#2A344A] flex items-center justify-center transition-all">
             <Keyboard className="w-4 h-4" />
           </div>
           <span className="text-[10px] font-medium">Teclado</span>
@@ -855,10 +855,10 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
         {/* End Call Button */}
         <button
           onClick={handleHangUp}
-          className="flex flex-col items-center gap-1 text-zinc-400 hover:text-rose-400 transition-colors cursor-pointer"
+          className="flex flex-col items-center gap-1 text-[#94A3B8] hover:text-rose-400 transition-colors cursor-pointer"
           title="Colgar y ver reporte"
         >
-          <div className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 hover:bg-rose-600 hover:border-rose-600 flex items-center justify-center text-rose-400 hover:text-white transition-all">
+          <div className="w-10 h-10 rounded-full bg-[#1C2331] border border-[#2A344A] hover:bg-rose-600 hover:border-rose-600 flex items-center justify-center text-rose-400 hover:text-white transition-all">
             <PhoneOff className="w-4 h-4" />
           </div>
           <span className="text-[10px] font-medium text-rose-400">Colgar</span>
@@ -867,27 +867,27 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
 
       {/* Lifeline Hints Modal */}
       {showHintsModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-5 max-w-sm w-full shadow-2xl space-y-3.5">
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-2.5">
-              <div className="flex items-center gap-2 text-amber-400">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-[#1C2331] border border-[#2A344A] rounded-3xl p-5 max-w-sm w-full shadow-2xl space-y-3.5">
+            <div className="flex items-center justify-between border-b border-[#2A344A] pb-2.5">
+              <div className="flex items-center gap-2 text-[#38BDF8]">
                 <Lightbulb className="w-4 h-4" />
-                <h3 className="text-xs font-bold text-white">Sugerencias para responder</h3>
+                <h3 className="text-xs font-bold text-[#E2E8F0]">Sugerencias para responder</h3>
               </div>
               <button
                 onClick={() => setShowHintsModal(false)}
-                className="text-zinc-400 hover:text-white cursor-pointer"
+                className="text-[#94A3B8] hover:text-[#E2E8F0] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <p className="text-[11px] text-zinc-400">
+            <p className="text-[11px] text-[#94A3B8]">
               Elige una frase profesional para responder de inmediato:
             </p>
 
             {loadingHints ? (
-              <div className="py-6 text-center text-xs text-zinc-400 animate-pulse">
+              <div className="py-6 text-center text-xs text-[#94A3B8] animate-pulse">
                 Generando opciones con IA...
               </div>
             ) : (
@@ -899,7 +899,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
                       setShowHintsModal(false);
                       handleUserSubmission(hint);
                     }}
-                    className="w-full text-left p-3 rounded-xl bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-xs text-zinc-200 leading-relaxed transition-all cursor-pointer"
+                    className="w-full text-left p-3 rounded-xl bg-[#12161F] hover:bg-[#202838] border border-[#2A344A] text-xs text-[#E2E8F0] leading-relaxed transition-all cursor-pointer"
                   >
                     "{hint}"
                   </button>

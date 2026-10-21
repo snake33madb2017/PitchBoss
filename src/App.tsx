@@ -240,7 +240,7 @@ function AppContent() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#09090b] text-zinc-100 selection:bg-amber-500/20 selection:text-amber-300">
+    <div className="min-h-screen flex flex-col bg-[#12161F] text-[#E2E8F0] selection:bg-sky-500/30 selection:text-sky-200">
       {/* Top Navigation */}
       <Navbar
         isAdmin={isAdmin}
@@ -274,9 +274,9 @@ function AppContent() {
       {isAdmin && (
         <div className="bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-amber-500/5 border-b border-amber-500/30 px-4 sm:px-8 py-2.5 flex items-center justify-between text-xs transition-all animate-in fade-in">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
-            <span className="font-bold text-amber-300">Modo Administrador Activo</span>
-            <span className="hidden sm:inline text-zinc-400">
+            <ShieldCheck className="w-4 h-4 text-[#FBBF24] shrink-0" />
+            <span className="font-bold text-[#FBBF24]">Modo Administrador Activo</span>
+            <span className="hidden sm:inline text-[#94A3B8]">
               — Puedes editar cualquier escenario, duplicar, ocultar y gestionar copias de seguridad.
             </span>
           </div>
@@ -284,7 +284,7 @@ function AppContent() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsAdminHubOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-500 text-zinc-950 font-bold hover:bg-amber-400 transition-colors cursor-pointer shadow-sm"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#0EA5E9] hover:bg-[#38BDF8] text-slate-950 font-bold transition-colors cursor-pointer shadow-sm"
             >
               <Settings2 className="w-3.5 h-3.5" />
               <span>Panel de Control</span>
@@ -292,7 +292,7 @@ function AppContent() {
 
             <button
               onClick={handleLogoutAdmin}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-xl text-zinc-400 hover:text-rose-400 hover:bg-zinc-900 border border-zinc-800 transition-colors cursor-pointer"
+              className="flex items-center gap-1 px-2.5 py-1 rounded-xl text-[#94A3B8] hover:text-rose-400 hover:bg-[#1C2331] border border-[#2A344A] transition-colors cursor-pointer"
               title="Cerrar sesión de administrador"
             >
               <LogOut className="w-3.5 h-3.5" />
@@ -305,53 +305,53 @@ function AppContent() {
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-8 py-8 space-y-8">
         {/* Hero Section */}
-        <div className="relative rounded-3xl border border-zinc-800 bg-gradient-to-b from-[#131317] via-[#0f0f13] to-[#09090b] p-6 sm:p-10 overflow-hidden shadow-2xl shadow-black/90 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-          {/* Subtle ambient gold tint */}
-          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 rounded-full bg-amber-500/5 blur-3xl pointer-events-none" />
+        <div className="relative rounded-3xl border border-[#2A344A] bg-[#1C2331] p-6 sm:p-10 overflow-hidden shadow-2xl shadow-black/50 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+          {/* Subtle ambient cyan glow */}
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 rounded-full bg-sky-500/5 blur-3xl pointer-events-none" />
 
           <div className="relative z-10 max-w-2xl space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-xs font-semibold text-amber-400">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-xs font-semibold text-[#38BDF8]">
               <Sparkles className="w-3.5 h-3.5" />
               <span>{t('hero.badge')}</span>
             </div>
 
-            <h2 className="text-2xl sm:text-4xl font-black tracking-tight leading-tight text-white">
+            <h2 className="text-2xl sm:text-4xl font-black tracking-tight leading-tight text-[#E2E8F0]">
               {t('hero.title')}{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#38BDF8] via-sky-300 to-[#0EA5E9]">
                 {t('hero.titleHighlight')}
               </span>
             </h2>
 
-            <p className="text-sm sm:text-base leading-relaxed max-w-2xl text-zinc-300">
+            <p className="text-sm sm:text-base leading-relaxed max-w-2xl text-[#94A3B8]">
               {t('hero.description')}
             </p>
 
             {/* Quick Benefits Badges */}
             <div className="flex flex-wrap items-center gap-4 pt-2 text-xs">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border bg-zinc-950/80 border-zinc-800 text-zinc-300 font-medium">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border bg-[#12161F] border-[#2A344A] text-[#E2E8F0] font-medium">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
                 <span>{t('hero.benefitStrict')}</span>
               </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border bg-zinc-950/80 border-zinc-800 text-zinc-300 font-medium">
-                <Zap className="w-4 h-4 text-amber-400" />
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border bg-[#12161F] border-[#2A344A] text-[#E2E8F0] font-medium">
+                <Zap className="w-4 h-4 text-[#FBBF24]" />
                 <span>{t('hero.benefitHandsFree')}</span>
               </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border bg-zinc-950/80 border-zinc-800 text-zinc-300 font-medium">
-                <Briefcase className="w-4 h-4 text-zinc-400" />
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border bg-[#12161F] border-[#2A344A] text-[#94A3B8] font-medium">
+                <Briefcase className="w-4 h-4 text-[#38BDF8]" />
                 <span>{t('hero.benefitFeedback')}</span>
               </div>
             </div>
           </div>
 
           {/* PitchBoss Emblem Card */}
-          <div className="relative z-10 hidden lg:flex flex-col items-center justify-center p-6 border border-zinc-800 rounded-3xl shrink-0 shadow-2xl shadow-black/80 backdrop-blur-sm max-w-[280px] bg-zinc-950/90">
-            <div className="w-28 h-28 rounded-2xl border border-zinc-800/80 bg-[#09090b] p-2 flex items-center justify-center mb-3 shadow-lg shadow-black/60">
+          <div className="relative z-10 hidden lg:flex flex-col items-center justify-center p-6 border border-[#2A344A] rounded-3xl shrink-0 shadow-2xl backdrop-blur-sm max-w-[280px] bg-[#12161F]/90">
+            <div className="w-28 h-28 rounded-2xl border border-[#2A344A] bg-[#1C2331] p-2 flex items-center justify-center mb-3 shadow-lg shadow-black/40">
               <img src="/logo-icon.png" alt="PitchBoss Emblem" className="w-full h-full object-contain drop-shadow-md rounded-xl" />
             </div>
-            <span className="text-base font-black flex items-center text-white">
-              Pitch<span className="text-amber-400 ml-0.5">Boss</span>
+            <span className="text-base font-black flex items-center text-[#E2E8F0]">
+              Pitch<span className="text-[#38BDF8] ml-0.5">Boss</span>
             </span>
-            <p className="text-[11px] text-center text-zinc-400 mt-1 leading-snug">
+            <p className="text-[11px] text-center text-[#94A3B8] mt-1 leading-snug">
               {t('nav.brandSubtitle')}
             </p>
           </div>
@@ -362,25 +362,25 @@ function AppContent() {
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
             {/* Search Input */}
             <div className="relative flex-1 max-w-md">
-              <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t('search.placeholder')}
-                className="w-full border rounded-2xl pl-10 pr-4 py-2.5 text-xs transition-colors focus:outline-none focus:border-amber-500/80 bg-zinc-900/90 border-zinc-800 text-zinc-100 placeholder:text-zinc-500"
+                className="w-full border rounded-2xl pl-10 pr-4 py-2.5 text-xs transition-colors focus:outline-none focus:border-[#38BDF8] bg-[#1C2331] border-[#2A344A] text-[#E2E8F0] placeholder:text-[#94A3B8]"
               />
             </div>
 
             {/* Difficulty Dropdown */}
             <div className="flex items-center gap-2">
-              <span className="text-xs text-zinc-400 flex items-center gap-1">
-                <Filter className="w-3.5 h-3.5" /> {t('filter.difficulty')}
+              <span className="text-xs text-[#94A3B8] flex items-center gap-1">
+                <Filter className="w-3.5 h-3.5 text-[#38BDF8]" /> {t('filter.difficulty')}
               </span>
               <select
                 value={selectedDifficulty}
                 onChange={(e) => setSelectedDifficulty(e.target.value)}
-                className="border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-amber-500 cursor-pointer bg-zinc-900 border-zinc-800 text-zinc-200"
+                className="border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#38BDF8] cursor-pointer bg-[#1C2331] border-[#2A344A] text-[#E2E8F0]"
               >
                 <option value="all">{t('filter.allDifficulties')}</option>
                 <option value="easy">{t('filter.easy')}</option>
@@ -401,8 +401,8 @@ function AppContent() {
                   onClick={() => setSelectedNiche(niche)}
                   className={`text-xs px-3.5 py-1.5 rounded-xl whitespace-nowrap font-medium transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-zinc-100 text-zinc-950 font-bold shadow-md shadow-black/40'
-                      : 'bg-zinc-900/90 text-zinc-400 hover:text-zinc-200 border border-zinc-800 hover:border-zinc-700'
+                      ? 'bg-[#0EA5E9] text-slate-950 font-bold shadow-md shadow-sky-950/40'
+                      : 'bg-[#1C2331] text-[#94A3B8] hover:text-[#E2E8F0] border border-[#2A344A] hover:border-[#3D4A66]'
                   }`}
                 >
                   {niche === 'all' ? t('filter.allNiches') : niche}
@@ -415,15 +415,15 @@ function AppContent() {
         {/* Scenarios Grid */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-bold flex items-center gap-2 text-white">
-              <Layers className="w-4 h-4 text-amber-400" />
+            <h3 className="text-base font-bold flex items-center gap-2 text-[#E2E8F0]">
+              <Layers className="w-4 h-4 text-[#38BDF8]" />
               <span>{t('scenarios.available')} ({filteredScenarios.length})</span>
             </h3>
 
             {isAdmin && (
               <button
                 onClick={handleOpenCreateScenario}
-                className="flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 text-xs font-bold text-[#38BDF8] hover:text-[#0EA5E9] transition-colors cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Nuevo Escenario</span>
@@ -432,19 +432,19 @@ function AppContent() {
           </div>
 
           {filteredScenarios.length === 0 ? (
-            <div className="text-center py-16 border rounded-3xl p-8 space-y-3 bg-zinc-900/40 border-zinc-800/80">
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto text-zinc-500 bg-zinc-800">
+            <div className="text-center py-16 border rounded-3xl p-8 space-y-3 bg-[#1C2331] border-[#2A344A]">
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto text-[#94A3B8] bg-[#12161F]">
                 <Search className="w-6 h-6" />
               </div>
-              <p className="text-sm font-semibold text-zinc-300">
+              <p className="text-sm font-semibold text-[#E2E8F0]">
                 {t('scenarios.emptyTitle')}
               </p>
-              <p className="text-xs text-zinc-500 max-w-sm mx-auto">
+              <p className="text-xs text-[#94A3B8] max-w-sm mx-auto">
                 {t('scenarios.emptyDesc')}
               </p>
               <button
                 onClick={handleOpenCreateScenario}
-                className="mt-2 px-4 py-2 rounded-xl text-xs font-bold cursor-pointer bg-zinc-100 hover:bg-white text-zinc-950 shadow-md shadow-black/40"
+                className="mt-2 px-4 py-2 rounded-xl text-xs font-bold cursor-pointer bg-[#0EA5E9] hover:bg-[#38BDF8] text-slate-950 shadow-md shadow-sky-950/40"
               >
                 {t('scenarios.createWithAi')}
               </button>
