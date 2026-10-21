@@ -165,7 +165,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </button>
           </div>
 
-          {/* PWA Install Quick Action */}
+          {/* PWA Install Quick Action (Android / Desktop) */}
           {canInstallPwa && onInstallPwa && (
             <div className="p-3.5 rounded-2xl border border-zinc-700/80 bg-zinc-800/40 flex items-center justify-between">
               <div className="space-y-0.5">
@@ -188,6 +188,22 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </button>
             </div>
           )}
+
+          {/* iOS / iPhone Install Guide */}
+          {typeof navigator !== 'undefined' &&
+            /iPad|iPhone|iPod/.test(navigator.userAgent || '') &&
+            !(navigator as unknown as { standalone?: boolean }).standalone && (
+              <div className="p-3.5 rounded-2xl border border-amber-500/20 bg-amber-500/5 space-y-2">
+                <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                  <Download className="w-4 h-4 text-amber-400" /> Cómo Instalar en iPhone / iPad
+                </span>
+                <p className="text-[11px] text-zinc-300 leading-relaxed">
+                  1. En <strong>Safari</strong>, pulsa el botón <strong>Compartir</strong> (icono del cuadrado con la flecha hacia arriba <span className="text-amber-400 font-bold">[ ↑ ]</span>).<br />
+                  2. Desliza hacia abajo y pulsa <strong>"Añadir a pantalla de inicio"</strong>.<br />
+                  3. Pulsa <strong>Añadir</strong> arriba a la derecha. ¡Listo!
+                </p>
+              </div>
+            )}
 
           {/* Admin Panel Quick Access */}
           {onOpenAdmin && (
