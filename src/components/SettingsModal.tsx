@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import type { AppSettings } from '../types';
-import { GeminiService } from '../services/geminiService';
 import { SpeechService } from '../services/speechService';
 import { useTranslation } from '../i18n/LanguageContext';
-import { Settings, Key, Volume2, Mic, Check, X, ExternalLink, Download } from 'lucide-react';
+import { Settings, Volume2, Mic, Check, X, Download } from 'lucide-react';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -26,7 +25,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const [apiKey, setApiKey] = useState(settings.apiKey);
   const [speechRate, setSpeechRate] = useState(settings.speechRate);
   const [autoListen, setAutoListen] = useState(settings.autoListen);
   const [preferredVoice, setPreferredVoice] = useState(settings.preferredVoice);
@@ -41,10 +39,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   if (!isOpen) return null;
 
   const handleSave = () => {
-    GeminiService.setApiKey(apiKey);
     onSaveSettings({
       ...settings,
-      apiKey,
       speechRate,
       autoListen,
       preferredVoice
@@ -53,8 +49,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-lg border rounded-3xl shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 bg-[#1C2331] border-[#2A344A] text-[#E2E8F0] shadow-black/80">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0B0F17]/85 backdrop-blur-md overflow-y-auto">
+      <div className="relative w-full max-w-lg border rounded-3xl shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 bg-[#1C2331] border-[#2A344A] text-[#E2E8F0]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b bg-[#12161F] border-[#2A344A]">
           <div className="flex items-center gap-2 text-[#38BDF8]">
@@ -71,34 +67,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
         {/* Form Body */}
         <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
-          {/* Gemini API Key */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold flex items-center gap-1.5 text-[#E2E8F0]">
-                <Key className="w-3.5 h-3.5 text-[#38BDF8]" />
-                {t('settings.apiKey')}
-              </label>
-              <a
-                href="https://aistudio.google.com/app/apikey"
-                target="_blank"
-                rel="noreferrer"
-                className="text-[11px] text-[#38BDF8] hover:text-[#0EA5E9] flex items-center gap-1 font-semibold"
-              >
-                {t('settings.getKey')} <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
-            <input
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="AIzaSy..."
-              className="w-full border rounded-xl px-3.5 py-2.5 text-xs font-mono transition-colors focus:outline-none focus:border-[#38BDF8] bg-[#12161F] border-[#2A344A] text-[#E2E8F0] placeholder:text-[#94A3B8]"
-            />
-            <p className="text-[11px] text-[#94A3B8]">
-              {t('settings.apiKeyDesc')}
-            </p>
-          </div>
-
           {/* Voice Selector */}
           <div className="space-y-2">
             <label className="text-xs font-semibold flex items-center gap-1.5 text-[#E2E8F0]">
@@ -182,7 +150,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   onClose();
                   onInstallPwa();
                 }}
-                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-[#0EA5E9] hover:bg-[#38BDF8] text-slate-950 transition-colors cursor-pointer shadow-sm"
+                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-[#0EA5E9] hover:bg-[#38BDF8] text-white transition-colors cursor-pointer shadow-sm"
               >
                 Instalar
               </button>
@@ -222,7 +190,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   onClose();
                   onOpenAdmin();
                 }}
-                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-[#0EA5E9] hover:bg-[#38BDF8] text-slate-950 transition-colors cursor-pointer shadow-sm"
+                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-[#0EA5E9] hover:bg-[#38BDF8] text-white transition-colors cursor-pointer shadow-sm"
               >
                 Abrir Admin
               </button>
@@ -240,9 +208,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </button>
           <button
             onClick={handleSave}
-            className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold shadow-lg transition-all cursor-pointer bg-[#0EA5E9] hover:bg-[#38BDF8] text-slate-950 shadow-sky-950/40"
+            className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold shadow-lg transition-all cursor-pointer bg-[#0EA5E9] hover:bg-[#38BDF8] text-white shadow-sky-950/40"
           >
-            <Check className="w-3.5 h-3.5 text-slate-950" />
+            <Check className="w-3.5 h-3.5 text-white" />
             {t('settings.save')}
           </button>
         </div>
