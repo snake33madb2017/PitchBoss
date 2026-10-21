@@ -238,7 +238,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-black/80 backdrop-blur-md overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-[#0B0F17]/80 backdrop-blur-md overflow-hidden">
       <div className="relative w-full max-w-4xl rounded-2xl sm:rounded-3xl border border-[#2A344A] bg-[#1C2331] text-[#E2E8F0] shadow-2xl flex flex-col h-[94vh] sm:h-auto sm:max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95">
         {/* Top Header */}
         <div className="flex items-center justify-between px-3 sm:px-6 py-2.5 sm:py-3.5 border-b border-[#2A344A] bg-[#12161F] shrink-0 z-10">
@@ -335,23 +335,23 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               {/* Controls bar */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                 <div className="relative flex-1 max-w-sm">
-                  <Search className="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Search className="w-4 h-4 text-[#94A3B8] absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Buscar escenario por título o nicho..."
-                    className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border bg-zinc-950 border-zinc-800 text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:border-amber-500 transition-colors"
+                    className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border bg-[#12161F] border-[#2A344A] text-[#E2E8F0] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#38BDF8] transition-colors"
                   />
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
                   <button
                     onClick={handleRestoreDefaults}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-zinc-300 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 transition-colors cursor-pointer"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-[#E2E8F0] hover:bg-[#202838] bg-[#12161F] border border-[#2A344A] transition-colors cursor-pointer"
                     title="Restaurar el escenario original de LOVO Bar"
                   >
-                    <RotateCcw className="w-3.5 h-3.5 text-zinc-400" />
+                    <RotateCcw className="w-3.5 h-3.5 text-[#94A3B8]" />
                     <span>Restaurar Fábrica</span>
                   </button>
                   <button
@@ -359,7 +359,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                       onClose();
                       onOpenCreateScenario();
                     }}
-                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-zinc-950 bg-amber-400 hover:bg-amber-300 transition-all shadow-md shadow-amber-500/20 cursor-pointer"
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-950 bg-[#0EA5E9] hover:bg-[#38BDF8] transition-all shadow-md shadow-sky-500/20 cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Crear Escenario</span>
@@ -368,43 +368,43 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               </div>
 
               {/* Scenarios Table / List */}
-              <div className="border border-zinc-800 rounded-2xl overflow-hidden bg-zinc-950/60 divide-y divide-zinc-800/80">
+              <div className="border border-[#2A344A] rounded-2xl overflow-hidden bg-[#12161F]/70 divide-y divide-[#2A344A]">
                 {filtered.length === 0 ? (
-                  <div className="p-8 text-center text-zinc-500 text-xs">
+                  <div className="p-8 text-center text-[#94A3B8] text-xs">
                     No se encontraron escenarios que coincidan con la búsqueda.
                   </div>
                 ) : (
                   filtered.map((scenario) => (
                     <div
                       key={scenario.id}
-                      className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-900/40 transition-colors"
+                      className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#202838]/50 transition-colors"
                     >
                       <div className="flex items-start gap-3 min-w-0">
-                        <span className="text-2xl shrink-0 p-2 rounded-xl bg-zinc-900 border border-zinc-800">
+                        <span className="text-2xl shrink-0 p-2 rounded-xl bg-[#1C2331] border border-[#2A344A]">
                           {scenario.aiCharacter.avatar || '💼'}
                         </span>
                         <div className="min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h4 className="text-xs sm:text-sm font-bold text-white truncate">
+                            <h4 className="text-xs sm:text-sm font-bold text-[#E2E8F0] truncate">
                               {scenario.title}
                             </h4>
                             {scenario.isHidden ? (
-                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700 font-medium">
+                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#1C2331] text-[#94A3B8] border border-[#2A344A] font-medium">
                                 Oculto a usuarios
                               </span>
                             ) : (
-                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
+                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-medium">
                                 Visible
                               </span>
                             )}
-                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-900 text-zinc-400 border border-zinc-800 font-mono">
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#1C2331] text-[#38BDF8] border border-[#2A344A] font-mono">
                               {scenario.targetEnglishLevel}
                             </span>
                           </div>
-                          <p className="text-[11px] text-zinc-400 truncate mt-0.5">
+                          <p className="text-[11px] text-[#94A3B8] truncate mt-0.5">
                             {scenario.niche} • Interlocutor: {scenario.aiCharacter.name} ({scenario.aiCharacter.role})
                           </p>
-                          <p className="text-[11px] text-zinc-500 line-clamp-1 mt-1 font-mono">
+                          <p className="text-[11px] text-[#94A3B8]/80 line-clamp-1 mt-1 font-mono">
                             {scenario.initialGreeting}
                           </p>
                         </div>
@@ -417,16 +417,16 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                             onClose();
                             onOpenEditScenario(scenario);
                           }}
-                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-800 transition-colors cursor-pointer"
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-[#1C2331] hover:bg-[#202838] text-[#E2E8F0] border border-[#2A344A] transition-colors cursor-pointer"
                           title="Editar todos los campos del escenario"
                         >
-                          <Edit3 className="w-3.5 h-3.5 text-amber-400" />
+                          <Edit3 className="w-3.5 h-3.5 text-[#38BDF8]" />
                           <span>Editar</span>
                         </button>
 
                         <button
                           onClick={() => handleDuplicate(scenario.id)}
-                          className="p-1.5 rounded-xl text-zinc-400 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-xl text-[#94A3B8] hover:text-[#E2E8F0] bg-[#1C2331] hover:bg-[#202838] border border-[#2A344A] transition-colors cursor-pointer"
                           title="Duplicar escenario"
                         >
                           <Copy className="w-3.5 h-3.5" />
@@ -436,8 +436,8 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                           onClick={() => handleToggleVisibility(scenario.id)}
                           className={`p-1.5 rounded-xl border transition-colors cursor-pointer ${
                             scenario.isHidden
-                              ? 'text-zinc-500 bg-zinc-900 border-zinc-800 hover:text-zinc-300'
-                              : 'text-amber-400 bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20'
+                              ? 'text-[#94A3B8] bg-[#1C2331] border-[#2A344A] hover:text-[#E2E8F0]'
+                              : 'text-[#38BDF8] bg-sky-500/10 border-sky-500/30 hover:bg-sky-500/20'
                           }`}
                           title={scenario.isHidden ? 'Hacer visible a los usuarios' : 'Ocultar a los usuarios'}
                         >
@@ -446,7 +446,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
 
                         <button
                           onClick={() => handleDelete(scenario.id, scenario.title)}
-                          className="p-1.5 rounded-xl text-zinc-500 hover:text-rose-400 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-xl text-[#94A3B8] hover:text-rose-400 bg-[#1C2331] hover:bg-[#202838] border border-[#2A344A] transition-colors cursor-pointer"
                           title="Eliminar escenario"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -463,13 +463,13 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
           {activeTab === 'licenses' && (
             <div className="space-y-6">
               {/* License Generator Box */}
-              <div className="p-5 rounded-2xl border border-zinc-800 bg-zinc-950 space-y-4">
+              <div className="p-5 rounded-2xl border border-[#2A344A] bg-[#12161F] space-y-4">
                 <div>
-                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                  <h3 className="text-sm font-bold text-[#E2E8F0] flex items-center gap-2">
                     <Crown className="w-4 h-4 text-amber-400" />
                     <span>Generador de Licencias y Enlaces Mágicos</span>
                   </h3>
-                  <p className="text-xs text-zinc-400 mt-0.5">
+                  <p className="text-xs text-[#94A3B8] mt-0.5">
                     Genera una clave y un enlace directo para enviar a tu cliente por WhatsApp o email al recibir el pago.
                   </p>
                 </div>
@@ -477,13 +477,13 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                 <form onSubmit={handleGenerateLicense} className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
+                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
                         Plan de Suscripción:
                       </label>
                       <select
                         value={selectedPlan}
                         onChange={(e) => setSelectedPlan(e.target.value as SubscriptionPlan)}
-                        className="w-full px-3 py-2 text-xs rounded-xl border bg-zinc-900 border-zinc-700 text-zinc-100 focus:outline-none focus:border-amber-500 cursor-pointer"
+                        className="w-full px-3 py-2 text-xs rounded-xl border bg-[#18202F] border-[#2A344A] text-[#E2E8F0] focus:outline-none focus:border-sky-500 cursor-pointer"
                       >
                         <option value="30D">Pase Mensual (30 Días - 19€)</option>
                         <option value="90D">Pase Trimestral (90 Días - 45€)</option>
@@ -493,7 +493,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
+                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
                         Cliente / Empresa / Nota:
                       </label>
                       <input
@@ -501,29 +501,29 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                         value={clientNotesInput}
                         onChange={(e) => setClientNotesInput(e.target.value)}
                         placeholder="Ej: Hotel Meliá - Recepción, o Juan Pérez"
-                        className="w-full px-3 py-2 text-xs rounded-xl border bg-zinc-900 border-zinc-700 text-zinc-100 focus:outline-none focus:border-amber-500"
+                        className="w-full px-3 py-2 text-xs rounded-xl border bg-[#18202F] border-[#2A344A] text-[#E2E8F0] focus:outline-none focus:border-sky-500"
                       />
                     </div>
                   </div>
 
                   <button
                     type="submit"
-                    className="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 font-bold text-xs flex items-center gap-2 transition-all cursor-pointer shadow-lg shadow-amber-500/10"
+                    className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs flex items-center gap-2 transition-all cursor-pointer shadow-lg shadow-sky-500/20"
                   >
-                    <Sparkles className="w-4 h-4 text-zinc-950" />
+                    <Sparkles className="w-4 h-4 text-white" />
                     <span>Generar Licencia y Enlace Mágico</span>
                   </button>
                 </form>
 
                 {/* Newly Generated License Card */}
                 {lastGeneratedLicense && (
-                  <div className="p-3.5 sm:p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-3 animate-in fade-in">
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-sky-500/10 border border-sky-500/30 space-y-3 animate-in fade-in">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                      <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                      <span className="text-xs font-bold text-sky-400 flex items-center gap-1.5">
                         <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                         <span>¡Licencia lista para entregar!</span>
                       </span>
-                      <span className="text-[11px] text-zinc-400">
+                      <span className="text-[11px] text-[#94A3B8]">
                         Expira el: {new Date(lastGeneratedLicense.expiresAt).toLocaleDateString()}
                       </span>
                     </div>
@@ -531,15 +531,15 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                     <div className="space-y-3">
                       {/* Key */}
                       <div>
-                        <span className="text-xs text-zinc-400 block mb-1">Código de Licencia:</span>
+                        <span className="text-xs text-[#94A3B8] block mb-1">Código de Licencia:</span>
                         <div className="flex items-center gap-2">
-                          <code className="flex-1 min-w-0 bg-zinc-900 px-3 py-2 rounded-xl font-mono text-xs text-amber-300 border border-zinc-800 truncate">
+                          <code className="flex-1 min-w-0 bg-[#18202F] px-3 py-2 rounded-xl font-mono text-xs text-sky-300 border border-[#2A344A] truncate">
                             {lastGeneratedLicense.key}
                           </code>
                           <button
                             type="button"
                             onClick={() => handleCopyKey(lastGeneratedLicense.key)}
-                            className="px-3.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold text-white transition-colors cursor-pointer flex items-center gap-1.5 shrink-0"
+                            className="px-3.5 py-2 rounded-xl bg-[#222B3D] hover:bg-[#2A344A] text-xs font-semibold text-white border border-[#2A344A] transition-colors cursor-pointer flex items-center gap-1.5 shrink-0"
                           >
                             {copiedKey === lastGeneratedLicense.key ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                             <span>{copiedKey === lastGeneratedLicense.key ? 'Copiado' : 'Copiar'}</span>
@@ -549,19 +549,19 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
 
                       {/* Magic Link */}
                       <div>
-                        <span className="text-xs text-zinc-400 block mb-1">Enlace Mágico de Activación Directa:</span>
+                        <span className="text-xs text-[#94A3B8] block mb-1">Enlace Mágico de Activación Directa:</span>
                         <div className="space-y-2">
                           <input
                             type="text"
                             readOnly
                             value={SubscriptionService.getMagicLink(lastGeneratedLicense.key)}
-                            className="w-full bg-zinc-900 px-3 py-2 rounded-xl font-mono text-xs text-zinc-300 border border-zinc-800 truncate"
+                            className="w-full bg-[#18202F] px-3 py-2 rounded-xl font-mono text-xs text-slate-300 border border-[#2A344A] truncate"
                           />
                           <div className="flex items-center gap-2">
                             <button
                               type="button"
                               onClick={() => handleCopyLink(lastGeneratedLicense.key)}
-                              className="flex-1 py-2 px-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold text-white transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                              className="flex-1 py-2 px-3 rounded-xl bg-[#222B3D] hover:bg-[#2A344A] text-xs font-semibold text-white border border-[#2A344A] transition-colors cursor-pointer flex items-center justify-center gap-1.5"
                             >
                               {copiedLink === lastGeneratedLicense.key ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <LinkIcon className="w-3.5 h-3.5" />}
                               <span>{copiedLink === lastGeneratedLicense.key ? 'Copiado' : 'Copiar Link'}</span>
@@ -585,13 +585,13 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               {/* Table of Issued Licenses */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#94A3B8]">
                     Historial de Licencias Emitidas ({adminLicenses.length})
                   </h3>
                 </div>
 
                 {adminLicenses.length === 0 ? (
-                  <div className="p-6 text-center text-xs text-zinc-500 border border-zinc-800/80 rounded-2xl bg-zinc-950/40">
+                  <div className="p-6 text-center text-xs text-[#94A3B8] border border-[#2A344A] rounded-2xl bg-[#12161F]">
                     Aún no has generado ninguna licencia. Utiliza el generador arriba para crear tu primer pase Pro.
                   </div>
                 ) : (
@@ -601,16 +601,16 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                       {adminLicenses.map((lic) => {
                         const isExpired = Date.now() > lic.expiresAt;
                         return (
-                          <div key={lic.key} className="p-3.5 rounded-2xl border border-zinc-800 bg-zinc-950/90 space-y-2.5">
+                          <div key={lic.key} className="p-3.5 rounded-2xl border border-[#2A344A] bg-[#12161F] space-y-2.5">
                             <div className="flex items-center justify-between gap-2">
                               <div className="flex items-center gap-1.5 min-w-0">
-                                <span className="font-bold text-xs text-white truncate">{lic.planName}</span>
+                                <span className="font-bold text-xs text-[#E2E8F0] truncate">{lic.planName}</span>
                                 {lic.isRevoked ? (
                                   <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20 shrink-0">
                                     Revocada
                                   </span>
                                 ) : isExpired ? (
-                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-800 text-zinc-400 shrink-0">
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#222B3D] text-[#94A3B8] border border-[#2A344A] shrink-0">
                                     Vencida
                                   </span>
                                 ) : (
@@ -619,31 +619,31 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                                   </span>
                                 )}
                               </div>
-                              <span className="text-[11px] text-zinc-400 shrink-0">
+                              <span className="text-[11px] text-[#94A3B8] shrink-0">
                                 {new Date(lic.expiresAt).toLocaleDateString()}
                               </span>
                             </div>
 
                             <div className="flex items-center justify-between gap-2 text-xs">
-                              <span className="text-zinc-400 truncate text-[11px]">{lic.clientNotes || 'Cliente Directo'}</span>
-                              <code className="font-mono text-[11px] text-amber-300 bg-zinc-900 px-2 py-0.5 rounded-lg border border-zinc-800 shrink-0">
+                              <span className="text-[#94A3B8] truncate text-[11px]">{lic.clientNotes || 'Cliente Directo'}</span>
+                              <code className="font-mono text-[11px] text-sky-300 bg-[#18202F] px-2 py-0.5 rounded-lg border border-[#2A344A] shrink-0">
                                 {lic.key}
                               </code>
                             </div>
 
-                            <div className="flex items-center gap-2 pt-1 border-t border-zinc-800/60">
+                            <div className="flex items-center gap-2 pt-1 border-t border-[#2A344A]">
                               <button
                                 type="button"
                                 onClick={() => handleCopyLink(lic.key)}
-                                className="flex-1 py-1.5 px-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-xs font-semibold text-zinc-200 border border-zinc-800 flex items-center justify-center gap-1 cursor-pointer"
+                                className="flex-1 py-1.5 px-2 rounded-xl bg-[#18202F] hover:bg-[#222B3D] text-xs font-semibold text-[#E2E8F0] border border-[#2A344A] flex items-center justify-center gap-1 cursor-pointer transition-colors"
                               >
-                                <LinkIcon className="w-3.5 h-3.5 text-zinc-400" />
+                                <LinkIcon className="w-3.5 h-3.5 text-[#94A3B8]" />
                                 <span>Copiar</span>
                               </button>
                               <button
                                 type="button"
                                 onClick={() => handleShareWhatsApp(lic)}
-                                className="flex-1 py-1.5 px-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white flex items-center justify-center gap-1 shadow-sm cursor-pointer"
+                                className="flex-1 py-1.5 px-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white flex items-center justify-center gap-1 shadow-sm cursor-pointer transition-colors"
                               >
                                 <MessageCircle className="w-3.5 h-3.5" />
                                 <span>WhatsApp</span>
@@ -653,7 +653,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                                   type="button"
                                   onClick={() => handleRevokeLicense(lic.key)}
                                   title="Revocar Licencia"
-                                  className="p-1.5 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 text-rose-400 border border-rose-500/20 cursor-pointer"
+                                  className="p-1.5 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 text-rose-400 border border-rose-500/20 cursor-pointer transition-colors"
                                 >
                                   <Ban className="w-3.5 h-3.5" />
                                 </button>
@@ -665,9 +665,9 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                     </div>
 
                     {/* Desktop Table View (hidden sm:block) */}
-                    <div className="hidden sm:block overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-950">
+                    <div className="hidden sm:block overflow-x-auto rounded-2xl border border-[#2A344A] bg-[#12161F]">
                       <table className="w-full text-left text-xs">
-                        <thead className="bg-zinc-900/80 border-b border-zinc-800 text-[11px] font-bold text-zinc-400">
+                        <thead className="bg-[#161D2B] border-b border-[#2A344A] text-[11px] font-bold text-[#94A3B8]">
                           <tr>
                             <th className="px-4 py-3">Código</th>
                             <th className="px-4 py-3">Cliente / Nota</th>
@@ -677,21 +677,21 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                             <th className="px-4 py-3 text-right">Acciones</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-zinc-800/60">
+                        <tbody className="divide-y divide-[#2A344A]/60">
                           {adminLicenses.map((lic) => {
                             const isExpired = Date.now() > lic.expiresAt;
                             return (
-                              <tr key={lic.key} className="hover:bg-zinc-900/40 transition-colors">
-                                <td className="px-4 py-3 font-mono text-[11px] text-amber-300 font-semibold">
+                              <tr key={lic.key} className="hover:bg-[#1C2331]/50 transition-colors">
+                                <td className="px-4 py-3 font-mono text-[11px] text-sky-300 font-semibold">
                                   {lic.key}
                                 </td>
-                                <td className="px-4 py-3 text-zinc-200">
+                                <td className="px-4 py-3 text-[#E2E8F0]">
                                   {lic.clientNotes || 'Directo'}
                                 </td>
-                                <td className="px-4 py-3 text-zinc-300 font-medium">
+                                <td className="px-4 py-3 text-slate-300 font-medium">
                                   {lic.planName}
                                 </td>
-                                <td className="px-4 py-3 text-zinc-400">
+                                <td className="px-4 py-3 text-[#94A3B8]">
                                   {new Date(lic.expiresAt).toLocaleDateString()}
                                 </td>
                                 <td className="px-4 py-3">
@@ -700,7 +700,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                                       Revocada
                                     </span>
                                   ) : isExpired ? (
-                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-800 text-zinc-400">
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#222B3D] text-[#94A3B8] border border-[#2A344A]">
                                       Vencida
                                     </span>
                                   ) : (
@@ -714,14 +714,14 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                                     <button
                                       onClick={() => handleCopyLink(lic.key)}
                                       title="Copiar Enlace Mágico"
-                                      className="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                                      className="p-1.5 rounded-lg bg-[#18202F] hover:bg-[#222B3D] text-[#94A3B8] hover:text-white border border-[#2A344A] transition-colors cursor-pointer"
                                     >
                                       <LinkIcon className="w-3.5 h-3.5" />
                                     </button>
                                     <button
                                       onClick={() => handleShareWhatsApp(lic)}
                                       title="Enviar por WhatsApp"
-                                      className="p-1.5 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-400 transition-colors cursor-pointer"
+                                      className="p-1.5 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-400 border border-emerald-500/20 transition-colors cursor-pointer"
                                     >
                                       <MessageCircle className="w-3.5 h-3.5" />
                                     </button>
@@ -729,7 +729,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                                       <button
                                         onClick={() => handleRevokeLicense(lic.key)}
                                         title="Revocar Licencia"
-                                        className="p-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/40 text-rose-400 transition-colors cursor-pointer"
+                                        className="p-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/40 text-rose-400 border border-rose-500/20 transition-colors cursor-pointer"
                                       >
                                         <Ban className="w-3.5 h-3.5" />
                                       </button>
@@ -751,11 +751,11 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
           {/* TAB 3: BACKUP & SYNC */}
           {activeTab === 'sync' && (
             <div className="space-y-6">
-              <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 text-xs text-zinc-300 space-y-1">
-                <p className="font-bold text-amber-400 flex items-center gap-1.5">
+              <div className="p-4 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-xs text-slate-300 space-y-1">
+                <p className="font-bold text-sky-400 flex items-center gap-1.5">
                   <Sparkles className="w-4 h-4" /> ¿Cómo compartir escenarios con otros teléfonos?
                 </p>
-                <p className="text-[11px] text-zinc-400 leading-relaxed">
+                <p className="text-[11px] text-[#94A3B8] leading-relaxed">
                   Para que tus camareros o alumnos tengan los mismos escenarios en sus móviles:
                   descarga el archivo JSON con el botón <strong>"Exportar Escenarios"</strong> y envíaselo por WhatsApp o correo.
                   Ellos solo deben abrir la PWA, entrar en Ajustes o Admin y pulsar <strong>"Importar Archivo JSON"</strong>.
@@ -763,14 +763,14 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               </div>
 
               {/* Export Box */}
-              <div className="p-5 rounded-2xl border border-zinc-800 bg-zinc-950 space-y-3">
+              <div className="p-5 rounded-2xl border border-[#2A344A] bg-[#12161F] space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-xs font-bold text-white flex items-center gap-2">
+                    <h3 className="text-xs font-bold text-[#E2E8F0] flex items-center gap-2">
                       <Download className="w-4 h-4 text-emerald-400" />
                       Exportar Escenarios (Copia de Seguridad)
                     </h3>
-                    <p className="text-[11px] text-zinc-400 mt-0.5">
+                    <p className="text-[11px] text-[#94A3B8] mt-0.5">
                       Descarga un archivo con todos los escenarios configurados para guardarlo como copia de seguridad o transferirlo.
                     </p>
                   </div>
@@ -779,7 +779,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-2">
                   <button
                     onClick={handleExportJson}
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-zinc-950 bg-emerald-400 hover:bg-emerald-300 transition-all cursor-pointer shadow-md shadow-emerald-500/20"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 transition-all cursor-pointer shadow-md shadow-emerald-600/20"
                   >
                     <Download className="w-4 h-4" />
                     <span>Descargar archivo JSON</span>
@@ -787,7 +787,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
 
                   <button
                     onClick={handleCopyJson}
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 transition-colors cursor-pointer"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold text-[#E2E8F0] bg-[#18202F] hover:bg-[#222B3D] border border-[#2A344A] transition-colors cursor-pointer"
                   >
                     {copied ? (
                       <>
@@ -796,7 +796,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                       </>
                     ) : (
                       <>
-                        <Copy className="w-4 h-4 text-zinc-400" />
+                        <Copy className="w-4 h-4 text-[#94A3B8]" />
                         <span>Copiar al portapapeles</span>
                       </>
                     )}
@@ -805,13 +805,13 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               </div>
 
               {/* Import Box */}
-              <div className="p-3.5 sm:p-5 rounded-2xl border border-zinc-800 bg-zinc-950 space-y-3">
+              <div className="p-3.5 sm:p-5 rounded-2xl border border-[#2A344A] bg-[#12161F] space-y-3">
                 <div>
-                  <h3 className="text-xs font-bold text-white flex items-center gap-2">
-                    <Upload className="w-4 h-4 text-amber-400" />
+                  <h3 className="text-xs font-bold text-[#E2E8F0] flex items-center gap-2">
+                    <Upload className="w-4 h-4 text-sky-400" />
                     Importar Escenarios desde Archivo JSON
                   </h3>
-                  <p className="text-[11px] text-zinc-400 mt-0.5">
+                  <p className="text-[11px] text-[#94A3B8] mt-0.5">
                     Carga un archivo JSON previamente exportado desde otro dispositivo o copia de respaldo.
                   </p>
                 </div>
@@ -824,9 +824,9 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                       name="importMode"
                       checked={importMode === 'merge'}
                       onChange={() => setImportMode('merge')}
-                      className="accent-amber-400"
+                      className="accent-sky-400"
                     />
-                    <span className="text-zinc-300">Fusionar (Añadir sin borrar los actuales)</span>
+                    <span className="text-slate-300">Fusionar (Añadir sin borrar los actuales)</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -834,14 +834,14 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                       name="importMode"
                       checked={importMode === 'replace'}
                       onChange={() => setImportMode('replace')}
-                      className="accent-amber-400"
+                      className="accent-sky-400"
                     />
-                    <span className="text-zinc-300">Reemplazar todo</span>
+                    <span className="text-slate-300">Reemplazar todo</span>
                   </label>
                 </div>
 
                 <div className="pt-2">
-                  <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-zinc-950 bg-amber-400 hover:bg-amber-300 transition-all cursor-pointer shadow-md shadow-amber-500/20">
+                  <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-sky-500 hover:bg-sky-400 transition-all cursor-pointer shadow-md shadow-sky-500/20">
                     <Upload className="w-4 h-4" />
                     <span>Seleccionar archivo JSON</span>
                     <input
@@ -869,55 +869,55 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
             </div>
           )}
 
-          {/* TAB 3: PWA & PIN SETTINGS */}
+          {/* TAB 4: PWA & PIN SETTINGS */}
           {activeTab === 'pwa' && (
             <div className="space-y-6">
               {/* Change Admin PIN */}
-              <div className="p-5 rounded-2xl border border-zinc-800 bg-zinc-950 space-y-4">
+              <div className="p-5 rounded-2xl border border-[#2A344A] bg-[#12161F] space-y-4">
                 <div>
-                  <h3 className="text-xs font-bold text-white flex items-center gap-2">
-                    <Key className="w-4 h-4 text-amber-400" />
+                  <h3 className="text-xs font-bold text-[#E2E8F0] flex items-center gap-2">
+                    <Key className="w-4 h-4 text-sky-400" />
                     Cambiar PIN de Acceso Administrador
                   </h3>
-                  <p className="text-[11px] text-zinc-400 mt-0.5">
+                  <p className="text-[11px] text-[#94A3B8] mt-0.5">
                     Modifica el código de seguridad para que solo tú puedas gestionar la aplicación.
                   </p>
                 </div>
 
                 <form onSubmit={handlePinChangeSubmit} className="space-y-3 max-w-md">
                   <div>
-                    <label className="block text-[11px] text-zinc-400 mb-1">PIN Actual</label>
+                    <label className="block text-[11px] text-[#94A3B8] mb-1">PIN Actual</label>
                     <input
                       type="password"
                       maxLength={8}
                       value={currentPinInput}
                       onChange={(e) => setCurrentPinInput(e.target.value)}
                       placeholder="••••"
-                      className="w-full px-3 py-2 text-xs rounded-xl border bg-zinc-900 border-zinc-800 text-zinc-100 focus:outline-none focus:border-amber-500 transition-colors"
+                      className="w-full px-3 py-2 text-xs rounded-xl border bg-[#18202F] border-[#2A344A] text-[#E2E8F0] focus:outline-none focus:border-sky-500 transition-colors"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[11px] text-zinc-400 mb-1">Nuevo PIN (mín. 4)</label>
+                      <label className="block text-[11px] text-[#94A3B8] mb-1">Nuevo PIN (mín. 4)</label>
                       <input
                         type="password"
                         maxLength={8}
                         value={newPinInput}
                         onChange={(e) => setNewPinInput(e.target.value)}
                         placeholder="••••"
-                        className="w-full px-3 py-2 text-xs rounded-xl border bg-zinc-900 border-zinc-800 text-zinc-100 focus:outline-none focus:border-amber-500 transition-colors"
+                        className="w-full px-3 py-2 text-xs rounded-xl border bg-[#18202F] border-[#2A344A] text-[#E2E8F0] focus:outline-none focus:border-sky-500 transition-colors"
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] text-zinc-400 mb-1">Confirmar Nuevo PIN</label>
+                      <label className="block text-[11px] text-[#94A3B8] mb-1">Confirmar Nuevo PIN</label>
                       <input
                         type="password"
                         maxLength={8}
                         value={confirmPinInput}
                         onChange={(e) => setConfirmPinInput(e.target.value)}
                         placeholder="••••"
-                        className="w-full px-3 py-2 text-xs rounded-xl border bg-zinc-900 border-zinc-800 text-zinc-100 focus:outline-none focus:border-amber-500 transition-colors"
+                        className="w-full px-3 py-2 text-xs rounded-xl border bg-[#18202F] border-[#2A344A] text-[#E2E8F0] focus:outline-none focus:border-sky-500 transition-colors"
                       />
                     </div>
                   </div>
@@ -937,7 +937,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
 
                   <button
                     type="submit"
-                    className="px-4 py-2 rounded-xl text-xs font-bold text-zinc-950 bg-amber-400 hover:bg-amber-300 transition-colors cursor-pointer"
+                    className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-sky-500 hover:bg-sky-400 transition-colors cursor-pointer shadow-md shadow-sky-500/20"
                   >
                     Guardar Nuevo PIN
                   </button>
@@ -945,14 +945,14 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               </div>
 
               {/* Gemini Central Key */}
-              <div className="p-5 rounded-2xl border border-zinc-800 bg-zinc-950 space-y-3">
+              <div className="p-5 rounded-2xl border border-[#2A344A] bg-[#12161F] space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-xs font-bold text-white flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-amber-400" />
+                    <h3 className="text-xs font-bold text-[#E2E8F0] flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-sky-400" />
                       Clave de API Gemini de la Empresa
                     </h3>
-                    <p className="text-[11px] text-zinc-400 mt-0.5">
+                    <p className="text-[11px] text-[#94A3B8] mt-0.5">
                       Configura la clave de Google Gemini para las simulaciones y el generador de escenarios.
                     </p>
                   </div>
@@ -960,7 +960,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                     href="https://aistudio.google.com/app/apikey"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-[11px] text-amber-400 hover:text-amber-300 flex items-center gap-1 font-semibold"
+                    className="text-[11px] text-sky-400 hover:text-sky-300 flex items-center gap-1 font-semibold"
                   >
                     Obtener clave gratuita <ExternalLink className="w-3 h-3" />
                   </a>
@@ -972,26 +972,26 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                     value={apiKeyInput}
                     onChange={(e) => setApiKeyInput(e.target.value)}
                     placeholder="AIzaSy..."
-                    className="flex-1 min-w-0 px-3 py-2 text-xs font-mono rounded-xl border bg-zinc-900 border-zinc-800 text-zinc-100 focus:outline-none focus:border-amber-500 transition-colors"
+                    className="flex-1 min-w-0 px-3 py-2 text-xs font-mono rounded-xl border bg-[#18202F] border-[#2A344A] text-[#E2E8F0] focus:outline-none focus:border-sky-500 transition-colors"
                   />
                   <button
                     onClick={handleSaveApiKey}
-                    className="px-4 py-2 rounded-xl text-xs font-bold text-zinc-950 bg-amber-400 hover:bg-amber-300 transition-colors cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
+                    className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-sky-500 hover:bg-sky-400 transition-colors cursor-pointer flex items-center justify-center gap-1.5 shrink-0 shadow-md shadow-sky-500/20"
                   >
-                    {apiKeySaved ? <Check className="w-3.5 h-3.5 text-zinc-950" /> : null}
+                    {apiKeySaved ? <Check className="w-3.5 h-3.5 text-white" /> : null}
                     <span>{apiKeySaved ? 'Guardada' : 'Guardar'}</span>
                   </button>
                 </div>
               </div>
 
               {/* PWA Maintenance & Cache */}
-              <div className="p-5 rounded-2xl border border-zinc-800 bg-zinc-950 space-y-3">
+              <div className="p-5 rounded-2xl border border-[#2A344A] bg-[#12161F] space-y-3">
                 <div>
-                  <h3 className="text-xs font-bold text-white flex items-center gap-2">
+                  <h3 className="text-xs font-bold text-[#E2E8F0] flex items-center gap-2">
                     <RefreshCw className="w-4 h-4 text-sky-400" />
                     Mantenimiento PWA y Forzar Actualización
                   </h3>
-                  <p className="text-[11px] text-zinc-400 mt-0.5">
+                  <p className="text-[11px] text-[#94A3B8] mt-0.5">
                     Si has publicado una actualización o notas lentitud, puedes limpiar la caché local y forzar la recarga del Service Worker.
                   </p>
                 </div>
@@ -1000,7 +1000,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                   <button
                     onClick={handleForcePwaUpdate}
                     disabled={isUpdatingPwa}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 transition-colors cursor-pointer disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-[#18202F] hover:bg-[#222B3D] border border-[#2A344A] transition-colors cursor-pointer disabled:opacity-50"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 text-sky-400 ${isUpdatingPwa ? 'animate-spin' : ''}`} />
                     <span>Limpiar Caché y Forzar Actualización PWA</span>
@@ -1012,11 +1012,11 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-3 border-t border-zinc-800 bg-zinc-950/80 flex items-center justify-between text-xs text-zinc-500 shrink-0">
+        <div className="px-6 py-3 border-t border-[#2A344A] bg-[#12161F] flex items-center justify-between text-xs text-[#94A3B8] shrink-0">
           <span>PitchBoss Admin System • v2.1</span>
           <button
             onClick={onClose}
-            className="px-4 py-1.5 rounded-xl text-xs font-semibold text-zinc-300 hover:text-white bg-zinc-900 hover:bg-zinc-800 transition-colors cursor-pointer"
+            className="px-4 py-1.5 rounded-xl text-xs font-semibold text-[#E2E8F0] hover:text-white bg-[#18202F] hover:bg-[#222B3D] border border-[#2A344A] transition-colors cursor-pointer"
           >
             Cerrar
           </button>

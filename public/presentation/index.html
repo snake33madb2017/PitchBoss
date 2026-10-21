@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PitchBoss Enterprise — Presentación Interactiva</title>
+  <link rel="icon" type="image/png" href="/logo-icon.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes pulse-slow {
+      0%, 100% { transform: scale(1); opacity: 0.85; }
+      50% { transform: scale(1.04); opacity: 1; }
+    }
+    .animate-pulse-glow {
+      animation: pulse-slow 3s infinite ease-in-out;
+    }
+    .slide-transition {
+      transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #12161F; }
+    ::-webkit-scrollbar-thumb { background: #2A344A; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #38BDF8; }
+  </style>
+</head>
+<body class="bg-[#12161F] text-[#E2E8F0] antialiased font-sans select-none min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+  <!-- Top Global Header / Navigation -->
+  <header class="sticky top-0 z-50 bg-[#1C2331]/90 backdrop-blur-md border-b border-[#2A344A] px-4 sm:px-8 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center font-black text-[#38BDF8] text-sm shadow-md shadow-sky-500/10">
+        PB
+      </div>
+      <div>
+        <h1 class="text-xs sm:text-sm font-black tracking-tight text-white flex items-center gap-1.5">
+          Pitch<span class="text-[#38BDF8]">Boss</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/15 border border-sky-500/30 text-sky-300 uppercase tracking-widest">
+            Enterprise
+          </span>
+        </h1>
+        <p class="text-[10px] text-[#94A3B8] hidden sm:block">Plataforma de Simulación por Voz con IA para Equipos Globales</p>
+      </div>
+    </div>
+
+    <!-- Navigation Slide Counter & Quick Jump -->
+    <div class="flex items-center gap-2 sm:gap-4">
+      <a href="/" class="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#18202F] hover:bg-[#222B3D] border border-[#2A344A] text-xs font-semibold text-[#E2E8F0] transition-colors" title="Abrir aplicación web">
+        <span>Abrir App PWA</span>
+        <svg class="w-3.5 h-3.5 text-[#38BDF8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+      </a>
+
+      <div class="flex items-center bg-[#18202F] border border-[#2A344A] rounded-xl px-3 py-1 text-xs font-semibold text-slate-300">
+        <span id="currentSlideNum" class="text-[#38BDF8] font-bold">1</span>
+        <span class="text-slate-600 mx-1.5">/</span>
+        <span id="totalSlidesNum">6</span>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-1.5">
+        <button onclick="prevSlide()" id="prevBtn" class="p-2 rounded-xl bg-[#18202F] hover:bg-[#222B3D] border border-[#2A344A] text-[#94A3B8] hover:text-white transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed" title="Diapositiva Anterior (Flecha Izquierda)">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <button onclick="nextSlide()" id="nextBtn" class="p-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold transition-all cursor-pointer shadow-md shadow-sky-500/20" title="Siguiente Diapositiva (Espacio o Flecha Derecha)">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Progress Bar Line -->
+  <div class="w-full bg-[#1C2331] h-1">
+    <div id="progressBar" class="bg-gradient-to-r from-sky-500 to-[#38BDF8] h-1 transition-all duration-300" style="width: 16.66%;"></div>
+  </div>
+
+  <!-- Main Slide Container -->
+  <main class="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-8 flex items-center justify-center">
+
+    <!-- SLIDE 1: PORTADA EJECUTIVA -->
+    <section id="slide-1" class="slide active w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      <div class="lg:col-span-7 space-y-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-xs font-semibold text-sky-400">
+          <span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
+          Simulación de Voz en Tiempo Real con IA
+        </div>
+        <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+          Fluidez Ejecutiva y Negociación en Inglés para <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#38BDF8] via-sky-400 to-sky-200">Equipos de Alto Rendimiento</span>
+        </h2>
+        <p class="text-[#94A3B8] text-sm sm:text-base leading-relaxed">
+          PitchBoss es la plataforma conversacional que entrena a sus colaboradores en situaciones críticas de negocio: defendiendo propuestas, rebatiendo objeciones y cerrando acuerdos en inglés con soltura absoluta.
+        </p>
+        
+        <!-- Key Metrics Cards -->
+        <div class="grid grid-cols-3 gap-3 pt-2">
+          <div class="p-3.5 rounded-2xl bg-[#1C2331] border border-[#2A344A]">
+            <span class="text-xl sm:text-2xl font-black text-[#38BDF8] block">+400%</span>
+            <span class="text-[11px] text-[#94A3B8] font-medium leading-tight block mt-0.5">Agilidad mental bajo presión</span>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-[#1C2331] border border-[#2A344A]">
+            <span class="text-xl sm:text-2xl font-black text-white block">5 Min</span>
+            <span class="text-[11px] text-[#94A3B8] font-medium leading-tight block mt-0.5">Práctica diaria sin perder turnos</span>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-[#1C2331] border border-[#2A344A]">
+            <span class="text-xl sm:text-2xl font-black text-emerald-400 block">100%</span>
+            <span class="text-[11px] text-[#94A3B8] font-medium leading-tight block mt-0.5">Adaptado a su empresa</span>
+          </div>
+        </div>
+
+        <div class="pt-4 flex items-center gap-3">
+          <button onclick="nextSlide()" class="px-6 py-3 rounded-2xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs sm:text-sm shadow-xl shadow-sky-500/20 transition-all cursor-pointer flex items-center gap-2">
+            Iniciar Recorrido Interactivo
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </button>
+          <span class="text-xs text-[#94A3B8]">Usa las flechas del teclado o los botones</span>
+        </div>
+      </div>
+
+      <div class="lg:col-span-5 relative">
+        <div class="absolute -inset-1 rounded-3xl bg-gradient-to-r from-sky-500/20 to-sky-300/10 blur-xl opacity-75"></div>
+        <div class="relative rounded-3xl overflow-hidden border border-[#2A344A] shadow-2xl bg-[#1C2331]">
+          <img src="./executive_boardroom_fluency_1792599775496.jpg" onerror="this.src='/presentation/executive_boardroom_fluency_1792599775496.jpg'" alt="Executive Boardroom" class="w-full h-80 lg:h-96 object-cover hover:scale-105 transition-transform duration-700" />
+          <div class="absolute inset-0 bg-gradient-to-t from-[#12161F]/95 via-[#12161F]/40 to-transparent p-6 flex flex-col justify-end">
+            <span class="text-xs font-bold text-sky-400 uppercase tracking-wider">Liderazgo & Presencia</span>
+            <p class="text-sm text-slate-200 mt-1 font-medium">Conversaciones que transmiten autoridad, rigor y credibilidad financiera.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: EL PROBLEMA REAL (INTERACTIVO) -->
+    <section id="slide-2" class="slide hidden w-full space-y-6">
+      <div class="text-center max-w-2xl mx-auto space-y-2">
+        <span class="text-xs font-bold text-rose-400 uppercase tracking-widest px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/20">El Desafío Corporativo</span>
+        <h2 class="text-2xl sm:text-4xl font-black text-white">El Coste Oculto de la Vacilación en Inglés</h2>
+        <p class="text-xs sm:text-sm text-[#94A3B8]">Toca cada tarjeta para explorar cómo afecta a cada área de la compañía:</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+        <!-- Interactive Card 1 -->
+        <div onclick="selectPainPoint(1)" id="painCard-1" class="p-5 rounded-3xl bg-[#1C2331] border border-rose-500/50 cursor-pointer transition-all hover:border-rose-400 space-y-3">
+          <div class="w-10 h-10 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 font-black">
+            01
+          </div>
+          <h3 class="font-bold text-white text-base">Bloqueo Bajo Presión</h3>
+          <p class="text-xs text-[#94A3B8] leading-relaxed">
+            El colaborador sabe inglés pasivo, pero se congela cuando un directivo extranjero pide justificar cifras o cuestiona plazos en vivo.
+          </p>
+          <div class="pt-2 text-[11px] font-bold text-rose-400 flex items-center gap-1">
+            <span>Impacto: Pérdida del 35% de acuerdos</span>
+          </div>
+        </div>
+
+        <!-- Interactive Card 2 -->
+        <div onclick="selectPainPoint(2)" id="painCard-2" class="p-5 rounded-3xl bg-[#1C2331]/70 border border-[#2A344A] cursor-pointer transition-all hover:border-sky-500/60 space-y-3">
+          <div class="w-10 h-10 rounded-2xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 font-black">
+            02
+          </div>
+          <h3 class="font-bold text-white text-base">La Trampa de los Cursos Clásicos</h3>
+          <p class="text-xs text-[#94A3B8] leading-relaxed">
+            Las academias enseñan gramática escolar ("The book is on the table"). No enseñan cómo negociar sus contratos ni su catálogo.
+          </p>
+          <div class="pt-2 text-[11px] font-bold text-sky-400 flex items-center gap-1">
+            <span>Impacto: Meses pagados sin soltura real</span>
+          </div>
+        </div>
+
+        <!-- Interactive Card 3 -->
+        <div onclick="selectPainPoint(3)" id="painCard-3" class="p-5 rounded-3xl bg-[#1C2331]/70 border border-[#2A344A] cursor-pointer transition-all hover:border-emerald-500/60 space-y-3">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-black">
+            03
+          </div>
+          <h3 class="font-bold text-white text-base">Incompatibilidad de Horarios</h3>
+          <p class="text-xs text-[#94A3B8] leading-relaxed">
+            La operativa no puede detenerse para enviar empleados a clases de 2 horas. El abandono de cursos corporativos supera el 65%.
+          </p>
+          <div class="pt-2 text-[11px] font-bold text-emerald-400 flex items-center gap-1">
+            <span>Impacto: Formación desaprovechada</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Solution callout box -->
+      <div id="painDetail" class="p-4 sm:p-5 rounded-2xl bg-[#1C2331] border border-[#2A344A] flex items-center justify-between gap-4">
+        <div class="space-y-1">
+          <span class="text-xs font-bold text-[#38BDF8]">Cómo lo resuelve PitchBoss:</span>
+          <p id="painDetailText" class="text-xs sm:text-sm text-slate-200">
+            Micro-entrenamientos conversacionales por voz de 5 minutos al día. El colaborador simula llamadas en cualquier momento antes de su turno.
+          </p>
+        </div>
+        <button onclick="nextSlide()" class="shrink-0 px-4 py-2 rounded-xl bg-[#18202F] hover:bg-[#222B3D] text-xs font-bold text-white border border-[#2A344A] transition-colors cursor-pointer">
+          Ver Demostración
+        </button>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: LA SOLUCIÓN Y SIMULADOR INTERACTIVO EN VIVO -->
+    <section id="slide-3" class="slide hidden w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      <div class="lg:col-span-6 space-y-5">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-semibold text-emerald-400">
+          Demostración Interactiva
+        </div>
+        <h2 class="text-2xl sm:text-4xl font-black text-white">Simulador de Negocio Manos Libres</h2>
+        <p class="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
+          El interlocutor de IA asume el papel de un decisor corporativo extranjero escéptico. El colaborador debe convencerle por voz.
+        </p>
+
+        <!-- Interactive Voice Box -->
+        <div class="p-5 rounded-3xl bg-[#1C2331] border border-[#2A344A] shadow-2xl space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-[#2A344A]">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-2xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-lg">
+                👔
+              </div>
+              <div>
+                <span class="text-xs font-bold text-white block">Arthur Vance — VP of Procurement</span>
+                <span class="text-[10px] text-[#94A3B8] block">Exigente, enfocado en ROI y plazos de entrega</span>
+              </div>
+            </div>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-300 border border-rose-500/20">Objeción en Vivo</span>
+          </div>
+
+          <!-- The spoken audio line -->
+          <div class="p-3.5 rounded-2xl bg-[#12161F] border border-[#2A344A] space-y-2">
+            <div class="flex items-center justify-between text-[11px] text-[#38BDF8] font-bold">
+              <span class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#38BDF8] animate-pulse"></span> Interlocutor de IA dice:
+              </span>
+              <button onclick="playAiSpeechSimulation()" class="text-xs hover:underline cursor-pointer flex items-center gap-1 text-sky-400 hover:text-white">
+                🔊 Escuchar simulación
+              </button>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-200 italic font-medium">
+              "We appreciate the proposal, but your 6-month roadmap introduces unacceptable operational risk. Why shouldn't we choose the incumbent vendor?"
+            </p>
+          </div>
+
+          <!-- Interactive options to answer -->
+          <div class="space-y-2 pt-1">
+            <span class="text-[11px] font-bold text-[#94A3B8] block">Toca cómo responderías tú:</span>
+            
+            <button onclick="testResponse('weak')" class="w-full text-left p-3 rounded-xl bg-[#18202F] hover:bg-[#222B3D] border border-[#2A344A] transition-all text-xs text-slate-300 cursor-pointer">
+              ❌ <strong class="text-white">Opción A (Básica):</strong> "Don't worry, our team is very good and we can try to do it faster for you."
+            </button>
+
+            <button onclick="testResponse('executive')" class="w-full text-left p-3 rounded-xl bg-[#18202F] hover:bg-sky-500/10 border border-[#2A344A] hover:border-sky-500/40 transition-all text-xs text-slate-300 cursor-pointer">
+              ⭐ <strong class="text-sky-400">Opción B (Nativa Ejecutiva):</strong> "We de-risk the transition with a phased 30-day pilot backed by guaranteed SLA milestones and dedicated support."
+            </button>
+          </div>
+
+          <!-- Simulation Result Box -->
+          <div id="simFeedback" class="hidden p-3.5 rounded-2xl text-xs space-y-1 transition-all">
+            <div id="simScore" class="font-bold flex items-center justify-between"></div>
+            <p id="simAdvice" class="text-slate-200 text-[11px] leading-relaxed"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-6 relative">
+        <div class="rounded-3xl overflow-hidden border border-[#2A344A] shadow-2xl bg-[#1C2331]">
+          <img src="./executive_desk_voice_ai_1792599792354.jpg" onerror="this.src='/presentation/executive_desk_voice_ai_1792599792354.jpg'" alt="Executive Voice AI Desk" class="w-full h-80 lg:h-[480px] object-cover" />
+          <div class="p-4 bg-[#1C2331] border-t border-[#2A344A] text-xs text-[#94A3B8] flex items-center justify-between">
+            <span>Visualizador de ondas de audio reactivo</span>
+            <span class="text-[#38BDF8] font-bold">100% Manos Libres</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4: METODOLOGÍA EN 4 FASES -->
+    <section id="slide-4" class="slide hidden w-full space-y-6">
+      <div class="text-center max-w-2xl mx-auto space-y-2">
+        <span class="text-xs font-bold text-sky-400 uppercase tracking-widest px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20">Metodología Comprobada</span>
+        <h2 class="text-2xl sm:text-4xl font-black text-white">De la Vacilación a la Autoridad Ejecutiva</h2>
+        <p class="text-xs sm:text-sm text-[#94A3B8]">Un ciclo de aprendizaje reactivo que multiplica la efectividad por 4 frente a métodos teóricos:</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+        <div class="p-5 rounded-3xl bg-[#1C2331] border border-[#2A344A] space-y-3 relative overflow-hidden group hover:border-sky-500/40 transition-all">
+          <div class="w-10 h-10 rounded-2xl bg-[#18202F] border border-[#2A344A] flex items-center justify-center text-sky-400 font-black">
+            1
+          </div>
+          <h3 class="font-bold text-white text-base">Inmersión en Rol</h3>
+          <p class="text-xs text-[#94A3B8] leading-relaxed">
+            El colaborador no responde preguntas aisladas. Entra en una llamada real de 5 minutos con un contexto empresarial claro.
+          </p>
+          <div class="text-[11px] text-sky-300 font-medium">Pierde el miedo escénico</div>
+        </div>
+
+        <div class="p-5 rounded-3xl bg-[#1C2331] border border-[#2A344A] space-y-3 relative overflow-hidden group hover:border-sky-500/40 transition-all">
+          <div class="w-10 h-10 rounded-2xl bg-[#18202F] border border-[#2A344A] flex items-center justify-center text-sky-400 font-black">
+            2
+          </div>
+          <h3 class="font-bold text-white text-base">Objeciones Reales</h3>
+          <p class="text-xs text-[#94A3B8] leading-relaxed">
+            La IA no es un chatbot condescendiente; desafía costes, pide aclaraciones y exige precisión técnica y comercial.
+          </p>
+          <div class="text-[11px] text-sky-300 font-medium">Agilidad en argumentación</div>
+        </div>
+
+        <div class="p-5 rounded-3xl bg-[#1C2331] border border-[#2A344A] space-y-3 relative overflow-hidden group hover:border-sky-500/40 transition-all">
+          <div class="w-10 h-10 rounded-2xl bg-[#18202F] border border-[#2A344A] flex items-center justify-center text-sky-400 font-black">
+            3
+          </div>
+          <h3 class="font-bold text-white text-base">Corrección Discreta</h3>
+          <p class="text-xs text-[#94A3B8] leading-relaxed">
+            Detecta errores gramaticales y vicios de traducción literal, ofreciendo la frase alternativa sin cortar el hilo de la charla.
+          </p>
+          <div class="text-[11px] text-sky-300 font-medium">Sustituye malos hábitos</div>
+        </div>
+
+        <div class="p-5 rounded-3xl bg-[#1C2331] border border-[#2A344A] space-y-3 relative overflow-hidden group hover:border-sky-500/40 transition-all">
+          <div class="w-10 h-10 rounded-2xl bg-[#18202F] border border-[#2A344A] flex items-center justify-center text-sky-400 font-black">
+            4
+          </div>
+          <h3 class="font-bold text-white text-base">Auditoría Ejecutiva</h3>
+          <p class="text-xs text-[#94A3B8] leading-relaxed">
+            Al colgar, recibe un desglose de Puntuación de Negocio (0-100%) y Fluidez en Inglés con comparador de frases directivas.
+          </p>
+          <div class="text-[11px] text-sky-300 font-medium">Métricas claras para RRHH</div>
+        </div>
+      </div>
+
+      <!-- Live Quote Banner -->
+      <div class="p-4 rounded-2xl bg-sky-500/5 border border-sky-500/20 text-center">
+        <p class="text-xs sm:text-sm text-slate-300">
+          <strong class="text-[#38BDF8]">El secreto del método:</strong> Practicar el 20% del vocabulario que genera el 80% del impacto financiero en las reuniones de su empresa.
+        </p>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: CALCULADORA DE RETORNO DE INVERSIÓN (ROI) -->
+    <section id="slide-5" class="slide hidden w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      <div class="lg:col-span-6 space-y-5">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-xs font-semibold text-sky-400">
+          Impacto Económico
+        </div>
+        <h2 class="text-2xl sm:text-4xl font-black text-white">Calculadora Interactiva de ROI Corporativo</h2>
+        <p class="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
+          Comprueba el ahorro directo en horas productivas y costes formativos al sustituir clases convencionales por micro-simulaciones de PitchBoss.
+        </p>
+
+        <!-- ROI Sliders -->
+        <div class="space-y-4 p-5 rounded-3xl bg-[#1C2331] border border-[#2A344A]">
+          <div>
+            <div class="flex justify-between text-xs font-bold mb-1">
+              <span class="text-slate-300">Número de Colaboradores a Capacitar:</span>
+              <span id="employeeVal" class="text-[#38BDF8] font-black text-sm">15 empleados</span>
+            </div>
+            <input type="range" id="employeeInput" min="2" max="100" value="15" oninput="calculateRoi()" class="w-full accent-sky-500 cursor-pointer" />
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs font-bold mb-1">
+              <span class="text-slate-300">Coste Estimado Actual de Cursos Tradicionales / Alumno / Año:</span>
+              <span id="costVal" class="text-[#38BDF8] font-black text-sm">650 €</span>
+            </div>
+            <input type="range" id="costInput" min="200" max="2000" step="50" value="650" oninput="calculateRoi()" class="w-full accent-sky-500 cursor-pointer" />
+          </div>
+
+          <div class="pt-3 border-t border-[#2A344A] text-[11px] text-[#94A3B8] flex items-center gap-2">
+            <span>⚡ Cálculo en tiempo real para comité financiero</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROI Results Card -->
+      <div class="lg:col-span-6 space-y-4">
+        <div class="p-6 sm:p-8 rounded-3xl bg-[#1C2331] border border-[#2A344A] shadow-2xl space-y-6">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-[#94A3B8] uppercase tracking-widest">Ahorro y Eficiencia Estimada</span>
+            <span class="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 text-xs font-bold">Alta Rentabilidad</span>
+          </div>
+
+          <div class="space-y-1">
+            <span class="text-xs text-[#94A3B8] font-medium">Ahorro Anual Directo Estimado en Formación:</span>
+            <div id="annualSavings" class="text-3xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-200">
+              7.200 € / año
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 pt-2 border-t border-[#2A344A]">
+            <div>
+              <span class="text-[11px] text-[#94A3B8] block font-medium">Horas de Operación Salvadas:</span>
+              <span id="hoursSaved" class="text-xl font-bold text-white mt-0.5 block">+1.440 h / año</span>
+              <span class="text-[10px] text-slate-500 block">Sin interrumpir la jornada</span>
+            </div>
+            <div>
+              <span class="text-[11px] text-[#94A3B8] block font-medium">Tasa de Adopción Esperada:</span>
+              <span class="text-xl font-bold text-[#38BDF8] mt-0.5 block">94%</span>
+              <span class="text-[10px] text-slate-500 block">Frente al 35% tradicional</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6: CIERRE Y DESPLIEGUE EN 24 HORAS -->
+    <section id="slide-6" class="slide hidden w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      <div class="lg:col-span-6 space-y-5">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-semibold text-emerald-400">
+          Despliegue Empresarial Inmediato
+        </div>
+        <h2 class="text-2xl sm:text-4xl font-black text-white">Implementación Llave en Mano en Menos de 24 Horas</h2>
+        <p class="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
+          Sin integraciones complejas con su departamento de TI. La plataforma se distribuye mediante enlaces mágicos directamente al móvil de los empleados.
+        </p>
+
+        <div class="space-y-3 pt-1">
+          <div class="p-3.5 rounded-2xl bg-[#1C2331] border border-[#2A344A] flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-sky-500/10 text-[#38BDF8] flex items-center justify-center font-bold shrink-0">✓</div>
+            <div>
+              <strong class="text-xs text-white block">Escenarios a Medida de su Compañía</strong>
+              <span class="text-[11px] text-[#94A3B8] block">Cargamos su propio catálogo, productos, objeciones y políticas.</span>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-[#1C2331] border border-[#2A344A] flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-sky-500/10 text-[#38BDF8] flex items-center justify-center font-bold shrink-0">✓</div>
+            <div>
+              <strong class="text-xs text-white block">Licenciamiento Flexible por Sede o Empleado</strong>
+              <span class="text-[11px] text-[#94A3B8] block">Pases mensuales, trimestrales o anuales adaptados al tamaño de su equipo.</span>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-[#1C2331] border border-[#2A344A] flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-sky-500/10 text-[#38BDF8] flex items-center justify-center font-bold shrink-0">✓</div>
+            <div>
+              <strong class="text-xs text-white block">Auditoría y Certificación de Fluidez</strong>
+              <span class="text-[11px] text-[#94A3B8] block">Visibilidad total de progreso y avance de nivel A1, A2, B1, B2.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-4 flex flex-wrap items-center gap-3">
+          <button onclick="goToSlide(1)" class="px-5 py-3 rounded-2xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs shadow-lg shadow-sky-500/20 transition-all cursor-pointer">
+            Reiniciar Presentación
+          </button>
+          <a href="/" class="px-5 py-3 rounded-2xl bg-[#18202F] hover:bg-[#222B3D] text-[#E2E8F0] border border-[#2A344A] font-bold text-xs transition-colors cursor-pointer">
+            Abrir App PitchBoss
+          </a>
+          <span class="text-xs text-[#94A3B8]">Solicite un piloto corporativo de 14 días</span>
+        </div>
+      </div>
+
+      <div class="lg:col-span-6 relative">
+        <div class="rounded-3xl overflow-hidden border border-[#2A344A] shadow-2xl bg-[#1C2331]">
+          <img src="./global_executive_deal_celebration_1792599807739.jpg" onerror="this.src='/presentation/global_executive_deal_celebration_1792599807739.jpg'" alt="Global Deal Celebration" class="w-full h-80 lg:h-96 object-cover" />
+          <div class="p-5 bg-[#1C2331] border-t border-[#2A344A] space-y-1">
+            <span class="text-xs font-bold text-[#38BDF8]">Resultados Visibles desde la Primera Semana</span>
+            <p class="text-xs text-slate-300">Equipos seguros, negociaciones más firmes y cierre de acuerdos internacionales sin barreras de idioma.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom Global Navigation Bar -->
+  <footer class="bg-[#1C2331]/80 backdrop-blur-md border-t border-[#2A344A] px-4 sm:px-8 py-3 flex items-center justify-between text-xs text-[#94A3B8]">
+    <div class="flex items-center gap-2">
+      <span class="hidden sm:inline">Navegación:</span>
+      <div class="flex items-center gap-1.5" id="slideDotsContainer">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <span class="hidden md:inline text-[11px] text-slate-500">Usa las teclas [ ← ] [ → ] o [ Espacio ]</span>
+      <button onclick="toggleFullScreen()" class="p-1.5 rounded-lg bg-[#18202F] hover:bg-[#222B3D] text-[#94A3B8] hover:text-white border border-[#2A344A] transition-colors cursor-pointer" title="Pantalla Completa">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+      </button>
+    </div>
+  </footer>
+
+  <!-- Interactive JavaScript Engine -->
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 6;
+
+    function updateSlideUI() {
+      // Hide all slides
+      for (let i = 1; i <= totalSlides; i++) {
+        const slide = document.getElementById(`slide-${i}`);
+        if (slide) {
+          if (i === currentSlide) {
+            slide.classList.remove('hidden');
+            slide.classList.add('slide-transition');
+          } else {
+            slide.classList.add('hidden');
+          }
+        }
+      }
+
+      // Update counters
+      document.getElementById('currentSlideNum').innerText = currentSlide;
+      document.getElementById('totalSlidesNum').innerText = totalSlides;
+
+      // Update progress bar
+      const pct = (currentSlide / totalSlides) * 100;
+      document.getElementById('progressBar').style.width = `${pct}%`;
+
+      // Update prev/next button states
+      document.getElementById('prevBtn').disabled = currentSlide === 1;
+
+      // Update bottom indicator dots
+      renderDots();
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        updateSlideUI();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        currentSlide--;
+        updateSlideUI();
+      }
+    }
+
+    function goToSlide(n) {
+      if (n >= 1 && n <= totalSlides) {
+        currentSlide = n;
+        updateSlideUI();
+      }
+    }
+
+    function renderDots() {
+      const container = document.getElementById('slideDotsContainer');
+      container.innerHTML = '';
+      for (let i = 1; i <= totalSlides; i++) {
+        const dot = document.createElement('button');
+        dot.className = `w-2.5 h-2.5 rounded-full transition-all cursor-pointer ${
+          i === currentSlide ? 'bg-sky-400 w-6' : 'bg-[#2A344A] hover:bg-sky-400/60'
+        }`;
+        dot.title = `Ir a diapositiva ${i}`;
+        dot.onclick = () => goToSlide(i);
+        container.appendChild(dot);
+      }
+    }
+
+    // Keyboard navigation
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      }
+    });
+
+    // Slide 2: Pain points interaction
+    const painDetails = {
+      1: "La falta de horas de práctica en situaciones tensas hace que el cerebro recurra a la traducción literal, generando titubeos y pérdida de autoridad ante clientes extranjeros.",
+      2: "Los cursos teóricos de academia se enfocan en tiempos verbales y vocabulario genérico desvinculado de la operativa de su empresa, diluyendo el interés del equipo.",
+      3: "Exigir a un equipo comercial u operativo que dedique tardes enteras a clases rígidas provoca ausencias y desmotivación. La solución es micro-práctica diaria de 5 minutos."
+    };
+
+    function selectPainPoint(num) {
+      for (let i = 1; i <= 3; i++) {
+        const card = document.getElementById(`painCard-${i}`);
+        if (i === num) {
+          card.classList.add('border-rose-500/60', 'bg-[#1C2331]');
+          card.classList.remove('border-[#2A344A]', 'bg-[#1C2331]/70');
+        } else {
+          card.classList.remove('border-rose-500/60');
+          card.classList.add('border-[#2A344A]', 'bg-[#1C2331]/70');
+        }
+      }
+      document.getElementById('painDetailText').innerText = painDetails[num] || '';
+    }
+
+    // Slide 3: Voice Simulation interactive response
+    function testResponse(type) {
+      const box = document.getElementById('simFeedback');
+      const score = document.getElementById('simScore');
+      const advice = document.getElementById('simAdvice');
+      box.classList.remove('hidden');
+
+      if (type === 'weak') {
+        box.className = 'p-3.5 rounded-2xl bg-rose-950/40 border border-rose-500/30 text-xs space-y-1';
+        score.innerHTML = '<span class="text-rose-400 font-bold">⚠️ Fluidez: 62% | Puntuación de Negocio: 48%</span><span class="text-rose-300 text-[10px]">Objeción No Superada</span>';
+        advice.innerHTML = '<strong>Análisis del Coach:</strong> Frase informal ("don\'t worry") y pasiva ("try to do it"). No aporta garantías operativas ni reduce el riesgo percibido por el VP de Compras.';
+      } else {
+        box.className = 'p-3.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 text-xs space-y-1';
+        score.innerHTML = '<span class="text-emerald-400 font-bold">⭐ Fluidez: 96% | Puntuación de Negocio: 94%</span><span class="text-emerald-300 text-[10px]">¡Objeción Superada con Éxito!</span>';
+        advice.innerHTML = '<strong>Análisis del Coach:</strong> Lenguaje directivo impecable ("de-risk", "phased pilot", "guaranteed SLA"). Responde directamente al dolor del cliente y sienta las bases para cerrar el contrato.';
+      }
+    }
+
+    function playAiSpeechSimulation() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance("We appreciate the proposal, but your 6-month roadmap introduces unacceptable operational risk. Why shouldn't we choose the incumbent vendor?");
+        utterance.lang = 'en-US';
+        utterance.rate = 0.95;
+        window.speechSynthesis.speak(utterance);
+      } else {
+        alert("Audio reproducido en simulación");
+      }
+    }
+
+    // Slide 5: ROI Calculator
+    function calculateRoi() {
+      const employees = parseInt(document.getElementById('employeeInput').value, 10);
+      const costPerYear = parseInt(document.getElementById('costInput').value, 10);
+
+      document.getElementById('employeeVal').innerText = `${employees} empleados`;
+      document.getElementById('costVal').innerText = `${costPerYear} €`;
+
+      // PitchBoss average company savings estimate: ~65% savings on traditional spend
+      const traditionalTotal = employees * costPerYear;
+      const pitchbossEstimate = employees * 180; // ~15€/mo
+      const netSavings = Math.max(0, traditionalTotal - pitchbossEstimate);
+      const hoursSavedTotal = employees * 96; // ~2 hrs/wk saved from rigid classes
+
+      document.getElementById('annualSavings').innerText = `${netSavings.toLocaleString('es-ES')} € / año`;
+      document.getElementById('hoursSaved').innerText = `+${hoursSavedTotal.toLocaleString('es-ES')} h / año`;
+    }
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // Initialize UI
+    updateSlideUI();
+    calculateRoi();
+  </script>
+</body>
+</html>

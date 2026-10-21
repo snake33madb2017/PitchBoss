@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Plus, Settings, Download, ChevronDown, Check, ShieldCheck, Shield, Crown, Sparkles, Lock, History, Award } from 'lucide-react';
+import { Plus, Settings, Download, ChevronDown, Check, ShieldCheck, Shield, Crown, Sparkles, Lock, History, Award, Presentation } from 'lucide-react';
 import type { EnglishLevel } from '../types';
 import { useTranslation } from '../i18n/LanguageContext';
 
@@ -213,13 +213,25 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
         )}
 
+        {/* Interactive Corporate Presentation Link */}
+        <a
+          href="/presentation/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hidden sm:flex items-center gap-1.5 px-2.5 py-2 rounded-xl border border-[#2A344A] bg-[#1C2331] hover:bg-[#242D3E] text-xs font-semibold text-[#E2E8F0] transition-colors shadow-sm cursor-pointer shrink-0"
+          title="Ver Presentación Corporativa Interactiva"
+        >
+          <Presentation className="w-3.5 h-3.5 text-[#38BDF8]" />
+          <span className="hidden xl:inline">Presentación</span>
+        </a>
+
         {/* New Scenario Button */}
         <button
           onClick={onOpenNewScenario}
-          className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold shadow-lg shadow-sky-950/40 active:scale-95 transition-all cursor-pointer bg-[#0EA5E9] hover:bg-[#38BDF8] text-slate-950 shrink-0"
+          className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold shadow-lg shadow-sky-950/40 active:scale-95 transition-all cursor-pointer bg-[#0EA5E9] hover:bg-[#38BDF8] text-white shrink-0"
           title={t('nav.newScenario')}
         >
-          <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-950" />
+          <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
           <span className="hidden sm:inline">{t('nav.newScenario')}</span>
         </button>
 
