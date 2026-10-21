@@ -16,7 +16,13 @@
     <title>PitchBoss — Domina el pitch en cualquier industria</title>
   </head>
   <body class="bg-[#12161f] text-[#e2e8f0] antialiased selection:bg-sky-500/30 selection:text-sky-200" style="background-color: #12161f;">
-    <div id="root"></div>
+    <div id="root">
+      <div style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #12161f; color: #94a3b8; font-family: system-ui, -apple-system, sans-serif;">
+        <div style="width: 44px; height: 44px; border: 3px solid rgba(56, 189, 248, 0.15); border-top-color: #38bdf8; border-radius: 50%; animation: pitchboss-spin 0.75s linear infinite;"></div>
+        <p style="margin-top: 14px; font-size: 13px; font-weight: 500; color: #94a3b8; letter-spacing: 0.05em;">Cargando PitchBoss...</p>
+        <style>@keyframes pitchboss-spin { to { transform: rotate(360deg); } }</style>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
