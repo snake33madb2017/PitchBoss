@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
-import type { Scenario, SessionReport, AppSettings, SavedSession } from './types';
+import type { Scenario, SessionReport, AppSettings, SavedSession, LevelProgress, LevelPromotionEvent } from './types';
 import { AdminStorageService } from './services/adminStorageService';
 import { SubscriptionService, type UserSubscriptionState } from './services/subscriptionService';
+import { LevelEvaluationService } from './services/levelEvaluationService';
 import { Navbar } from './components/Navbar';
 import { ScenarioCard } from './components/ScenarioCard';
 import { ScenarioModal } from './components/ScenarioModal';
 import { CallScreen } from './components/CallScreen';
 import { SessionReportModal } from './components/SessionReportModal';
 import { SessionHistoryModal } from './components/SessionHistoryModal';
+import { LevelAssessmentModal } from './components/LevelAssessmentModal';
+import { LevelPromotionModal } from './components/LevelPromotionModal';
 import { SettingsModal } from './components/SettingsModal';
 import { AdminPinModal } from './components/AdminPinModal';
 import { AdminHubModal } from './components/AdminHubModal';
@@ -59,6 +62,14 @@ function AppContent() {
   );
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
   const [activationToast, setActivationToast] = useState<string | null>(null);
+
+  // Collaborator CEFR Level & Promotion state
+  const [levelProgress, setLevelProgress] = useState<LevelProgress>(() =>
+    LevelEvaluationService.getLevelProgress()
+  );
+  const [isLevelAssessmentModalOpen, setIsLevelAssessmentModalOpen] = useState(false);
+  const [promotionEvent, setPromotionEvent] = useState<LevelPromotionEvent | null>(null);
+  const [isPromotionModalOpen, setIsPromotionModalOpen] = useState(false);
 
   // Auto-detect Magic Activation Link from URL (?key=PB-...)
   useEffect(() => {
@@ -237,6 +248,8 @@ function AppContent() {
         onOpenNewScenario={handleOpenCreateScenario}
         onOpenSettings={() => setIsSettingsModalOpen(true)}
         onOpenHistory={() => setIsHistoryModalOpen(true)}
+        currentLevel={levelProgress.currentLevel}
+        onOpenLevelModal={() => setIsLevelAssessmentModalOpen(true)}
         canInstallPwa={canInstallPwa}
         onInstallPwa={handleInstallPwa}
         subscriptionStatus={subscriptionState.status}
@@ -465,6 +478,14 @@ function AppContent() {
             setActiveCallScenario(null);
             setActiveSessionToResume(null);
             setSessionReport(report);
+
+            // Autonomous evaluation and level promotion check
+            const evalResult = LevelEvaluationService.evaluateSession(report);
+            setLevelProgress(evalResult.progress);
+            if (evalResult.promoted && evalResult.promotionEvent) {
+              setPromotionEvent(evalResult.promotionEvent);
+              setIsPromotionModalOpen(true);
+            }
           }}
           onExit={() => {
             setActiveCallScenario(null);
@@ -542,6 +563,24 @@ function AppContent() {
           if (session.report) {
             setSessionReport(session.report);
           }
+        }}
+      />
+
+      {/* Level Assessment & CEFR Progress Modal */}
+      <LevelAssessmentModal
+        isOpen={isLevelAssessmentModalOpen}
+        onClose={() => setIsLevelAssessmentModalOpen(false)}
+        isAdmin={isAdmin}
+        onLevelChanged={(updated) => setLevelProgress(updated)}
+      />
+
+      {/* Level Promotion Celebration Modal */}
+      <LevelPromotionModal
+        isOpen={isPromotionModalOpen}
+        onClose={() => setIsPromotionModalOpen(false)}
+        event={promotionEvent}
+        onViewReport={() => {
+          setIsPromotionModalOpen(false);
         }}
       />
 

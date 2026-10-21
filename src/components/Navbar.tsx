@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Plus, Settings, Download, ChevronDown, Check, ShieldCheck, Shield, Crown, Sparkles, Lock, History } from 'lucide-react';
+import { Plus, Settings, Download, ChevronDown, Check, ShieldCheck, Shield, Crown, Sparkles, Lock, History, Award } from 'lucide-react';
+import type { EnglishLevel } from '../types';
 import { useTranslation } from '../i18n/LanguageContext';
 
 interface NavbarProps {
@@ -8,6 +9,8 @@ interface NavbarProps {
   onOpenNewScenario: () => void;
   onOpenSettings: () => void;
   onOpenHistory?: () => void;
+  currentLevel?: EnglishLevel;
+  onOpenLevelModal?: () => void;
   canInstallPwa: boolean;
   onInstallPwa: () => void;
   subscriptionStatus: 'active' | 'free_trial' | 'expired';
@@ -21,6 +24,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenNewScenario,
   onOpenSettings,
   onOpenHistory,
+  currentLevel = 'A1',
+  onOpenLevelModal,
   canInstallPwa,
   onInstallPwa,
   subscriptionStatus,
@@ -72,6 +77,21 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Actions */}
       <div className="flex items-center gap-1 xs:gap-1.5 sm:gap-2.5 shrink-0">
+        {/* User CEFR Level Badge */}
+        {onOpenLevelModal && (
+          <button
+            onClick={onOpenLevelModal}
+            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-xl border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-xs text-zinc-200 transition-colors cursor-pointer shadow-sm shrink-0 font-bold"
+            title="Ver evaluación de nivel CEFR y progreso"
+          >
+            <Award className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            <span className="text-[10px] sm:text-xs">
+              <span className="hidden sm:inline text-zinc-400 font-normal">Nivel </span>
+              <strong className="text-amber-400">{currentLevel}</strong>
+            </span>
+          </button>
+        )}
+
         {/* Subscription Status Pill */}
         {subscriptionStatus === 'active' ? (
           <button

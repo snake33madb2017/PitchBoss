@@ -92,3 +92,23 @@ export interface SavedSession {
   objectives: Objective[];
   report?: SessionReport;
 }
+
+export interface LevelPromotionEvent {
+  fromLevel: EnglishLevel;
+  toLevel: EnglishLevel;
+  date: number;
+  reason: string;
+  businessScore: number;
+  englishScore: number;
+  scenarioTitle: string;
+}
+
+export interface LevelProgress {
+  currentLevel: EnglishLevel;
+  nextLevel: EnglishLevel | null;
+  masteryScore: number; // 0 - 100%
+  consecutivePassingSessions: number;
+  totalCompletedEvaluations: number;
+  lastEvaluatedAt?: number;
+  history: LevelPromotionEvent[];
+}
