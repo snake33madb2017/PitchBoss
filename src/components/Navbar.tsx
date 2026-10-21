@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Plus, Settings, Download, ChevronDown, Check, ShieldCheck, Shield, Crown, Sparkles, Lock } from 'lucide-react';
+import { Plus, Settings, Download, ChevronDown, Check, ShieldCheck, Shield, Crown, Sparkles, Lock, History } from 'lucide-react';
 import { useTranslation } from '../i18n/LanguageContext';
 
 interface NavbarProps {
@@ -7,6 +7,7 @@ interface NavbarProps {
   onOpenAdmin: () => void;
   onOpenNewScenario: () => void;
   onOpenSettings: () => void;
+  onOpenHistory?: () => void;
   canInstallPwa: boolean;
   onInstallPwa: () => void;
   subscriptionStatus: 'active' | 'free_trial' | 'expired';
@@ -19,6 +20,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenAdmin,
   onOpenNewScenario,
   onOpenSettings,
+  onOpenHistory,
   canInstallPwa,
   onInstallPwa,
   subscriptionStatus,
@@ -188,6 +190,18 @@ export const Navbar: React.FC<NavbarProps> = ({
           <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-950" />
           <span className="hidden sm:inline">{t('nav.newScenario')}</span>
         </button>
+
+        {/* History Button */}
+        {onOpenHistory && (
+          <button
+            onClick={onOpenHistory}
+            className="flex items-center gap-1.5 p-1.5 sm:px-2.5 sm:py-2 rounded-xl border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white transition-colors cursor-pointer shrink-0 text-xs font-semibold"
+            title="Historial de conversaciones y transcripciones"
+          >
+            <History className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
+            <span className="hidden lg:inline">Historial</span>
+          </button>
+        )}
 
         {/* Settings Button */}
         <button

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import type { Scenario, Message, SessionReport } from '../types';
+import type { Scenario, Message, SessionReport, SavedSession } from '../types';
 import { GeminiService } from '../services/geminiService';
 import { SpeechService } from '../services/speechService';
+import { SessionHistoryService } from '../services/sessionHistoryService';
 import { AudioVisualizer } from './AudioVisualizer';
 import { useTranslation } from '../i18n/LanguageContext';
 import {
@@ -25,18 +26,39 @@ import {
 
 interface CallScreenProps {
   scenario: Scenario;
+  initialSession?: SavedSession | null;
   onEndCall: (report: SessionReport) => void;
   onExit: () => void;
 }
 
-export const CallScreen: React.FC<CallScreenProps> = ({ scenario, onEndCall, onExit }) => {
+export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession, onEndCall, onExit }) => {
   const { t } = useTranslation();
 
+  const sessionIdRef = useRef<string>(
+    initialSession?.id || `session-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
+  );
+
   // Call state
-  const [callState, setCallState] = useState<'idle' | 'ai_speaking' | 'user_listening' | 'processing'>('processing');
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [callState, setCallState] = useState<'idle' | 'ai_speaking' | 'user_listening' | 'processing'>(
+    initialSession ? 'idle' : 'processing'
+  );
+  const [messages, setMessages] = useState<Message[]>(() => {
+    if (initialSession && initialSession.messages.length > 0) {
+      return initialSession.messages;
+    }
+    return [
+      {
+        id: 'msg-0',
+        sender: 'ai',
+        text: scenario.initialGreeting,
+        translation: scenario.initialTranslation,
+        tip: scenario.initialTip,
+        timestamp: Date.now()
+      }
+    ];
+  });
   const [interimTranscript, setInterimTranscript] = useState('');
-  const [durationSeconds, setDurationSeconds] = useState(0);
+  const [durationSeconds, setDurationSeconds] = useState(initialSession?.durationSeconds || 0);
   const [isMuted, setIsMuted] = useState(false);
 
   // Walkie-Talkie Push-To-Talk state
@@ -66,7 +88,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, onEndCall, onE
   } | null>(null);
 
   // Scenario objectives state
-  const [currentObjectives, setCurrentObjectives] = useState(scenario.objectives);
+  const [currentObjectives, setCurrentObjectives] = useState(initialSession?.objectives || scenario.objectives);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -85,8 +107,16 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, onEndCall, onE
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Start initial greeting
+  // Start initial greeting or resume session
   useEffect(() => {
+    if (initialSession) {
+      setCallState('idle');
+      return () => {
+        SpeechService.cancelSpeech();
+        SpeechService.stopListening();
+      };
+    }
+
     const initialMsg: Message = {
       id: 'msg-0',
       sender: 'ai',
@@ -96,6 +126,19 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, onEndCall, onE
       timestamp: Date.now()
     };
     setMessages([initialMsg]);
+
+    SessionHistoryService.upsertSession({
+      id: sessionIdRef.current,
+      scenarioId: scenario.id,
+      scenarioTitle: scenario.title,
+      scenarioNiche: scenario.niche,
+      startedAt: Date.now(),
+      updatedAt: Date.now(),
+      durationSeconds: 0,
+      status: 'in_progress',
+      messages: [initialMsg],
+      objectives: scenario.objectives
+    });
 
     // Speak initial greeting
     setCallState('ai_speaking');
@@ -269,7 +312,22 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, onEndCall, onE
         corrections: response.corrections
       };
 
-      setMessages((prev) => [...prev, aiMsg]);
+      const nextMessages = [...updatedHistory, aiMsg];
+      setMessages(nextMessages);
+
+      // Auto-save in-progress session
+      SessionHistoryService.upsertSession({
+        id: sessionIdRef.current,
+        scenarioId: scenario.id,
+        scenarioTitle: scenario.title,
+        scenarioNiche: scenario.niche,
+        startedAt: initialSession?.startedAt || Date.now(),
+        updatedAt: Date.now(),
+        durationSeconds,
+        status: 'in_progress',
+        messages: nextMessages,
+        objectives: currentObjectives
+      });
 
       // Speak response out loud
       if (!isMuted) {
@@ -340,7 +398,34 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, onEndCall, onE
       durationSeconds
     });
 
+    // Mark session as completed in storage
+    SessionHistoryService.completeSession({
+      sessionId: sessionIdRef.current,
+      report,
+      messages,
+      objectives: currentObjectives,
+      durationSeconds
+    });
+
     onEndCall(report);
+  };
+
+  const handleExitWithAutoSave = () => {
+    SpeechService.cancelSpeech();
+    SpeechService.stopListening();
+    SessionHistoryService.upsertSession({
+      id: sessionIdRef.current,
+      scenarioId: scenario.id,
+      scenarioTitle: scenario.title,
+      scenarioNiche: scenario.niche,
+      startedAt: initialSession?.startedAt || Date.now(),
+      updatedAt: Date.now(),
+      durationSeconds,
+      status: 'in_progress',
+      messages,
+      objectives: currentObjectives
+    });
+    onExit();
   };
 
   const lastAiMsg = [...messages].reverse().find((m) => m.sender === 'ai');
@@ -410,9 +495,9 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, onEndCall, onE
 
           {/* Exit without report */}
           <button
-            onClick={onExit}
+            onClick={handleExitWithAutoSave}
             className="p-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white transition-colors cursor-pointer"
-            title="Salir"
+            title="Guardar y Salir"
           >
             <X className="w-3.5 h-3.5" />
           </button>

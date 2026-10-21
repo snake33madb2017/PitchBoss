@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { Scenario, SessionReport, AppSettings } from './types';
+import type { Scenario, SessionReport, AppSettings, SavedSession } from './types';
 import { AdminStorageService } from './services/adminStorageService';
 import { SubscriptionService, type UserSubscriptionState } from './services/subscriptionService';
 import { Navbar } from './components/Navbar';
@@ -7,6 +7,7 @@ import { ScenarioCard } from './components/ScenarioCard';
 import { ScenarioModal } from './components/ScenarioModal';
 import { CallScreen } from './components/CallScreen';
 import { SessionReportModal } from './components/SessionReportModal';
+import { SessionHistoryModal } from './components/SessionHistoryModal';
 import { SettingsModal } from './components/SettingsModal';
 import { AdminPinModal } from './components/AdminPinModal';
 import { AdminHubModal } from './components/AdminHubModal';
@@ -45,6 +46,8 @@ function AppContent() {
 
   // Active call & modals
   const [activeCallScenario, setActiveCallScenario] = useState<Scenario | null>(null);
+  const [activeSessionToResume, setActiveSessionToResume] = useState<SavedSession | null>(null);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [isScenarioModalOpen, setIsScenarioModalOpen] = useState(false);
   const [scenarioToEdit, setScenarioToEdit] = useState<Scenario | null>(null);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -169,6 +172,19 @@ function AppContent() {
     setActiveCallScenario(scenario);
   };
 
+  const handleResumeSession = (session: SavedSession) => {
+    const sc = scenarios.find((s) => s.id === session.scenarioId);
+    if (sc) {
+      setActiveSessionToResume(session);
+      setActiveCallScenario(sc);
+    }
+  };
+
+  const handleStartFreshScenario = (scenario: Scenario) => {
+    setActiveSessionToResume(null);
+    handleSelectScenario(scenario);
+  };
+
   // Admin authentication handlers
   const handleOpenAdmin = () => {
     if (isAdmin) {
@@ -220,6 +236,7 @@ function AppContent() {
         onOpenAdmin={handleOpenAdmin}
         onOpenNewScenario={handleOpenCreateScenario}
         onOpenSettings={() => setIsSettingsModalOpen(true)}
+        onOpenHistory={() => setIsHistoryModalOpen(true)}
         canInstallPwa={canInstallPwa}
         onInstallPwa={handleInstallPwa}
         subscriptionStatus={subscriptionState.status}
@@ -426,7 +443,8 @@ function AppContent() {
                   key={scenario.id}
                   scenario={scenario}
                   isAdmin={isAdmin}
-                  onSelect={handleSelectScenario}
+                  onSelect={handleStartFreshScenario}
+                  onResume={handleResumeSession}
                   onEdit={handleOpenEditScenario}
                   onDuplicate={handleDuplicateScenario}
                   onToggleVisibility={handleToggleVisibility}
@@ -442,11 +460,16 @@ function AppContent() {
       {activeCallScenario && (
         <CallScreen
           scenario={activeCallScenario}
+          initialSession={activeSessionToResume}
           onEndCall={(report) => {
             setActiveCallScenario(null);
+            setActiveSessionToResume(null);
             setSessionReport(report);
           }}
-          onExit={() => setActiveCallScenario(null)}
+          onExit={() => {
+            setActiveCallScenario(null);
+            setActiveSessionToResume(null);
+          }}
         />
       )}
 
@@ -506,6 +529,21 @@ function AppContent() {
           }}
         />
       )}
+
+      {/* Session History & Audit Transcripts Modal */}
+      <SessionHistoryModal
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+        onResumeSession={(session) => {
+          setIsHistoryModalOpen(false);
+          handleResumeSession(session);
+        }}
+        onViewReport={(session) => {
+          if (session.report) {
+            setSessionReport(session.report);
+          }
+        }}
+      />
 
       {/* Subscription Paywall & License Management Modal */}
       <SubscriptionModal

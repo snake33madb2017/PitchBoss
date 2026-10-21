@@ -78,3 +78,17 @@ export interface AppSettings {
   hapticFeedback: boolean;
   adminPin?: string; // Admin PIN (defaults to '1234')
 }
+
+export interface SavedSession {
+  id: string;
+  scenarioId: string;
+  scenarioTitle: string;
+  scenarioNiche: string;
+  startedAt: number;
+  updatedAt: number;
+  durationSeconds: number;
+  status: 'in_progress' | 'completed';
+  messages: Message[];
+  objectives: Objective[];
+  report?: SessionReport;
+}

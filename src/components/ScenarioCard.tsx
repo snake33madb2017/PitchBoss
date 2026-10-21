@@ -1,11 +1,13 @@
 import React from 'react';
-import type { Scenario } from '../types';
-import { Phone, Target, Trash2, Building2, User, Edit3, Copy, Eye, EyeOff } from 'lucide-react';
+import type { Scenario, SavedSession } from '../types';
+import { Phone, Target, Trash2, Building2, User, Edit3, Copy, Eye, EyeOff, Play, RotateCcw } from 'lucide-react';
+import { SessionHistoryService } from '../services/sessionHistoryService';
 import { useTranslation } from '../i18n/LanguageContext';
 
 interface ScenarioCardProps {
   scenario: Scenario;
   onSelect: (scenario: Scenario) => void;
+  onResume?: (session: SavedSession) => void;
   isAdmin?: boolean;
   onEdit?: (scenario: Scenario) => void;
   onDuplicate?: (id: string) => void;
@@ -16,6 +18,7 @@ interface ScenarioCardProps {
 export const ScenarioCard: React.FC<ScenarioCardProps> = ({
   scenario,
   onSelect,
+  onResume,
   isAdmin = false,
   onEdit,
   onDuplicate,
@@ -23,6 +26,7 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
   onDelete
 }) => {
   const { t } = useTranslation();
+  const inProgressSession = SessionHistoryService.getLatestInProgressSession(scenario.id);
 
   const getDifficultyBadge = (difficulty: string) => {
     switch (difficulty) {
@@ -221,14 +225,43 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
         )}
       </div>
 
-      {/* Action Button - High Contrast Corporate Platinum CTA */}
-      <button
-        onClick={() => onSelect(scenario)}
-        className="w-full mt-2 py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg active:scale-[0.99] transition-all cursor-pointer bg-zinc-100 hover:bg-white text-zinc-950 shadow-black/30"
-      >
-        <Phone className="w-3.5 h-3.5 text-zinc-950" />
-        <span>{t('card.startRoleplay')}</span>
-      </button>
+      {/* Action Buttons */}
+      {inProgressSession ? (
+        <div className="space-y-1.5 mt-2">
+          <div className="flex items-center justify-between text-[10px] text-amber-400 font-semibold px-1">
+            <span className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+              Sesión en curso ({inProgressSession.messages.length} msgs)
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => (onResume ? onResume(inProgressSession) : onSelect(scenario))}
+              className="py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-md bg-amber-500 hover:bg-amber-400 text-zinc-950 transition-all cursor-pointer"
+              title="Continuar conversación donde se dejó"
+            >
+              <Play className="w-3.5 h-3.5 fill-current" />
+              <span>Continuar</span>
+            </button>
+            <button
+              onClick={() => onSelect(scenario)}
+              className="py-2.5 px-3 rounded-xl font-medium text-xs flex items-center justify-center gap-1.5 border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 transition-all cursor-pointer"
+              title="Iniciar una nueva llamada desde el principio"
+            >
+              <RotateCcw className="w-3 h-3 text-zinc-400" />
+              <span>Reiniciar</span>
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button
+          onClick={() => onSelect(scenario)}
+          className="w-full mt-2 py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg active:scale-[0.99] transition-all cursor-pointer bg-zinc-100 hover:bg-white text-zinc-950 shadow-black/30"
+        >
+          <Phone className="w-3.5 h-3.5 text-zinc-950" />
+          <span>{t('card.startRoleplay')}</span>
+        </button>
+      )}
     </div>
   );
 };
