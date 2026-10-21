@@ -378,10 +378,19 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
     }
   };
 
-  // Re-play last AI utterance
-  const repeatLastAiStatement = () => {
+  // Re-play or toggle last AI utterance
+  const toggleRepeatAiSpeech = () => {
+    if (callState === 'ai_speaking') {
+      SpeechService.cancelSpeech();
+      setCallState('idle');
+      return;
+    }
+
     const lastAi = [...messages].reverse().find((m) => m.sender === 'ai');
     if (lastAi) {
+      if (isMuted) {
+        setIsMuted(false);
+      }
       SpeechService.cancelSpeech();
       setCallState('ai_speaking');
       SpeechService.speakText({
@@ -389,10 +398,15 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
         onStart: () => setCallState('ai_speaking'),
         onEnd: () => {
           setCallState('idle');
+        },
+        onError: () => {
+          setCallState('idle');
         }
       });
     }
   };
+
+  const repeatLastAiStatement = toggleRepeatAiSpeech;
 
   // Request instant hints from AI
   const fetchLiveHints = async () => {
@@ -685,6 +699,30 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
                 <span>{showTip ? 'Ocultar sugerencia' : '💡 ¿Cómo responder?'}</span>
               </button>
             )}
+
+            {/* Third button: Replay / Escuchar mensaje de la IA */}
+            <button
+              type="button"
+              onClick={toggleRepeatAiSpeech}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium border transition-colors cursor-pointer ${
+                callState === 'ai_speaking'
+                  ? 'bg-sky-500/15 border-sky-500/50 text-[#38BDF8] shadow-sm shadow-sky-500/20'
+                  : 'bg-[#12161F] border-[#2A344A] text-[#94A3B8] hover:text-[#E2E8F0] hover:border-[#38BDF8]/40'
+              }`}
+              title={callState === 'ai_speaking' ? 'Toca para pausar o detener el audio' : 'Reproducir mensaje de la IA en voz alta'}
+            >
+              {callState === 'ai_speaking' ? (
+                <>
+                  <VolumeX className="w-3 h-3 text-[#38BDF8] animate-pulse" />
+                  <span>Detener audio</span>
+                </>
+              ) : (
+                <>
+                  <Volume2 className="w-3 h-3 text-[#38BDF8]" />
+                  <span>🔊 Escuchar de nuevo</span>
+                </>
+              )}
+            </button>
           </div>
 
           {/* Expanded Spanish Translation Card */}
@@ -826,13 +864,27 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
         {/* Repeat audio button */}
         <button
           onClick={repeatLastAiStatement}
-          className="flex flex-col items-center gap-1 text-[#94A3B8] hover:text-[#E2E8F0] transition-colors cursor-pointer"
-          title="Escuchar de nuevo"
+          className={`flex flex-col items-center gap-1 transition-colors cursor-pointer ${
+            callState === 'ai_speaking' ? 'text-[#38BDF8]' : 'text-[#94A3B8] hover:text-[#E2E8F0]'
+          }`}
+          title={callState === 'ai_speaking' ? 'Detener audio' : 'Escuchar de nuevo'}
         >
-          <div className="w-10 h-10 rounded-full bg-[#1C2331] border border-[#2A344A] hover:border-[#3D4A66] flex items-center justify-center transition-all">
-            <RotateCcw className="w-4 h-4" />
+          <div
+            className={`w-10 h-10 rounded-full bg-[#1C2331] border flex items-center justify-center transition-all ${
+              callState === 'ai_speaking'
+                ? 'border-[#38BDF8] shadow-sm shadow-sky-500/20'
+                : 'border-[#2A344A] hover:border-[#3D4A66]'
+            }`}
+          >
+            {callState === 'ai_speaking' ? (
+              <VolumeX className="w-4 h-4 text-[#38BDF8] animate-pulse" />
+            ) : (
+              <RotateCcw className="w-4 h-4" />
+            )}
           </div>
-          <span className="text-[10px] font-medium">Repetir</span>
+          <span className="text-[10px] font-medium">
+            {callState === 'ai_speaking' ? 'Detener' : 'Repetir'}
+          </span>
         </button>
 
         {/* Central Prominent Walkie-Talkie Button */}
