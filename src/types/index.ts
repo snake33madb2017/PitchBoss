@@ -28,6 +28,7 @@ export interface Scenario {
   objectives: Objective[];
   commonObjections: string[];
   nicheVocabulary: string[]; // Specific industry jargon to use or practice
+  businessKnowledge?: string; // Raw pasted menu, product list, FAQs or operational manual
   isCustom?: boolean;
   isHidden?: boolean; // When true, hidden from non-admin users
   createdAt: number;

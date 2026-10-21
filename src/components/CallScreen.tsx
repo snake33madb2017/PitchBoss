@@ -21,7 +21,8 @@ import {
   X,
   Keyboard,
   Languages,
-  Radio
+  Radio,
+  BookOpen
 } from 'lucide-react';
 
 interface CallScreenProps {
@@ -74,6 +75,8 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
   // Collapsible helpers to avoid screen clutter
   const [showTranslation, setShowTranslation] = useState(false);
   const [showTip, setShowTip] = useState(false);
+  const [showVocabulary, setShowVocabulary] = useState(false);
+  const [dismissedLevelNudge, setDismissedLevelNudge] = useState(false);
   const [showObjectives, setShowObjectives] = useState(false);
   const [showChatLog, setShowChatLog] = useState(false);
   const [showTextInput, setShowTextInput] = useState(false);
@@ -657,6 +660,39 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
           </div>
         )}
 
+        {/* Proactive Level Promotion Suggestion Nudge */}
+        {!dismissedLevelNudge &&
+          currentObjectives.filter((o) => o.completed).length >= 2 &&
+          messages.filter((m) => m.sender === 'user').length >= 3 && (
+            <div className="w-full rounded-2xl p-3.5 bg-gradient-to-r from-amber-500/15 via-[#1C2331] to-sky-500/15 border border-amber-500/30 shadow-lg text-xs animate-in fade-in slide-in-from-top-2 flex flex-col sm:flex-row items-center justify-between gap-2.5 shrink-0">
+              <div className="flex items-center gap-2.5">
+                <span className="text-xl">⚡</span>
+                <div>
+                  <p className="font-bold text-[#FBBF24]">¡Excelente dominio de este escenario!</p>
+                  <p className="text-[#94A3B8] text-[11px] leading-snug">
+                    Has cumplido {currentObjectives.filter((o) => o.completed).length} objetivos. ¿Listo para dar el salto al siguiente nivel al colgar?
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end">
+                <button
+                  type="button"
+                  onClick={() => setDismissedLevelNudge(true)}
+                  className="px-2.5 py-1 rounded-xl text-[11px] text-[#94A3B8] hover:text-[#E2E8F0] transition-colors cursor-pointer"
+                >
+                  Seguir aquí
+                </button>
+                <button
+                  type="button"
+                  onClick={handleHangUp}
+                  className="px-3 py-1.5 rounded-xl text-[11px] font-bold bg-[#FBBF24] hover:bg-amber-300 text-slate-950 transition-all shadow-md shadow-amber-500/20 cursor-pointer"
+                >
+                  Colgar y Subir Nivel 🏆
+                </button>
+              </div>
+            </div>
+          )}
+
         {/* Clean Dialogue Card: Spacious & Ergonomic */}
         <div className="w-full rounded-3xl bg-[#1C2331] border border-[#2A344A] p-4 sm:p-5 shadow-2xl backdrop-blur-md space-y-3 shrink-0">
           <div>
@@ -723,6 +759,23 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
                 </>
               )}
             </button>
+
+            {/* Fourth button: Toggle Menu & Vocabulary Cheat Sheet */}
+            {scenario.nicheVocabulary && scenario.nicheVocabulary.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowVocabulary(!showVocabulary)}
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium border transition-colors cursor-pointer ${
+                  showVocabulary
+                    ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
+                    : 'bg-[#12161F] border-[#2A344A] text-[#94A3B8] hover:text-[#E2E8F0]'
+                }`}
+                title="Ver carta de productos y vocabulario clave"
+              >
+                <BookOpen className="w-3 h-3 text-emerald-400" />
+                <span>{showVocabulary ? 'Ocultar carta' : `📋 Carta & Léxico (${scenario.nicheVocabulary.length})`}</span>
+              </button>
+            )}
           </div>
 
           {/* Expanded Spanish Translation Card */}
@@ -743,6 +796,49 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
                 <span>Consejo de respuesta y fonética:</span>
               </div>
               <p className="leading-relaxed">{lastAiTip}</p>
+            </div>
+          )}
+
+          {/* Expanded Vocabulary & Menu Cheat Sheet */}
+          {showVocabulary && scenario.nicheVocabulary && scenario.nicheVocabulary.length > 0 && (
+            <div className="p-3.5 rounded-2xl bg-[#12161F] border border-[#2A344A] space-y-2.5 animate-in fade-in slide-in-from-top-1">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-emerald-400 text-xs flex items-center gap-1.5 uppercase tracking-wider">
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>Carta & Vocabulario del Local</span>
+                </span>
+                <span className="text-[10px] text-[#94A3B8]">
+                  Pronúncialos para ganar fluidez
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1 scrollbar-thin">
+                {scenario.nicheVocabulary.map((term, idx) => {
+                  const userSpeech = messages
+                    .filter((m) => m.sender === 'user')
+                    .map((m) => m.text.toLowerCase())
+                    .join(' ');
+                  const cleanKey = term.split('[')[0].trim().toLowerCase();
+                  const isMentioned = cleanKey.length >= 3 && userSpeech.includes(cleanKey);
+
+                  return (
+                    <div
+                      key={idx}
+                      className={`p-2 rounded-xl text-xs border transition-all flex items-start justify-between gap-1.5 ${
+                        isMentioned
+                          ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 font-medium'
+                          : 'bg-[#1C2331] border-[#2A344A] text-[#E2E8F0]'
+                      }`}
+                    >
+                      <span className="leading-snug text-[11px] font-mono">{term}</span>
+                      {isMentioned && (
+                        <span className="text-emerald-400 text-[10px] font-bold shrink-0 bg-emerald-500/20 px-1.5 py-0.5 rounded-md">
+                          ✓ Usado
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>

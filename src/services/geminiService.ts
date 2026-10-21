@@ -1,4 +1,4 @@
-import type { Scenario, Message, SessionReport } from '../types';
+import type { Scenario, Message, SessionReport, EnglishLevel, DifficultyLevel } from '../types';
 
 export class GeminiService {
   private static getModel(): string {
@@ -87,13 +87,28 @@ export class GeminiService {
   }
 
   /**
-   * Generates a complete scenario from a simple user description in any business niche.
+   * Generates a complete scenario from a simple user description, full menu, or company manual.
    * Uses Gemini with temperature 0.25 and strict responseSchema.
    */
-  public static async generateScenarioFromPrompt(prompt: string): Promise<Partial<Scenario>> {
-    const systemInstructionText = `You are an expert executive coach and roleplay curriculum designer.
-Convert the user's prompt into a high-stakes, realistic English professional roleplay scenario.
-Be realistic, industry-specific, and calibrate difficulties and vocabulary accurately.`;
+  public static async generateScenarioFromPrompt(
+    prompt: string,
+    options?: { targetEnglishLevel?: EnglishLevel; difficulty?: DifficultyLevel }
+  ): Promise<Partial<Scenario>> {
+    const targetLevel = options?.targetEnglishLevel;
+    const targetDiff = options?.difficulty;
+
+    const systemInstructionText = `You are an expert executive coach, roleplay curriculum designer, and business hospitality consultant.
+The user is providing business documentation, a restaurant/bar menu, a service catalogue, an operations manual, or roleplay specifications.
+Your mission is to parse this business knowledge and generate a high-stakes, realistic English professional roleplay scenario.
+
+CRITICAL PARSING & EXTRACTION DIRECTIVES:
+1. EXTRACT REAL BUSINESS ASSETS: Extract actual product names, cocktails, dishes, ingredients, prices, service rules, opening hours, and policies from the user's text.
+2. CEFR LEVEL CALIBRATION: ${targetLevel ? `Calibrate dialogues, sentence complexity, and phonetic tips strictly for CEFR Level ${targetLevel}.` : 'Calibrate automatically according to complexity.'}
+3. DIFFICULTY CALIBRATION: ${targetDiff ? `Set customer temperament and scenario friction to ${targetDiff}.` : 'Set realistic difficulty.'}
+4. OBJECTIVES: Create 4 clear, action-oriented business goals (e.g., recommend specific items from the provided menu, handle payment, resolve doubts).
+5. COMMON OBJECTIONS: Formulate 3 to 4 realistic objections or questions customers will genuinely ask about these exact items, prices, or policies.
+6. NICHE VOCABULARY: Extract at least 8 to 14 crucial terms/cocktails/dishes from the text, providing phonetic pronunciation in brackets [e.g. "Bubi Cocktail [Bú-bi Cóc-teil] (Dulce, ron y plátano)"].
+7. ZERO-HALLUCINATIONS: Ground names, prices, and facts directly in the user's provided text.`;
 
     const payload = {
       systemInstruction: {
@@ -102,7 +117,7 @@ Be realistic, industry-specific, and calibrate difficulties and vocabulary accur
       contents: [
         {
           role: 'user',
-          parts: [{ text: `Create a professional business English roleplay scenario for: "${prompt}".` }]
+          parts: [{ text: `Create a professional business English roleplay scenario based on this company documentation/menu:\n\n"""\n${prompt}\n"""` }]
         }
       ],
       generationConfig: {
@@ -171,12 +186,21 @@ Be realistic, industry-specific, and calibrate difficulties and vocabulary accur
       return {
         ...parsed,
         id: 'custom-' + Date.now(),
+        businessKnowledge: prompt,
+        targetEnglishLevel: targetLevel || parsed.targetEnglishLevel || 'A1',
+        difficulty: targetDiff || parsed.difficulty || 'easy',
         isCustom: true,
         createdAt: Date.now()
       };
     } catch (err) {
       console.warn('AI Generation failed, using dynamic template:', err);
-      return this.mockGenerateScenario(prompt);
+      const mocked = this.mockGenerateScenario(prompt);
+      return {
+        ...mocked,
+        businessKnowledge: prompt,
+        targetEnglishLevel: targetLevel || mocked.targetEnglishLevel || 'A1',
+        difficulty: targetDiff || mocked.difficulty || 'easy'
+      };
     }
   }
 
@@ -220,6 +244,17 @@ You are strictly roleplaying as:
 - Difficulty: ${scenario.difficulty}
 
 The user is playing the professional role of: "${scenario.userRole}".
+${
+  scenario.businessKnowledge
+    ? `
+OFFICIAL COMPANY KNOWLEDGE BASE & PRODUCTS (STRICT SOURCE OF TRUTH):
+"""
+${scenario.businessKnowledge}
+"""
+You must strictly follow this knowledge base. Reference real cocktails, dishes, ingredients, prices, and policies mentioned above when interacting as a customer or providing feedback.
+`
+    : ''
+}
 
 Common business objections in this situation:
 ${scenario.commonObjections.map((o) => `- ${o}`).join('\n')}

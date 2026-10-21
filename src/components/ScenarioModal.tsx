@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Scenario, DifficultyLevel, EnglishLevel, Objective } from '../types';
 import { GeminiService } from '../services/geminiService';
-import { X, Sparkles, Plus, Trash2, Loader2, Wand2, Edit3, BookOpen, MessageSquare, Check } from 'lucide-react';
+import { X, Sparkles, Plus, Trash2, Loader2, Wand2, Edit3, BookOpen, MessageSquare, Check, FileText } from 'lucide-react';
 import { useTranslation } from '../i18n/LanguageContext';
 
 interface ScenarioModalProps {
@@ -41,6 +41,8 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
   const [initialTip, setInitialTip] = useState('');
   const [difficulty, setDifficulty] = useState<DifficultyLevel>('easy');
   const [targetEnglishLevel, setTargetEnglishLevel] = useState<EnglishLevel>('A1');
+  const [businessKnowledge, setBusinessKnowledge] = useState('');
+  const [generationNotice, setGenerationNotice] = useState<string | null>(null);
 
   const [objectives, setObjectives] = useState<Objective[]>([
     { id: 'obj-1', description: 'Dar la bienvenida y ubicar a los clientes', completed: false }
@@ -87,6 +89,8 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
             ? scenarioToEdit.nicheVocabulary
             : ['Término clave [fonética]']
         );
+        setBusinessKnowledge(scenarioToEdit.businessKnowledge || '');
+        setGenerationNotice(null);
       } else {
         setActiveTab('ai');
         setTitle('');
@@ -103,6 +107,8 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
         setInitialTip('');
         setDifficulty('easy');
         setTargetEnglishLevel('A1');
+        setBusinessKnowledge('');
+        setGenerationNotice(null);
         setObjectives([
           { id: 'obj-1', description: 'Saludar en inglés con naturalidad', completed: false }
         ]);
@@ -117,14 +123,18 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
   const handleGenerateWithAI = async () => {
     if (!aiPrompt.trim()) return;
     setIsGenerating(true);
+    setGenerationNotice(null);
     try {
-      const generated = await GeminiService.generateScenarioFromPrompt(aiPrompt);
+      const generated = await GeminiService.generateScenarioFromPrompt(aiPrompt, {
+        targetEnglishLevel,
+        difficulty
+      });
       if (generated) {
         setTitle(generated.title || '');
         setNiche(generated.niche || '');
         setAiName(generated.aiCharacter?.name || '');
         setAiRole(generated.aiCharacter?.role || '');
-        setAiAvatar(generated.aiCharacter?.avatar || '💼');
+        setAiAvatar(generated.aiCharacter?.avatar || '🍸');
         setAiPersonality(generated.aiCharacter?.personality || '');
         setVoiceGender(generated.aiCharacter?.voiceGender || 'male');
         setUserRole(generated.userRole || '');
@@ -132,8 +142,9 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
         setInitialGreeting(generated.initialGreeting || '');
         setInitialTranslation(generated.initialTranslation || '');
         setInitialTip(generated.initialTip || '');
-        setDifficulty(generated.difficulty || 'medium');
-        setTargetEnglishLevel(generated.targetEnglishLevel || 'B1');
+        setDifficulty(generated.difficulty || difficulty || 'easy');
+        setTargetEnglishLevel(generated.targetEnglishLevel || targetEnglishLevel || 'A1');
+        setBusinessKnowledge(aiPrompt.trim());
         if (generated.objectives && generated.objectives.length > 0) {
           setObjectives(generated.objectives);
         }
@@ -144,9 +155,12 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
           setVocabulary(generated.nicheVocabulary);
         }
         setActiveTab('manual');
+        setGenerationNotice('¡Escenario calibrado y programado con éxito a partir de tu carta! Revisa los campos y pulsa Guardar.');
+        setTimeout(() => setGenerationNotice(null), 8000);
       }
     } catch (e) {
       console.error(e);
+      alert('Hubo un error al procesar el documento con la IA. Por favor, intenta de nuevo.');
     } finally {
       setIsGenerating(false);
     }
@@ -179,6 +193,7 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
       objectives: objectives.filter((o) => o.description.trim().length > 0),
       commonObjections: objections.filter((o) => o.trim().length > 0),
       nicheVocabulary: vocabulary.filter((v) => v.trim().length > 0),
+      businessKnowledge: businessKnowledge.trim() || undefined,
       isCustom: true,
       isHidden: scenarioToEdit?.isHidden || false,
       createdAt: scenarioToEdit?.createdAt || Date.now(),
@@ -220,19 +235,17 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
 
         {/* Tab Buttons */}
         <div className="flex border-b border-zinc-800 px-4 sm:px-6 pt-1 bg-zinc-950/50 shrink-0">
-          {!isEditMode && (
-            <button
-              onClick={() => setActiveTab('ai')}
-              className={`flex items-center gap-2 px-4 py-3 text-sm font-bold border-b-2 transition-colors cursor-pointer ${
-                activeTab === 'ai'
-                  ? 'border-amber-400 text-amber-400'
-                  : 'border-transparent text-zinc-400 hover:text-zinc-200'
-              }`}
-            >
-              <Wand2 className="w-4 h-4" />
-              <span>{t('modal.tabAi')}</span>
-            </button>
-          )}
+          <button
+            onClick={() => setActiveTab('ai')}
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-bold border-b-2 transition-colors cursor-pointer ${
+              activeTab === 'ai'
+                ? 'border-amber-400 text-amber-400'
+                : 'border-transparent text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            <Wand2 className="w-4 h-4" />
+            <span>✨ Inyector Maestro de Carta / IA</span>
+          </button>
           <button
             onClick={() => setActiveTab('manual')}
             className={`flex items-center gap-2 px-4 py-3 text-sm font-bold border-b-2 transition-colors cursor-pointer ${
@@ -242,7 +255,7 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
             }`}
           >
             <Edit3 className="w-4 h-4" />
-            <span>{isEditMode ? 'Datos del Escenario' : t('modal.tabManual')}</span>
+            <span>{isEditMode ? 'Datos del Escenario' : 'Campos Detallados'}</span>
           </button>
         </div>
 
@@ -250,66 +263,165 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
         <div className="p-4 sm:p-6 overflow-y-auto overscroll-contain flex-1 space-y-5 scrollbar-thin">
           {activeTab === 'ai' ? (
             <div className="space-y-4">
-              <div className="border border-zinc-800 rounded-2xl p-4 text-xs sm:text-sm leading-relaxed bg-zinc-950 text-zinc-300">
-                {t('modal.aiBanner')}
+              {/* Master Injector Header Card */}
+              <div className="border border-amber-500/30 rounded-2xl p-4 sm:p-5 bg-gradient-to-r from-zinc-950 to-zinc-900 text-zinc-100 space-y-2 shadow-lg">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-amber-500/20 text-amber-400">
+                    <Sparkles className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-sm sm:text-base font-bold text-zinc-100">
+                    Inyector Maestro de Empresa / Carta de Productos
+                  </h3>
+                </div>
+                <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+                  Copia y pega aquí la <strong>carta completa de tu bar/restaurante</strong>, lista de productos, precios, alérgenos o el manual de atención de tu empresa. La IA extraerá los nombres reales, creará los objetivos comerciales y calibrará los diálogos con fonética en un solo clic.
+                </p>
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold mb-2 text-zinc-200">
-                  {t('modal.promptLabel')}
-                </label>
-                <textarea
-                  rows={4}
-                  value={aiPrompt}
-                  onChange={(e) => setAiPrompt(e.target.value)}
-                  placeholder="Ej: Camarero en LOVO Bar atendiendo a una pareja de turistas británicos que preguntan por cócteles dulces y tapas sin gluten..."
-                  className="w-full border rounded-2xl p-3.5 text-sm sm:text-base transition-colors focus:outline-none focus:border-amber-500 bg-zinc-950 border-zinc-800 text-zinc-100 placeholder:text-zinc-600"
-                />
-              </div>
+              {/* Pre-calibration Controls: English Level & Customer Temperament */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-2xl bg-zinc-950/70 border border-zinc-800">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-amber-400 mb-1.5">
+                    Nivel de Inglés Objetivo
+                  </label>
+                  <select
+                    value={targetEnglishLevel}
+                    onChange={(e) => setTargetEnglishLevel(e.target.value as EnglishLevel)}
+                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs font-semibold text-zinc-100 focus:outline-none focus:border-amber-400"
+                  >
+                    <option value="A1">A1 - Principiante (Frases muy cortas y apoyo fonético)</option>
+                    <option value="A2">A2 - Básico (Atención fluida y vocabulario de carta)</option>
+                    <option value="B1">B1 - Intermedio (Preguntas de clientes y alternativas)</option>
+                    <option value="B2">B2 - Avanzado (Clientes exigentes y modismos)</option>
+                    <option value="C1">C1 - Ejecutivo / Experto</option>
+                  </select>
+                </div>
 
-              {/* Sample idea chips */}
-              <div className="space-y-2">
-                <p className="text-xs text-zinc-400 font-semibold">Ideas de prueba rápida:</p>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    'Atender comensales estadounidenses que piden la cuenta por separado en barra',
-                    'Recomendar cócteles de autor en LOVO Bar a una clienta indecisa',
-                    'Gestionar una queja amablemente por una bebida que tardó unos minutos',
-                    'Atender a turistas en inglés básico A1 preguntando por el baño y tapas ibéricas'
-                  ].map((idea, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setAiPrompt(idea)}
-                      className="text-xs sm:text-sm px-3 py-1.5 rounded-xl text-left border transition-colors cursor-pointer bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border-zinc-800"
-                    >
-                      {idea}
-                    </button>
-                  ))}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-sky-400 mb-1.5">
+                    Dificultad / Actitud del Cliente
+                  </label>
+                  <select
+                    value={difficulty}
+                    onChange={(e) => setDifficulty(e.target.value as DifficultyLevel)}
+                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-xs font-semibold text-zinc-100 focus:outline-none focus:border-sky-400"
+                  >
+                    <option value="easy">Fácil (Cliente amable y comprensivo)</option>
+                    <option value="medium">Medio (Cliente indeciso que pide recomendaciones)</option>
+                    <option value="hard">Difícil (Cliente con prisas o peticiones especiales)</option>
+                    <option value="hostile">Hostil / Retador (Quejas y gestión de incidencias)</option>
+                  </select>
                 </div>
               </div>
 
+              {/* Giant Master Textarea */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-zinc-300">
+                    Pega aquí la carta, menú o ambiente completo *
+                  </label>
+                  <span className="text-[11px] font-mono text-zinc-500">
+                    {aiPrompt.length} caracteres
+                  </span>
+                </div>
+                <textarea
+                  rows={9}
+                  value={aiPrompt}
+                  onChange={(e) => setAiPrompt(e.target.value)}
+                  placeholder="Ejemplo de lo que puedes pegar en bruto:&#10;&#10;CARTA DE COCTELERÍA Y TAPAS (LOVO BAR):&#10;- Bubi Cocktail (12€): Ron blanco, plátano flameado, cacao, ginger beer. Sabor dulce.&#10;- Manabi Cocktail (13€): Pisco acholado, piña asada, coco, ají amarillo. Afrutado y picante.&#10;- Josephine Baker 0.0 (10€): Sin alcohol con maracuyá, menta fresca y tónica.&#10;- Tabla Jamón Ibérico de Bellota (22€), Tabla de Quesos Artesanos (18€).&#10;&#10;INFORMACIÓN DEL LOCAL:&#10;- Baños: Bajando las escaleras a la izquierda.&#10;- Pago: Tarjeta Visa/Mastercard o efectivo.&#10;- Preguntas habituales: ¿Opciones sin gluten? Sí, tablas y ensaladas."
+                  className="w-full border rounded-2xl p-4 text-xs sm:text-sm font-mono leading-relaxed transition-colors focus:outline-none focus:border-amber-400 bg-zinc-950 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 resize-y"
+                />
+              </div>
+
+              {/* Quick Load Business Templates */}
+              <div className="space-y-2">
+                <p className="text-xs text-zinc-400 font-semibold flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5 text-amber-400" />
+                  <span>O carga una plantilla real de negocio para probar:</span>
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTargetEnglishLevel('A1');
+                      setDifficulty('easy');
+                      setAiPrompt(`CARTA DE COCTELERÍA Y TAPAS (LOVO BAR MADRID):\n- Bubi Cocktail (12€): Ron blanco, plátano flameado, cacao, ginger beer. Sabor dulce y especiado.\n- Manabi Cocktail (13€): Pisco acholado, piña asada, coco, ají amarillo. Afrutado con toque picante.\n- Josephine Baker 0.0 (10€): Mocktail sin alcohol con maracuyá, menta fresca y tónica.\n- Tabla de Jamón Ibérico de Bellota (22€) y Tabla de Quesos Artesanos (18€).\n\nINFORMACIÓN DEL LOCAL:\n- Baños: Bajando las escaleras a la izquierda.\n- Formas de pago: Aceptamos tarjeta (Visa/Mastercard) y efectivo.\n- Alérgenos: Opciones sin gluten disponibles (tablas y ensaladas).\n- Políticas: No reservamos mesas en terraza, es por orden de llegada.`);
+                    }}
+                    className="text-xs p-2.5 rounded-xl text-left border transition-all cursor-pointer bg-zinc-900/80 hover:bg-zinc-800 border-zinc-800 text-zinc-200 hover:border-amber-400/50 flex items-center gap-2"
+                  >
+                    <span>🍸</span>
+                    <span className="font-medium">Bar / Coctelería de Autor (LOVO Bar)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTargetEnglishLevel('A2');
+                      setDifficulty('medium');
+                      setAiPrompt(`MANUAL DE ATENCIÓN EN RECEPCIÓN CORPORATIVA:\n- Procedimiento: Saludar cordialmente, pedir documento de identidad (ID / Passport) y registrar en el libro de visitas.\n- Entrega de acreditación: Entregar pase de visitante (Visitor Badge) para los tornos de acceso.\n- Salas de reuniones: Sala A (primera planta), Sala B (segunda planta al fondo a la derecha).\n- Paquetería: Recepcionar envíos de mensajería (DHL, UPS), firmar albarán y notificar al empleado destinatario.\n- Incidencias: Contactar con equipo de mantenimiento si falla el proyector o el aire acondicionado.`);
+                    }}
+                    className="text-xs p-2.5 rounded-xl text-left border transition-all cursor-pointer bg-zinc-900/80 hover:bg-zinc-800 border-zinc-800 text-zinc-200 hover:border-sky-400/50 flex items-center gap-2"
+                  >
+                    <span>🏢</span>
+                    <span className="font-medium">Oficinas / Recepción & Mensajería</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTargetEnglishLevel('B1');
+                      setDifficulty('medium');
+                      setAiPrompt(`CARTA RESTAURANTE Y CAFETERÍA ESPECIALIDAD:\n- Flat White (3.20€), Cold Brew con avena (4.50€), Matcha Latte (4.80€).\n- Tostada de aguacate, huevo poché y semillas (8.50€). Pan sin gluten disponible (+1€).\n- Alérgenos: Disponemos de leche de avena, almendras y soja. Toda la repostería contiene trazas de frutos secos.\n- Pago y pedidos: Se pide en mostrador con número de mesa. Aceptamos pagos con móvil y Apple Pay.`);
+                    }}
+                    className="text-xs p-2.5 rounded-xl text-left border transition-all cursor-pointer bg-zinc-900/80 hover:bg-zinc-800 border-zinc-800 text-zinc-200 hover:border-emerald-400/50 flex items-center gap-2"
+                  >
+                    <span>☕</span>
+                    <span className="font-medium">Cafetería de Especialidad & Brunch</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTargetEnglishLevel('B1');
+                      setDifficulty('hard');
+                      setAiPrompt(`MANUAL DE CHECK-IN EN HOTEL INTERNACIONAL:\n- Check-in: A partir de las 15:00. Solicitar pasaportes de todos los huéspedes mayores de edad.\n- Desayuno buffet: De 07:00 a 10:30 AM en la planta baja.\n- Check-out: Máximo a las 12:00 del mediodía. Late check-out sujeto a suplemento y disponibilidad.\n- Consigna: Gratuita para clientes antes de entrar a la habitación o tras la salida.\n- Taxis al aeropuerto: Se solicitan desde recepción, coste fijo aproximado 30-35€.`);
+                    }}
+                    className="text-xs p-2.5 rounded-xl text-left border transition-all cursor-pointer bg-zinc-900/80 hover:bg-zinc-800 border-zinc-800 text-zinc-200 hover:border-purple-400/50 flex items-center gap-2"
+                  >
+                    <span>🛎️</span>
+                    <span className="font-medium">Hotel / Recepción & Conserjería</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Prominent Action Button */}
               <button
                 type="button"
                 onClick={handleGenerateWithAI}
                 disabled={isGenerating || !aiPrompt.trim()}
-                className="w-full py-3.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 transition-all cursor-pointer bg-amber-400 hover:bg-amber-300 text-zinc-950 shadow-amber-500/20"
+                className="w-full py-4 rounded-2xl font-bold text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-xl disabled:opacity-50 transition-all cursor-pointer bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-zinc-950 shadow-amber-500/20 active:scale-[0.99]"
               >
                 {isGenerating ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>{t('modal.generating')}</span>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Procesando carta y programando cerebro IA...</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-4 h-4 text-zinc-950" />
-                    <span>Generar Escenario con IA</span>
+                    <Sparkles className="w-5 h-5 text-zinc-950" />
+                    <span>PROGRAMAR CEREBRO IA CON ESTA INFORMACIÓN (1 Clic)</span>
                   </>
                 )}
               </button>
             </div>
           ) : (
             <div className="space-y-5">
+              {generationNotice && (
+                <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs sm:text-sm font-semibold flex items-center gap-2.5 animate-in fade-in">
+                  <Check className="w-5 h-5 text-emerald-400 shrink-0" />
+                  <span>{generationNotice}</span>
+                </div>
+              )}
               {/* Basic Details: Title & Niche */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -647,6 +759,29 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
                     </div>
                   ))}
                 </div>
+              </div>
+
+              {/* Master Business Knowledge / Menu Document */}
+              <div className="rounded-2xl p-4 sm:p-5 border border-zinc-800 bg-zinc-950/60 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-bold text-white flex items-center gap-1.5">
+                    <FileText className="w-4 h-4 text-[#38BDF8]" />
+                    <span>Carta / Documento de Empresa Guardado</span>
+                  </label>
+                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold">
+                    Memoria de la IA
+                  </span>
+                </div>
+                <p className="text-xs text-zinc-400">
+                  La IA consultará este texto en cada llamada para respetar fielmente tus cócteles, platos, precios y políticas sin inventar datos.
+                </p>
+                <textarea
+                  rows={4}
+                  value={businessKnowledge}
+                  onChange={(e) => setBusinessKnowledge(e.target.value)}
+                  placeholder="Aquí queda guardada la carta o manual en bruto de la empresa..."
+                  className="w-full border rounded-xl p-3 text-xs sm:text-sm transition-colors focus:outline-none focus:border-amber-500 bg-zinc-900 border-zinc-800 text-zinc-200 placeholder:text-zinc-600 font-mono"
+                />
               </div>
             </div>
           )}
