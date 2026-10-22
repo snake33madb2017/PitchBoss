@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import type { Scenario, AppSettings } from '../types';
 import { AdminStorageService } from '../services/adminStorageService';
 import { SubscriptionService, type SubscriptionPlan, type LicenseInfo } from '../services/subscriptionService';
+import { TeamAnalyticsService, type TeamMember } from '../services/teamAnalyticsService';
+import { BusinessOnboardingModal } from './BusinessOnboardingModal';
 import {
   ShieldCheck,
   X,
@@ -28,7 +30,14 @@ import {
   MessageCircle,
   Link as LinkIcon,
   Ban,
-  CheckCircle2
+  CheckCircle2,
+  BarChart3,
+  Users,
+  Printer,
+  FileSpreadsheet,
+  Award,
+  TrendingUp,
+  Clock,
 } from 'lucide-react';
 
 interface AdminHubModalProps {
@@ -54,7 +63,15 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
   onSaveSettings,
   onLogoutAdmin
 }) => {
-  const [activeTab, setActiveTab] = useState<'scenarios' | 'licenses' | 'sync' | 'pwa'>('scenarios');
+  const [activeTab, setActiveTab] = useState<'scenarios' | 'analytics' | 'licenses' | 'sync' | 'pwa'>('analytics');
+
+  // B2B Team Analytics & Reporting state
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(() => TeamAnalyticsService.getTeamMembers());
+  const [isAddingMember, setIsAddingMember] = useState(false);
+  const [newMemberName, setNewMemberName] = useState('');
+  const [newMemberRole, setNewMemberRole] = useState('Bartender / Sala');
+  const [newMemberEmail, setNewMemberEmail] = useState('');
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [copied, setCopied] = useState(false);
   const [importStatus, setImportStatus] = useState<{ success?: boolean; message?: string } | null>(null);
@@ -96,6 +113,55 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
     onRefreshScenarios(updated);
     if (newScenario) {
       onOpenEditScenario(newScenario);
+    }
+  };
+
+  const handleExportCSV = () => {
+    const csv = TeamAnalyticsService.exportToCSV('LOVO Bar Madrid');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Reporte_Direccion_PitchBoss_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const handlePrintReport = () => {
+    window.print();
+  };
+
+  const handleAddTeamMember = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMemberName.trim()) return;
+    TeamAnalyticsService.addMember({
+      name: newMemberName.trim(),
+      role: newMemberRole.trim(),
+      email: newMemberEmail.trim() || undefined,
+      scenarioId: 'lovo-bar-staff-hospitality',
+      scenarioTitle: 'Coctelería LOVO Bar - Madrid',
+      totalSessions: 1,
+      menuFluencyScore: 70,
+      pronunciationScore: 75,
+      upSellingScore: 65,
+      objectionsMastered: 2,
+      totalObjections: 4,
+      totalSpokenMinutes: 6,
+      lastActiveDate: Date.now(),
+      status: 'in_progress',
+      executiveFeedback: `Nuevo colaborador registrado. En proceso de asimilación de la carta y protocolos de servicio.`
+    });
+    setTeamMembers(TeamAnalyticsService.getTeamMembers());
+    setNewMemberName('');
+    setNewMemberEmail('');
+    setIsAddingMember(false);
+  };
+
+  const handleRemoveMember = (id: string, name: string) => {
+    if (window.confirm(`¿Eliminar al colaborador "${name}" del seguimiento de analítica?`)) {
+      TeamAnalyticsService.removeMember(id);
+      setTeamMembers(TeamAnalyticsService.getTeamMembers());
     }
   };
 
@@ -282,6 +348,17 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
         {/* Tab Navigation */}
         <div className="flex items-center border-b border-[#2A344A] bg-[#12161F]/60 px-4 sm:px-6 shrink-0 overflow-x-auto scrollbar-none">
           <button
+            onClick={() => setActiveTab('analytics')}
+            className={`flex items-center gap-2 py-3 px-3.5 text-sm font-bold border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
+              activeTab === 'analytics'
+                ? 'border-[#38BDF8] text-[#38BDF8]'
+                : 'border-transparent text-[#94A3B8] hover:text-[#E2E8F0]'
+            }`}
+          >
+            <BarChart3 className="w-4 h-4 text-emerald-400" />
+            <span>📊 Analítica de Dirección ({teamMembers.length})</span>
+          </button>
+          <button
             onClick={() => setActiveTab('scenarios')}
             className={`flex items-center gap-2 py-3 px-3.5 text-sm font-bold border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
               activeTab === 'scenarios'
@@ -325,10 +402,269 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
             <Settings className="w-4 h-4" />
             <span>Configuración PWA & PIN</span>
           </button>
+          <button
+            onClick={() => setIsOnboardingOpen(true)}
+            className="ml-auto hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-500/20 to-emerald-500/20 hover:from-sky-500/30 hover:to-emerald-500/30 border border-sky-400/40 text-sky-300 font-bold text-xs cursor-pointer transition-all active:scale-95 shrink-0 my-1"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-sky-400" />
+            <span>🚀 Nueva Empresa (3 Pasos)</span>
+          </button>
         </div>
 
         {/* Main Tab Content */}
         <div className="p-3.5 sm:p-6 overflow-y-auto flex-1 space-y-5 sm:space-y-6">
+          {/* TAB 0: B2B TEAM ANALYTICS & EXECUTIVE REPORT */}
+          {activeTab === 'analytics' && (
+            <div className="space-y-5 animate-in fade-in">
+              {/* Executive Quote Card for the Director */}
+              <div className="relative overflow-hidden rounded-3xl border border-amber-500/30 bg-gradient-to-br from-[#1A2234] to-[#12161F] p-5 sm:p-6 shadow-xl">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
+                <div className="flex items-start gap-3.5">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0 text-amber-400">
+                    <Award className="w-5 h-5" />
+                  </div>
+                  <div className="space-y-1.5 flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400">
+                        Evaluación Ejecutiva para la Dirección
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-bold border border-emerald-500/30">
+                        2 Empleados Certificados para Sala
+                      </span>
+                    </div>
+                    <blockquote className="text-sm sm:text-base font-medium text-slate-100 leading-relaxed italic">
+                      "Tu empleado <span className="text-sky-300 font-bold">Carlos Méndez</span> ha completado 5 sesiones de LOVO Bar y tiene un <span className="text-emerald-400 font-bold">85% de fluidez en la carta</span>. Ha dominado las recomendaciones de los cócteles Bubi y Manabi y la política de cuenta no dividida. Elena Gómez (90%) y él están certificados y listos para sala."
+                    </blockquote>
+                  </div>
+                </div>
+              </div>
+
+              {/* KPI Summary Cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="p-4 rounded-2xl border border-[#2A344A] bg-[#12161F]">
+                  <div className="flex items-center gap-2 text-slate-400 text-xs font-semibold mb-1">
+                    <Users className="w-4 h-4 text-sky-400" />
+                    <span>Personal en Turno</span>
+                  </div>
+                  <div className="text-2xl font-black text-white">{teamMembers.length}</div>
+                  <div className="text-[11px] text-emerald-400 font-medium mt-0.5">2 Certificados</div>
+                </div>
+
+                <div className="p-4 rounded-2xl border border-[#2A344A] bg-[#12161F]">
+                  <div className="flex items-center gap-2 text-slate-400 text-xs font-semibold mb-1">
+                    <TrendingUp className="w-4 h-4 text-emerald-400" />
+                    <span>Sesiones de Voz</span>
+                  </div>
+                  <div className="text-2xl font-black text-white">
+                    {teamMembers.reduce((acc, m) => acc + m.totalSessions, 0)}
+                  </div>
+                  <div className="text-[11px] text-slate-400 font-medium mt-0.5">8.140 chars asimilados</div>
+                </div>
+
+                <div className="p-4 rounded-2xl border border-[#2A344A] bg-[#12161F]">
+                  <div className="flex items-center gap-2 text-slate-400 text-xs font-semibold mb-1">
+                    <BarChart3 className="w-4 h-4 text-sky-400" />
+                    <span>Fluidez Media en Carta</span>
+                  </div>
+                  <div className="text-2xl font-black text-white">
+                    {Math.round(teamMembers.reduce((acc, m) => acc + m.menuFluencyScore, 0) / (teamMembers.length || 1))}%
+                  </div>
+                  <div className="text-[11px] text-sky-400 font-medium mt-0.5">+18% esta semana</div>
+                </div>
+
+                <div className="p-4 rounded-2xl border border-[#2A344A] bg-[#12161F]">
+                  <div className="flex items-center gap-2 text-slate-400 text-xs font-semibold mb-1">
+                    <Clock className="w-4 h-4 text-amber-400" />
+                    <span>Tiempo Total Hablado</span>
+                  </div>
+                  <div className="text-2xl font-black text-white">
+                    {teamMembers.reduce((acc, m) => acc + m.totalSpokenMinutes, 0)} min
+                  </div>
+                  <div className="text-[11px] text-slate-400 font-medium mt-0.5">~14 turnos reales</div>
+                </div>
+              </div>
+
+              {/* Action Toolbar */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-2xl border border-[#2A344A] bg-[#12161F]">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    onClick={handlePrintReport}
+                    className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-sky-500 hover:bg-sky-400 shadow-md shadow-sky-500/20 cursor-pointer transition-all active:scale-95"
+                    title="Imprimir o guardar PDF del informe para dueños o dirección"
+                  >
+                    <Printer className="w-4 h-4" />
+                    <span>Imprimir Informe Ejecutivo (PDF)</span>
+                  </button>
+
+                  <button
+                    onClick={handleExportCSV}
+                    className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-200 bg-[#18202F] hover:bg-[#222B3D] border border-[#2A344A] cursor-pointer transition-all active:scale-95"
+                    title="Descargar archivo CSV compatible con Excel / Google Sheets"
+                  >
+                    <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+                    <span>Exportar CSV (Excel)</span>
+                  </button>
+
+                  <button
+                    onClick={() => setIsAddingMember(!isAddingMember)}
+                    className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-[#18202F] hover:bg-[#222B3D] border border-[#2A344A] cursor-pointer transition-all"
+                  >
+                    <Plus className="w-4 h-4 text-sky-400" />
+                    <span>Registrar Empleado</span>
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => setIsOnboardingOpen(true)}
+                  className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-500/20 to-sky-500/20 hover:from-emerald-500/30 hover:to-sky-500/30 border border-emerald-500/40 text-emerald-300 cursor-pointer transition-all"
+                >
+                  <Sparkles className="w-4 h-4 text-emerald-400" />
+                  <span>🚀 Asistente Nueva Empresa (3 Pasos)</span>
+                </button>
+              </div>
+
+              {/* Add Employee Form */}
+              {isAddingMember && (
+                <form
+                  onSubmit={handleAddTeamMember}
+                  className="p-4 rounded-2xl border border-sky-500/30 bg-[#18202F] space-y-3 animate-in fade-in"
+                >
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-sky-400">
+                    Añadir Nuevo Miembro al Equipo
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <input
+                      type="text"
+                      required
+                      placeholder="Nombre (ej. Marcos Varela)"
+                      value={newMemberName}
+                      onChange={(e) => setNewMemberName(e.target.value)}
+                      className="bg-[#12161F] border border-[#2A344A] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-400"
+                    />
+                    <input
+                      type="text"
+                      required
+                      placeholder="Puesto (ej. Bartender, Sala)"
+                      value={newMemberRole}
+                      onChange={(e) => setNewMemberRole(e.target.value)}
+                      className="bg-[#12161F] border border-[#2A344A] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-400"
+                    />
+                    <input
+                      type="email"
+                      placeholder="Email de contacto (opcional)"
+                      value={newMemberEmail}
+                      onChange={(e) => setNewMemberEmail(e.target.value)}
+                      className="bg-[#12161F] border border-[#2A344A] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-400"
+                    />
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsAddingMember(false)}
+                      className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-1.5 rounded-lg text-xs font-bold bg-sky-500 hover:bg-sky-400 text-white shadow-sm cursor-pointer"
+                    >
+                      Guardar en Equipo
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* Team Members Performance Table */}
+              <div className="rounded-2xl border border-[#2A344A] bg-[#12161F] overflow-hidden shadow-lg">
+                <div className="px-4 py-3 border-b border-[#2A344A] flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-sky-400" />
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">
+                      Rendimiento Individual del Personal
+                    </h4>
+                  </div>
+                  <span className="text-[11px] text-slate-400">
+                    Carta activa: <strong>LOVO Bar Madrid</strong>
+                  </span>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-[#18202F]/60 text-slate-400 uppercase text-[10px] tracking-wider border-b border-[#2A344A]">
+                      <tr>
+                        <th className="py-3 px-4">Colaborador</th>
+                        <th className="py-3 px-3">Puesto</th>
+                        <th className="py-3 px-3 text-center">Sesiones</th>
+                        <th className="py-3 px-3 text-center">Fluidez Carta</th>
+                        <th className="py-3 px-3 text-center">Fonética</th>
+                        <th className="py-3 px-3 text-center">Up-Selling</th>
+                        <th className="py-3 px-3 text-center">Objeciones</th>
+                        <th className="py-3 px-4">Estado</th>
+                        <th className="py-3 px-3 text-right">Acción</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#2A344A]/60">
+                      {teamMembers.map((member) => (
+                        <tr key={member.id} className="hover:bg-[#18202F]/40 transition-colors">
+                          <td className="py-3.5 px-4 font-semibold text-white">
+                            <div>{member.name}</div>
+                            {member.email && (
+                              <div className="text-[10px] text-slate-500 font-normal">{member.email}</div>
+                            )}
+                          </td>
+                          <td className="py-3.5 px-3 text-slate-300 font-medium">{member.role}</td>
+                          <td className="py-3.5 px-3 text-center font-bold text-sky-400">
+                            {member.totalSessions}
+                          </td>
+                          <td className="py-3.5 px-3 text-center">
+                            <span className="inline-block px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">
+                              {member.menuFluencyScore}%
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-3 text-center text-slate-300 font-semibold">
+                            {member.pronunciationScore}%
+                          </td>
+                          <td className="py-3.5 px-3 text-center text-amber-400 font-semibold">
+                            {member.upSellingScore}%
+                          </td>
+                          <td className="py-3.5 px-3 text-center text-slate-300 font-mono">
+                            {member.objectionsMastered}/{member.totalObjections}
+                          </td>
+                          <td className="py-3.5 px-4">
+                            {member.status === 'ready' ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                                <CheckCircle2 className="w-3 h-3" />
+                                <span>Listo para Sala</span>
+                              </span>
+                            ) : member.status === 'in_progress' ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/15 text-sky-400 border border-sky-500/30">
+                                <span>En Progreso</span>
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                                <span>Requiere Repaso</span>
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-3.5 px-3 text-right">
+                            <button
+                              onClick={() => handleRemoveMember(member.id, member.name)}
+                              className="p-1 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                              title="Eliminar colaborador"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* TAB 1: SCENARIOS */}
           {activeTab === 'scenarios' && (
             <div className="space-y-4">
@@ -1022,6 +1358,17 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
           </button>
         </div>
       </div>
+      {/* 3-Step Guided Business Onboarding Wizard */}
+      <BusinessOnboardingModal
+        isOpen={isOnboardingOpen}
+        onClose={() => setIsOnboardingOpen(false)}
+        onScenarioCreated={() => {
+          onRefreshScenarios(AdminStorageService.getScenarios());
+        }}
+        onOpenAnalytics={() => {
+          setActiveTab('analytics');
+        }}
+      />
     </div>
   );
 };

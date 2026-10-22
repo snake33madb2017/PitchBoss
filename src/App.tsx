@@ -81,6 +81,20 @@ function AppContent() {
     }
   }, []);
 
+  // Auto-detect direct scenario deep link (?scenario=...)
+  useEffect(() => {
+    if (scenarios.length > 0) {
+      const params = new URLSearchParams(window.location.search);
+      const targetScenarioId = params.get('scenario');
+      if (targetScenarioId) {
+        const found = scenarios.find((s) => s.id === targetScenarioId);
+        if (found) {
+          handleSelectScenario(found);
+        }
+      }
+    }
+  }, [scenarios]);
+
   // App settings state
   const [settings, setSettings] = useState<AppSettings>(() => {
     const saved = localStorage.getItem('persona_app_settings');
