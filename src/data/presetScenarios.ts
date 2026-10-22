@@ -1,47 +1,51 @@
 import type { Scenario } from '../types';
+import { LOVO_BAR_MASTER_KNOWLEDGE } from './lovoBarKnowledge';
 
 export const PRESET_SCENARIOS: Scenario[] = [
   {
     id: 'lovo-bar-staff-hospitality',
-    title: 'Staff LOVO Bar: Atención a Clientes Internacionales (Nivel A1 / Principiante)',
-    niche: 'Coctelería & Hospitalidad (LOVO Bar Madrid)',
+    title: 'Coctelería LOVO Bar - Madrid (Atención Internacional & Carta Oficial)',
+    niche: 'Coctelería Emocional & Hospitalidad (LOVO Bar - Calle Echegaray 20, Madrid)',
+    businessKnowledge: LOVO_BAR_MASTER_KNOWLEDGE,
     aiCharacter: {
-      name: 'James & Sarah (LOVO Bar)',
-      role: 'Clientes extranjeros y guía en LOVO Bar (Calle Echegaray 20)',
+      name: 'James & Sarah (Clientes Internacionales en LOVO Bar)',
+      role: 'Clientes extranjeros en barra y tutor bilingüe en LOVO Bar',
       avatar: '🍸',
-      personality: 'Tutor empático y cercano. Te guía en español, te explica la situación, interpreta a clientes extranjeros y te ayuda a pronunciar las frases en inglés paso a paso.',
+      personality: 'Tutor interactivo y cliente internacional. Habla en inglés cuando actúa como cliente en barra (preguntando por cócteles de autor, recomendaciones, destilados premium y comida) y te guía en español con corrección fonética inmediata y consejos prácticos basados en el protocolo oficial de LOVO Bar.',
       voiceGender: 'male'
     },
-    userRole: 'Camarero / Bartender de LOVO Bar',
-    context: 'Estás en LOVO Bar (Calle Echegaray 20, Madrid). Tu tutor te guía en español paso a paso para atender clientes internacionales con frases cortas de nivel A1.',
-    initialGreeting: '¡Hola! Bienvenido a tu entrenamiento en LOVO Bar. Yo seré tu cliente internacional y tu tutor. Empecemos: entro al bar y me acerco a ti.\n\nHello! Good evening, a table for two, please!',
-    initialTranslation: '¡Hola! Buenas noches, ¿una mesa para dos, por favor?',
-    initialTip: "Tip: Saluda y pregúntales si prefieren mesa o barra diciendo: 'Welcome to LOVO Bar! Table or bar?' [Uél-cam tu Lovo Bar! Téibol or bar?]",
+    userRole: 'Bartender / Camarero de LOVO Bar',
+    context: 'Estás atendiendo en la barra de LOVO Bar (Calle Echegaray 20, Madrid). Conoces al detalle la filosofía de Coctelería Emocional inspirada en Joséphine Baker, los espacios de La Caza y La Cueva, el protocolo de 8 pasos (bienvenida en 40s, posavasos, agua de cortesía, sugerencias en pizarra, elaboración visible, up-selling de calidad, cuenta no fraccionada) y toda la carta oficial (Las Tribus como Bubi o Manabi, Animal Tótem, Lovo Lovers, Long Drinks, destilados y comida).',
+    initialGreeting: '¡Hola! Bienvenido a tu entrenamiento en LOVO Bar. Hoy pondrás en práctica la atención en barra con clientes internacionales usando la carta real y los 8 pasos de hospitalidad.\n\nEntro a LOVO Bar por primera vez, me siento en la barra y te miro con curiosidad:\n\n"Good evening! It’s our first time here at LOVO Bar. Could you tell us what this place is about, and what would you recommend to start?"',
+    initialTranslation: '¡Buenas noches! Es nuestra primera vez aquí en LOVO Bar. ¿Podrías contarnos de qué trata el local y qué nos recomendarías para empezar?',
+    initialTip: "Tip: Aplica el Paso 1 del protocolo LOVO (Welcome): saluda en menos de 40s, extiende los posavasos, ofrece agua de bienvenida y explica que es una coctelería emocional inspirada en Josephine Baker: 'Welcome to LOVO! We are an emotional cocktail bar inspired by Josephine Baker. Here is some water to welcome you. Would you like to explore our menu?' [Uél-cam tu Ló-vo! Uii ar an i-móu-sho-nal cóc-teil bar...]",
     difficulty: 'easy',
     targetEnglishLevel: 'A1',
     objectives: [
-      { id: 'obj-1', description: 'Dar la bienvenida y ubicar a los clientes ("Welcome to Lovo Bar! Table or bar?")', completed: false },
-      { id: 'obj-2', description: 'Recomendar un cóctel de Lovo Bar ("I recommend the Bubi or Manabi cocktail / Sweet or fresh?")', completed: false },
-      { id: 'obj-3', description: 'Ofrecer comida o alternativa sin alcohol ("We have Iberian Ham, cheese board or 0.0 cocktails")', completed: false },
-      { id: 'obj-4', description: 'Indicar los baños y cobrar la cuenta ("Restrooms are downstairs / Card or cash?")', completed: false }
+      { id: 'obj-1', description: 'Bienvenida en 40s y presentación LOVO: Saludar, servir agua de cortesía y explicar la Coctelería Emocional inspirada en Josephine Baker', completed: false },
+      { id: 'obj-2', description: 'Toma de comanda e indagación de gustos: Preguntar por preferencias (dulce, cítrico, afrutado, picante) y recomendar cócteles de la carta (Bubi, Manabi, Jupe Banane)', completed: false },
+      { id: 'obj-3', description: 'Up-selling de calidad & Alergias: Consultar intolerancias y ofrecer up-selling en 2ª ronda (Bourbon/Rye superior, Negroni week o tablas de jamón ibérico/quesos)', completed: false },
+      { id: 'obj-4', description: 'Cuenta dividida y despedida calurosa: Entregar la cuenta total dividida a partes iguales y despedir con agradecimiento según el protocolo', completed: false }
     ],
     commonObjections: [
-      "We don't speak Spanish, could you recommend something sweet and fruity from your cocktail menu?",
-      "Do you have any snacks or tapas like Iberian ham or a cheese board to pair with the drinks?",
-      "Excuse me, where are the restrooms? And could we have the bill to pay by credit card?"
+      "It's our first time at LOVO Bar. Could you explain the concept and recommend a signature cocktail that is fruity and slightly spicy?",
+      "I have a peanut and gluten allergy. Which signature cocktails or food bites from your menu are completely safe for me?",
+      "For our second round, can you recommend a high-end Bourbon or a premium Rye whiskey from your top shelf?",
+      "Could we have the bill, please? We would like to pay by credit card and split the total equally."
     ],
     nicheVocabulary: [
-      'Welcome to Lovo Bar [Uél-cam tu Lovo Bar]',
-      'Table or bar? [Téibol or bar?]',
-      'What would you like to drink? [Uát uud iu laik tu drink?]',
-      'Bubi Cocktail (Dulce, plátano, cacao y ginger beer)',
-      'Manabi Cocktail (Afrutado, piña, coco y toque picante)',
-      'Cocktail 0,0: Josephine Baker (Sin alcohol)',
-      'Jamón Ibérico & Cheese Board [Tapas y placeres]',
-      'One moment, please [Uán móment, plis]',
-      'Restrooms are downstairs [Rest-rums ar daun-stérs]',
-      'Card or cash? [Card or cash?]',
-      'Have a great night! [Jav a greit náit!]'
+      'Welcome to LOVO Bar! [Uél-cam tu Ló-vo Bar!] (Bienvenida)',
+      'Emotional Cocktail Bar [I-móu-sho-nal Cóc-teil Bar] (Coctelería emocional)',
+      'Complimentary welcome water [Com-pli-mén-ta-ri uél-cam uó-ter] (Agua de bienvenida)',
+      'Bubi Cocktail [Bú-bi Cóc-teil] (12€: Ron Arehucas, plátano, cacao, ginger beer - Dulce)',
+      'Manabi Cocktail [Ma-na-bí Cóc-teil] (13€: Ron Bumbu, piña, coco, picante - Afrutado)',
+      'Samurai Cocktail [Sa-mu-rái Cóc-teil] (15€: Hibiki Harmony, pandan, nori - Umami)',
+      'Jupe Banane [Dchup Ba-nán] (12€: Grey Goose, plátano maduro, frambuesa)',
+      'La Caza & La Cueva [Event and cocktail spaces for up to 50 guests]',
+      'Do you have any food allergies or intolerances? [Du iu jav é-ni fud á-ler-dchis?]',
+      'Up-selling: Premium Bourbon or Rye [Prí-mium Bór-bon or Rai]',
+      'We divide the total bill equally [Uii di-váid de tóu-tal bil í-cua-li]',
+      'Thank you for visiting LOVO, have a wonderful night! [Jav a uán-der-ful náit!]'
     ],
     createdAt: Date.now()
   },

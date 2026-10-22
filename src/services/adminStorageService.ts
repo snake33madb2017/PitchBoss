@@ -18,14 +18,41 @@ export class AdminStorageService {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
+          let hasSynced = false;
+          const syncedScenarios = parsed.map((s: Scenario) => {
+            const presetMatch = PRESET_SCENARIOS.find((p) => p.id === s.id);
+            // If it's a default preset and missing the full master business knowledge, auto-upgrade it
+            if (presetMatch && (!s.businessKnowledge || s.businessKnowledge.length < 500)) {
+              hasSynced = true;
+              return {
+                ...s,
+                title: presetMatch.title,
+                niche: presetMatch.niche,
+                businessKnowledge: presetMatch.businessKnowledge,
+                context: presetMatch.context,
+                aiCharacter: presetMatch.aiCharacter,
+                objectives: presetMatch.objectives,
+                commonObjections: presetMatch.commonObjections,
+                nicheVocabulary: presetMatch.nicheVocabulary,
+                initialGreeting: presetMatch.initialGreeting,
+                initialTranslation: presetMatch.initialTranslation,
+                initialTip: presetMatch.initialTip
+              };
+            }
+            return s;
+          });
+
           // Auto-merge newly added preset scenarios if they are not yet in storage
-          const missingPresets = PRESET_SCENARIOS.filter(p => !parsed.some((s: Scenario) => s.id === p.id));
-          if (missingPresets.length > 0) {
-            const merged = [...parsed, ...missingPresets];
+          const missingPresets = PRESET_SCENARIOS.filter(
+            (p) => !syncedScenarios.some((s: Scenario) => s.id === p.id)
+          );
+
+          if (missingPresets.length > 0 || hasSynced) {
+            const merged = [...syncedScenarios, ...missingPresets];
             this.saveScenarios(merged);
             return merged;
           }
-          return parsed;
+          return syncedScenarios;
         }
       }
 

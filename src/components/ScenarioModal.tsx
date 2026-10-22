@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import type { Scenario, DifficultyLevel, EnglishLevel, Objective } from '../types';
 import { GeminiService } from '../services/geminiService';
-import { X, Sparkles, Plus, Trash2, Loader2, Wand2, Edit3, BookOpen, MessageSquare, Check, FileText } from 'lucide-react';
+import { X, Sparkles, Plus, Trash2, Loader2, Wand2, Edit3, BookOpen, MessageSquare, Check, FileText, Zap } from 'lucide-react';
 import { useTranslation } from '../i18n/LanguageContext';
+import { LOVO_BAR_MASTER_KNOWLEDGE } from '../data/lovoBarKnowledge';
 
 interface ScenarioModalProps {
   isOpen: boolean;
@@ -59,7 +60,9 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       if (scenarioToEdit) {
-        setActiveTab('manual');
+        setAiPrompt(scenarioToEdit.businessKnowledge || '');
+        setBusinessKnowledge(scenarioToEdit.businessKnowledge || '');
+        setActiveTab(scenarioToEdit.businessKnowledge ? 'manual' : 'ai');
         setTitle(scenarioToEdit.title || '');
         setNiche(scenarioToEdit.niche || '');
         setAiName(scenarioToEdit.aiCharacter?.name || '');
@@ -89,10 +92,10 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
             ? scenarioToEdit.nicheVocabulary
             : ['Término clave [fonética]']
         );
-        setBusinessKnowledge(scenarioToEdit.businessKnowledge || '');
         setGenerationNotice(null);
       } else {
         setActiveTab('ai');
+        setAiPrompt('');
         setTitle('');
         setNiche('');
         setAiName('');
@@ -117,6 +120,51 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
       }
     }
   }, [isOpen, scenarioToEdit]);
+
+  // Instant direct injection of business knowledge into scenario memory without requiring external AI
+  const handleDirectInject = () => {
+    if (!aiPrompt.trim()) return;
+    const text = aiPrompt.trim();
+    setBusinessKnowledge(text);
+
+    // Auto-detect or provide smart defaults if fields are empty
+    if (!title.trim() || title === 'Nuevo Escenario') {
+      if (text.toLowerCase().includes('lovo bar')) {
+        setTitle('Coctelería LOVO Bar - Madrid (Atención Internacional & Carta)');
+        setNiche('Coctelería Emocional & Hospitalidad (Calle Echegaray 20)');
+      } else {
+        const firstLine = text.split('\n')[0].replace(/^Presentacion:\s*/i, '').trim();
+        setTitle(firstLine.slice(0, 55) || 'Escenario Personalizado');
+        setNiche('Atención & Negocio Internacional');
+      }
+    }
+
+    if (!aiName.trim()) {
+      setAiName('James & Sarah (Clientes Internacionales)');
+      setAiRole('Clientes extranjeros en barra');
+      setAiAvatar('🍸');
+      setAiPersonality('Clientes internacionales curiosos por probar cócteles de autor, pedir recomendaciones y disfrutar de la experiencia del local.');
+      setVoiceGender('male');
+    }
+
+    if (!userRole.trim()) {
+      setUserRole('Bartender / Camarero');
+    }
+
+    if (!context.trim()) {
+      setContext('Atención en barra a clientes internacionales aplicando la carta oficial y protocolos de servicio del establecimiento.');
+    }
+
+    if (!initialGreeting.trim()) {
+      setInitialGreeting('¡Hola! Bienvenido a tu entrenamiento.\n\nGood evening! It is our first time here. Could you recommend something special from your cocktail menu?');
+      setInitialTranslation('¡Buenas noches! Es nuestra primera vez aquí. ¿Podrías recomendarnos algo especial de vuestra carta de cócteles?');
+      setInitialTip('Tip: Saluda con amabilidad, da la bienvenida, extiende posavasos y ofrece agua de cortesía.');
+    }
+
+    setGenerationNotice('¡Memoria inyectada con éxito! La IA utilizará este documento completo como fuente de la verdad para todos sus diálogos.');
+    setActiveTab('manual');
+    setTimeout(() => setGenerationNotice(null), 6000);
+  };
 
   if (!isOpen) return null;
 
@@ -345,12 +393,12 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
                     onClick={() => {
                       setTargetEnglishLevel('A1');
                       setDifficulty('easy');
-                      setAiPrompt(`CARTA DE COCTELERÍA Y TAPAS (LOVO BAR MADRID):\n- Bubi Cocktail (12€): Ron blanco, plátano flameado, cacao, ginger beer. Sabor dulce y especiado.\n- Manabi Cocktail (13€): Pisco acholado, piña asada, coco, ají amarillo. Afrutado con toque picante.\n- Josephine Baker 0.0 (10€): Mocktail sin alcohol con maracuyá, menta fresca y tónica.\n- Tabla de Jamón Ibérico de Bellota (22€) y Tabla de Quesos Artesanos (18€).\n\nINFORMACIÓN DEL LOCAL:\n- Baños: Bajando las escaleras a la izquierda.\n- Formas de pago: Aceptamos tarjeta (Visa/Mastercard) y efectivo.\n- Alérgenos: Opciones sin gluten disponibles (tablas y ensaladas).\n- Políticas: No reservamos mesas en terraza, es por orden de llegada.`);
+                      setAiPrompt(LOVO_BAR_MASTER_KNOWLEDGE);
                     }}
                     className="text-xs p-2.5 rounded-xl text-left border transition-all cursor-pointer bg-[#18202F] hover:bg-[#222B3D] border-[#2A344A] text-[#E2E8F0] hover:border-sky-400/50 flex items-center gap-2"
                   >
                     <span>🍸</span>
-                    <span className="font-medium">Bar / Coctelería de Autor (LOVO Bar)</span>
+                    <span className="font-medium">Coctelería LOVO Bar (Carta Oficial Completa + Protocolo 8 Pasos)</span>
                   </button>
 
                   <button
@@ -394,25 +442,38 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
                 </div>
               </div>
 
-              {/* Prominent Action Button */}
-              <button
-                type="button"
-                onClick={handleGenerateWithAI}
-                disabled={isGenerating || !aiPrompt.trim()}
-                className="w-full py-4 rounded-2xl font-bold text-sm sm:text-base flex items-center justify-center gap-2.5 shadow-xl disabled:opacity-50 transition-all cursor-pointer bg-sky-500 hover:bg-sky-400 text-white shadow-sky-500/20 active:scale-[0.99]"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Procesando carta y programando cerebro IA...</span>
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-5 h-5 text-white" />
-                    <span>PROGRAMAR CEREBRO IA CON ESTA INFORMACIÓN (1 Clic)</span>
-                  </>
-                )}
-              </button>
+              {/* Action Buttons: AI Calibration & Direct Memory Injection */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={handleGenerateWithAI}
+                  disabled={isGenerating || !aiPrompt.trim()}
+                  className="py-3.5 px-4 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 transition-all cursor-pointer bg-sky-500 hover:bg-sky-400 text-white shadow-sky-500/20 active:scale-[0.99]"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin text-white" />
+                      <span>Calibrando con IA...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 text-white" />
+                      <span>✨ Calibrar Diálogos & Objetivos con IA</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleDirectInject}
+                  disabled={!aiPrompt.trim()}
+                  className="py-3.5 px-4 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer bg-[#18202F] hover:bg-[#222B3D] border border-sky-400/50 text-sky-400 hover:text-sky-300 disabled:opacity-50 active:scale-[0.99]"
+                  title="Inyecta todo el texto en bruto a la memoria de la IA de inmediato"
+                >
+                  <Zap className="w-4 h-4 text-sky-400" />
+                  <span>⚡ Inyectar a Memoria Directamente (1 Clic)</span>
+                </button>
+              </div>
             </div>
           ) : (
             <div className="space-y-5">
@@ -447,6 +508,52 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
                     placeholder="Ej: Coctelería & Hospitalidad (LOVO Bar Madrid)"
                     className="w-full border rounded-xl px-3.5 py-2.5 text-sm sm:text-base transition-colors focus:outline-none focus:border-sky-500 bg-[#18202F] border-[#2A344A] text-[#E2E8F0]"
                   />
+                </div>
+              </div>
+
+              {/* Master Business Knowledge / Menu Document Card */}
+              <div className="rounded-2xl p-4 sm:p-5 border border-sky-500/30 bg-[#12161F] space-y-2.5 shadow-md">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-bold text-[#E2E8F0] flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-sky-400" />
+                    <span>Memoria de Negocio / Carta Inyectada a la IA</span>
+                  </label>
+                  <span className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                    {businessKnowledge.length > 0 ? `${businessKnowledge.length} caracteres activos` : 'Sin memoria inyectada'}
+                  </span>
+                </div>
+                <p className="text-xs text-[#94A3B8] leading-relaxed">
+                  Todo lo que esté en esta caja es la <strong>fuente estricta de la verdad</strong> para la IA durante la simulación de voz (cócteles, precios, ingredientes, políticas y storytelling).
+                </p>
+                <textarea
+                  rows={4}
+                  value={businessKnowledge}
+                  onChange={(e) => setBusinessKnowledge(e.target.value)}
+                  placeholder="Pega aquí la carta, menú o manual del negocio..."
+                  className="w-full border rounded-xl p-3 text-xs sm:text-sm transition-colors focus:outline-none focus:border-sky-500 bg-[#18202F] border-[#2A344A] text-[#E2E8F0] placeholder:text-slate-500 font-mono resize-y"
+                />
+                <div className="flex items-center justify-between pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAiPrompt(businessKnowledge || LOVO_BAR_MASTER_KNOWLEDGE);
+                      setActiveTab('ai');
+                    }}
+                    className="text-xs text-sky-400 hover:text-sky-300 font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Wand2 className="w-3.5 h-3.5" />
+                    <span>Abrir en el Inyector Maestro de Carta / IA</span>
+                  </button>
+                  {businessKnowledge.length === 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setBusinessKnowledge(LOVO_BAR_MASTER_KNOWLEDGE)}
+                      className="text-xs text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <Zap className="w-3.5 h-3.5" />
+                      <span>Inyectar Carta Oficial LOVO Bar</span>
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -759,29 +866,6 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
                     </div>
                   ))}
                 </div>
-              </div>
-
-              {/* Master Business Knowledge / Menu Document */}
-              <div className="rounded-2xl p-4 sm:p-5 border border-[#2A344A] bg-[#12161F] space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-bold text-white flex items-center gap-1.5">
-                    <FileText className="w-4 h-4 text-[#38BDF8]" />
-                    <span>Carta / Documento de Empresa Guardado</span>
-                  </label>
-                  <span className="text-[10px] text-[#94A3B8] uppercase tracking-wider font-semibold">
-                    Memoria de la IA
-                  </span>
-                </div>
-                <p className="text-xs text-[#94A3B8]">
-                  La IA consultará este texto en cada llamada para respetar fielmente tus cócteles, platos, precios y políticas sin inventar datos.
-                </p>
-                <textarea
-                  rows={4}
-                  value={businessKnowledge}
-                  onChange={(e) => setBusinessKnowledge(e.target.value)}
-                  placeholder="Aquí queda guardada la carta o manual en bruto de la empresa..."
-                  className="w-full border rounded-xl p-3 text-xs sm:text-sm transition-colors focus:outline-none focus:border-sky-500 bg-[#18202F] border-[#2A344A] text-[#E2E8F0] placeholder:text-slate-500 font-mono"
-                />
               </div>
             </div>
           )}
