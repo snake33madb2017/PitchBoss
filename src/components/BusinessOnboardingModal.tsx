@@ -58,9 +58,9 @@ export const BusinessOnboardingModal: React.FC<BusinessOnboardingModalProps> = (
       },
       userRole: employeeRole,
       context: `Estás en ${businessName}. Conoces la carta oficial, los productos, precios y protocolos de servicio. Atiendes clientes internacionales practicando conversación en inglés.`,
-      initialGreeting: `¡Hola! Bienvenido a la simulación con la carta de ${businessName}.\n\nGood evening! It is our first time here. Could you recommend something special from your menu?`,
-      initialTranslation: '¡Buenas noches! Es nuestra primera vez aquí. ¿Podrías recomendarnos algo especial de vuestra carta?',
-      initialTip: 'Tip: Saluda con calidez, da la bienvenida y ofrece ver la carta.',
+      initialGreeting: `Good evening! It is our first time here at ${businessName}. Could you recommend something special from your menu?`,
+      initialTranslation: `¡Buenas noches! Es nuestra primera vez aquí en ${businessName}. ¿Podrías recomendarnos algo especial de vuestra carta?`,
+      initialTip: `Tip: Saluda cordialmente en inglés diciendo: "Good evening, welcome to ${businessName}! Here is our menu." [Gud ív-ning, uél-cam tu ${businessName}! Jí-er is au-er me-niu].`,
       difficulty,
       targetEnglishLevel: targetLevel,
       objectives: [

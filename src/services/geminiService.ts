@@ -108,7 +108,13 @@ CRITICAL PARSING & EXTRACTION DIRECTIVES:
 4. OBJECTIVES: Create 4 clear, action-oriented business goals (e.g., recommend specific items from the provided menu, handle payment, resolve doubts).
 5. COMMON OBJECTIONS: Formulate 3 to 4 realistic objections or questions customers will genuinely ask about these exact items, prices, or policies.
 6. NICHE VOCABULARY: Extract at least 8 to 14 crucial terms/cocktails/dishes from the text, providing phonetic pronunciation in brackets [e.g. "Bubi Cocktail [Bú-bi Cóc-teil] (Dulce, ron y plátano)"].
-7. ZERO-HALLUCINATIONS: Ground names, prices, and facts directly in the user's provided text.`;
+7. ZERO-HALLUCINATIONS: Ground names, prices, and facts directly in the user's provided text.
+8. 🚨 MANDATORY LANGUAGE DISCIPLINE:
+   - PitchBoss is strictly for practicing English in customer/business encounters.
+   - The AI character (${options?.targetEnglishLevel || 'Customer'}) ONLY speaks English and does not speak Spanish.
+   - "initialGreeting": Spoken strictly in English (e.g. "Good evening! It is our first time here. Could you recommend something special from your cocktail menu?").
+   - "initialTranslation": Spanish translation of the greeting for learner comprehension.
+   - "initialTip": Coaching advice in Spanish, BUT the spoken sentence inside quotes MUST 100% BE IN ENGLISH with phonetic transcription in brackets [e.g. Di en inglés: "Welcome to LOVO Bar! Here is our cocktail menu." [Uél-cam tu LO-VO Bar! Jí-er is au-er cóc-teil me-niu].]. NEVER suggest the user speak in Spanish!`;
 
     const payload = {
       systemInstruction: {
@@ -142,9 +148,18 @@ CRITICAL PARSING & EXTRACTION DIRECTIVES:
             },
             userRole: { type: 'STRING' },
             context: { type: 'STRING' },
-            initialGreeting: { type: 'STRING' },
-            initialTranslation: { type: 'STRING' },
-            initialTip: { type: 'STRING' },
+            initialGreeting: {
+              type: 'STRING',
+              description: 'Customer opening greeting spoken strictly in natural English.'
+            },
+            initialTranslation: {
+              type: 'STRING',
+              description: 'Spanish translation of the customer initial greeting.'
+            },
+            initialTip: {
+              type: 'STRING',
+              description: 'Coaching tip in Spanish telling the user what phrase to say IN ENGLISH with phonetics in brackets. Example: Di en inglés: "Welcome to our bar! Here is our menu." [Uél-cam tu au-er bar! Jí-er is au-er me-niu]. NEVER suggest speaking in Spanish.'
+            },
             difficulty: { type: 'STRING', enum: ['easy', 'medium', 'hard', 'hostile'] },
             targetEnglishLevel: { type: 'STRING', enum: ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] },
             objectives: {
@@ -265,17 +280,25 @@ ${scenario.nicheVocabulary.map((v) => `- ${v}`).join('\n')}
 Pending Business Objectives to achieve:
 ${pendingObjectives.map((o) => `- [${o.id}] ${o.description}`).join('\n')}
 
-GROUNDING & ZERO-HALLUCINATION RULES:
-1. Stay 100% in character as ${scenario.aiCharacter.name}. Never break character or refer to yourself as an AI model.
-2. STRICT GROUNDING: Strictly confine your knowledge to the scenario context, industry domain, and established business facts. NEVER invent imaginary company policies, non-existent warranty clauses, or hallucinated prices. If asked about unknown technical or legal details, state in character that you will verify with your executive board.
-3. Keep spoken replies concise and natural for audio playback (1 to 2 spoken sentences maximum).
+🚨 CRITICAL RULES & STRICT LANGUAGE DISCIPLINE (ABSOLUTE PRIORITY):
+1. ROLE & IDENTITY: Stay 100% in character as ${scenario.aiCharacter.name}. Never break character or refer to yourself as an AI model. Keep your spoken replies concise and natural for real-time speech (1 to 2 spoken English sentences maximum).
+2. STRICT GROUNDING: Strictly confine your knowledge to the scenario context, company knowledge base, and business facts. NEVER invent imaginary policies, non-existent drinks/dishes, or hallucinated prices.
+3. 🌐 ABSOLUTE LANGUAGE RULE FOR THE "tip" FIELD:
+   - PitchBoss is a specialized training simulator for non-native employees (bartenders, waitstaff, receptionists, executives) to attend international clients IN ENGLISH.
+   - The customer (${scenario.aiCharacter.name}) DOES NOT SPEAK SPANISH and only speaks English.
+   - ⚠️ EVEN IF THE MENU, INGREDIENTS, RECIPES, OR PROTOCOLS IN THE KNOWLEDGE BASE ARE WRITTEN IN SPANISH, YOU MUST ALWAYS TRANSLATE ANY RECOMMENDED PRODUCTS, INGREDIENTS, OR RESPONSES INTO NATURAL ENGLISH FOR THE USER'S SPOKEN LINE.
+   - The "tip" field gives coaching advice in Spanish, BUT THE SPOKEN LINE INSIDE QUOTES MUST ALWAYS BE 100% IN ENGLISH, followed by a phonetic pronunciation transcription in square brackets [for Spanish speakers].
+   - ❌ STRICTLY FORBIDDEN: NEVER suggest a response in Spanish!
+     DO NOT WRITE: Di: "Claro, tenemos el Manabi. Es afrutado y picante..." [Klá-ro, te-né-mos...]
+   - ✅ MANDATORY FORMAT:
+     Di en inglés: "Certainly! I recommend our Manabi cocktail. It's fruity and spicy with Bumbu rum, passion fruit, and a hint of chili." [Sér-ten-li! Ai re-co-mend au-er Ma-na-bi cóc-teil. It's fru-ti and spái-si uid Bum-bu ram, pá-shon frut, and e jint of chi-li.]
 4. CEFR Level Guidance:
    ${
      isBeginner
-       ? '- The user is at Beginner level (' + scenario.targetEnglishLevel + '). Speak in short, clear, accessible English. The "tip" field MUST be friendly in Spanish, coaching the user on what phrase to say next in English with a phonetic pronunciation guide in brackets [e.g. Di: "Good morning, welcome!" [Gud mór-ning, uél-cam!]].'
+       ? '- The user is at Beginner level (' + scenario.targetEnglishLevel + '). Speak in short, clear, accessible English. The "tip" MUST provide a short, direct phrase IN ENGLISH inside quotation marks, followed by phonetic transcription in brackets [e.g. Di en inglés: "Good evening, welcome to LOVO Bar! Here is our menu." [Gud ív-ning, uél-cam tu LO-VO Bar! Jí-er is au-er me-niu.]].'
        : isIntermediate
-       ? '- The user is at Intermediate level (' + scenario.targetEnglishLevel + '). Speak naturally as a business professional with realistic objections. The "tip" field should be in Spanish with strategic business phrasing.'
-       : '- The user is at Advanced Executive level (' + scenario.targetEnglishLevel + '). Challenge claims with rigor, evaluate ROI and risk, and speak in native executive English.'
+       ? '- The user is at Intermediate level (' + scenario.targetEnglishLevel + '). Speak naturally as a business customer with realistic requests. The "tip" MUST coach the user on how to respond IN ENGLISH with natural phrasing and consultative upselling, followed by phonetics in brackets [e.g. Di en inglés: "Certainly, we have two signature cocktails: the Bubi and the Manabi. Which flavours do you prefer?" [Sér-ten-li, uii jav tu síg-na-chur cóc-teils: de Bu-bi and de Ma-na-bi. Uich fléi-vors du iu pri-fér?]].'
+       : '- The user is at Advanced Executive level (' + scenario.targetEnglishLevel + '). Speak in fluent, nuanced business English. The "tip" should provide executive-level phrasing IN ENGLISH with strategic negotiation guidance and phonetics.'
    }
 5. Check if the user's latest response fulfilled any pending objectives. If so, include their exact IDs in "completedObjectiveIds".
 6. Detect any notable English grammar, pronunciation or vocabulary mistakes and provide discrete suggestions in "corrections". If the user spoke well, return an empty array [].
@@ -313,9 +336,18 @@ GROUNDING & ZERO-HALLUCINATION RULES:
         responseSchema: {
           type: 'OBJECT',
           properties: {
-            reply: { type: 'STRING' },
-            translation: { type: 'STRING' },
-            tip: { type: 'STRING' },
+            reply: {
+              type: 'STRING',
+              description: 'Customer spoken reply strictly in natural English (1 to 2 sentences).'
+            },
+            translation: {
+              type: 'STRING',
+              description: 'Accurate Spanish translation of the reply for student comprehension.'
+            },
+            tip: {
+              type: 'STRING',
+              description: 'Coaching tip in Spanish advising the user what phrase to say. The suggested spoken dialogue inside quotes MUST BE 100% IN ENGLISH, followed by phonetic transcription in brackets for Spanish speakers. Example: Di en inglés: "Certainly! I recommend the Manabi cocktail." [Sér-ten-li! Ai re-co-mend de Ma-na-bi cóc-teil.]. NEVER suggest a Spanish phrase inside quotes, even if the menu was provided in Spanish.'
+            },
             corrections: {
               type: 'ARRAY',
               items: {
@@ -377,7 +409,7 @@ Vocabulary to practice: ${scenario.nicheVocabulary.slice(0, 5).join(', ')}
 
 Provide 3 short, easy, natural spoken English sentences suitable for a ${scenario.userRole}${
                 isBeginner ? ' including Spanish phonetic pronunciation in brackets like [Jáu can ai jelp iu?]' : ''
-              } that the user could say right now to reply.`
+              } that the user could say right now to reply. Even if company documentation, menus, or ingredients are in Spanish, all 3 suggested sentences MUST be in English with phonetic pronunciation in brackets for Spanish speakers. Never suggest Spanish sentences.`
             }
           ]
         }

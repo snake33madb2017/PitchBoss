@@ -156,9 +156,9 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
     }
 
     if (!initialGreeting.trim()) {
-      setInitialGreeting('¡Hola! Bienvenido a tu entrenamiento.\n\nGood evening! It is our first time here. Could you recommend something special from your cocktail menu?');
-      setInitialTranslation('¡Buenas noches! Es nuestra primera vez aquí. ¿Podrías recomendarnos algo especial de vuestra carta de cócteles?');
-      setInitialTip('Tip: Saluda con amabilidad, da la bienvenida, extiende posavasos y ofrece agua de cortesía.');
+      setInitialGreeting('Good evening! It is our first time here at LOVO Bar. Could you recommend something special from your cocktail menu?');
+      setInitialTranslation('¡Buenas noches! Es nuestra primera vez aquí en LOVO Bar. ¿Podrías recomendarnos algo especial de vuestra carta de cócteles?');
+      setInitialTip('Tip: Saluda cordialmente en inglés diciendo: "Good evening, welcome to LOVO Bar! Here is our cocktail menu." [Gud ív-ning, uél-cam tu LO-VO Bar! Jí-er is au-er cóc-teil me-niu].');
     }
 
     setGenerationNotice('¡Memoria inyectada con éxito! La IA utilizará este documento completo como fuente de la verdad para todos sus diálogos.');
@@ -699,7 +699,7 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
                       type="text"
                       value={initialTip}
                       onChange={(e) => setInitialTip(e.target.value)}
-                      placeholder="Tip: Di 'Welcome to LOVO Bar!' [Uél-cam tu Lovo Bar!]"
+                      placeholder="Tip: Di en inglés 'Welcome to LOVO Bar!' [Uél-cam tu LO-VO Bar!]"
                       className="w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-sky-500 bg-[#18202F] border-[#2A344A] text-[#E2E8F0]"
                     />
                   </div>
