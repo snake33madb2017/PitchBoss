@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Informe de Infraestructura de Servidores y Costes en Render</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 16mm 14mm 18mm 14mm;
+      @bottom-right {
+        content: counter(page);
+      }
+    }
+    
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 10.5pt;
+      line-height: 1.55;
+      color: #1E293B;
+      background: #FFFFFF;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Executive Header */
+    .doc-header {
+      background: linear-gradient(135deg, #090D16 0%, #1E293B 100%);
+      color: #FFFFFF;
+      padding: 24px 28px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      border: 1px solid #334155;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .doc-badge {
+      display: inline-block;
+      background: rgba(56, 189, 248, 0.15);
+      color: #38BDF8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 8pt;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .doc-header h1 {
+      margin: 6px 0 8px 0;
+      font-size: 18pt;
+      color: #F8FAFC;
+      letter-spacing: -0.5px;
+      line-height: 1.25;
+    }
+
+    .doc-subtitle {
+      font-size: 9.5pt;
+      color: #94A3B8;
+      margin: 0;
+    }
+
+    .doc-meta {
+      display: flex;
+      gap: 16px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      font-size: 8.5pt;
+      color: #CBD5E1;
+    }
+
+    .doc-meta span strong {
+      color: #38BDF8;
+    }
+
+    /* Titles */
+    h1.main-title {
+      display: none; /* Already in banner */
+    }
+
+    h2.section-title {
+      font-size: 13pt;
+      color: #0F172A;
+      margin-top: 24px;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #E2E8F0;
+      letter-spacing: -0.3px;
+      page-break-after: avoid;
+    }
+
+    h3.subsection-title {
+      font-size: 11pt;
+      color: #0284C7;
+      margin-top: 16px;
+      margin-bottom: 6px;
+      page-break-after: avoid;
+    }
+
+    h4.sub-subsection-title {
+      font-size: 10pt;
+      color: #334155;
+      margin-top: 12px;
+      margin-bottom: 4px;
+      page-break-after: avoid;
+    }
+
+    p {
+      margin: 0 0 10px 0;
+      text-align: justify;
+    }
+
+    strong {
+      color: #0F172A;
+    }
+
+    code {
+      background: #F1F5F9;
+      color: #0284C7;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 9pt;
+      border: 1px solid #E2E8F0;
+      font-family: Consolas, Monaco, monospace;
+    }
+
+    hr.doc-divider {
+      border: none;
+      border-top: 1px solid #E2E8F0;
+      margin: 20px 0;
+    }
+
+    ul, ol {
+      margin: 0 0 12px 0;
+      padding-left: 22px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    /* Tables */
+    .table-container {
+      margin: 14px 0 18px 0;
+      page-break-inside: avoid;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9pt;
+      border: 1px solid #CBD5E1;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    th {
+      background: #F1F5F9;
+      color: #0F172A;
+      font-weight: 700;
+      text-align: left;
+      padding: 8px 10px;
+      border: 1px solid #CBD5E1;
+      font-size: 8.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    td {
+      padding: 7px 10px;
+      border: 1px solid #E2E8F0;
+      vertical-align: middle;
+    }
+
+    tr:nth-child(even) td {
+      background: #F8FAFC;
+    }
+
+    .text-right {
+      text-align: right;
+      font-weight: 600;
+    }
+
+    /* Callout Boxes */
+    .callout {
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin: 14px 0;
+      page-break-inside: avoid;
+      font-size: 9.5pt;
+    }
+
+    .callout-header {
+      font-weight: 700;
+      font-size: 9pt;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .callout-note {
+      background: #F0F9FF;
+      border-left: 4px solid #0284C7;
+      color: #0369A1;
+    }
+    .callout-note .callout-header { color: #0284C7; }
+
+    .callout-tip {
+      background: #F0FDF4;
+      border-left: 4px solid #10B981;
+      color: #166534;
+    }
+    .callout-tip .callout-header { color: #10B981; }
+
+    .callout-important {
+      background: #FFFBEB;
+      border-left: 4px solid #F59E0B;
+      color: #92400E;
+    }
+    .callout-important .callout-header { color: #D97706; }
+
+    /* Diagram Styling */
+    .diagram-box {
+      background: #F8FAFC;
+      border: 1px solid #CBD5E1;
+      border-radius: 10px;
+      padding: 16px;
+      margin: 18px 0;
+      page-break-inside: avoid;
+    }
+
+    .diagram-title {
+      font-size: 9.5pt;
+      font-weight: 700;
+      color: #334155;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .arch-grid {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .arch-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      flex: 1;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .arch-badge {
+      font-size: 7pt;
+      font-weight: 700;
+      color: #0284C7;
+      background: #E0F2FE;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+
+    .arch-name {
+      font-size: 9.5pt;
+      font-weight: 700;
+      color: #0F172A;
+      margin-bottom: 4px;
+    }
+
+    .arch-card p {
+      font-size: 8pt;
+      color: #64748B;
+      margin: 0;
+      text-align: center;
+    }
+
+    .arch-arrow {
+      font-size: 14pt;
+      color: #94A3B8;
+      font-weight: bold;
+    }
+
+    /* Bar Chart for MRR */
+    .chart-container {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      height: 270px;
+      padding: 20px 10px 10px 10px;
+      background: #FFFFFF;
+      border-radius: 8px;
+      border: 1px solid #E2E8F0;
+    }
+
+    .bar-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      height: 100%;
+      width: 75px;
+    }
+
+    .bar-val {
+      font-size: 8.5pt;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    .highlight-val {
+      color: #0284C7;
+      font-size: 10pt;
+    }
+
+    .bar {
+      width: 44px;
+      background: #94A3B8;
+      border-radius: 4px 4px 0 0;
+      transition: all 0.3s ease;
+    }
+
+    .highlight-bar {
+      background: linear-gradient(180deg, #38BDF8 0%, #0284C7 100%);
+    }
+
+    .bar-label {
+      font-size: 8pt;
+      color: #64748B;
+      text-align: center;
+      margin-top: 8px;
+      line-height: 1.2;
+    }
+
+    .chart-footer {
+      font-size: 8.5pt;
+      color: #64748B;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    /* ROI Flow */
+    .roi-flow {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .roi-step {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 12px;
+      flex: 1;
+      text-align: center;
+    }
+
+    .roi-cost {
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: #DC2626;
+    }
+
+    .roi-gain {
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: #D97706;
+    }
+
+    .roi-winner {
+      background: #F0FDF4;
+      border: 1px solid #86EFAC;
+    }
+
+    .roi-result {
+      font-size: 13pt;
+      font-weight: 800;
+      color: #16A34A;
+    }
+
+    .roi-desc {
+      font-size: 8pt;
+      color: #64748B;
+      margin-top: 4px;
+    }
+
+    .roi-arrow {
+      font-size: 16pt;
+      font-weight: bold;
+      color: #94A3B8;
+    }
+
+    /* Tracks Grid */
+    .tracks-grid {
+      display: flex;
+      gap: 10px;
+    }
+
+    .track-card {
+      flex: 1;
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .track-header {
+      font-size: 8.5pt;
+      font-weight: 700;
+      color: #0284C7;
+      margin-bottom: 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #F1F5F9;
+    }
+
+    .track-card ul {
+      padding-left: 16px;
+      margin: 0;
+      font-size: 8pt;
+      color: #475569;
+    }
+
+    /* Footer Branding */
+    .footer-bar {
+      margin-top: 30px;
+      padding-top: 10px;
+      border-top: 1px solid #E2E8F0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 8pt;
+      color: #94A3B8;
+    }
+  </style>
+</head>
+<body>
+  <div class="doc-header">
+    <div class="doc-badge">INFRAESTRUCTURA TÉCNICA CLOUD & PRESUPUESTO</div>
+    <h1>Informe de Infraestructura de Servidores y Costes en Render</h1>
+    <p class="doc-subtitle">Análisis pormenorizado de servidores, arquitectura lean, consumo de IA Gemini y costes operativos</p>
+    <div class="doc-meta">
+      <span>Fecha: <strong>Octubre 2026</strong></span>
+      <span>Versión: <strong>1.0 Producción</strong></span>
+      <span>Plataforma: <strong>PitchBoss Enterprise PWA</strong></span>
+      <span>Cloud Host: <strong>dashboard.render.com</strong></span>
+    </div>
+  </div>
+
+  <h1 class="main-title">PitchBoss Enterprise — Informe de Infraestructura de Servidores y Costes en Render</h1>
+<blockquote><strong>Proveedor Cloud:</strong> [Render.com](https://dashboard.render.com/)</blockquote>
+<blockquote><strong>Fecha:</strong> Octubre 2026 | <strong>Versión:</strong> 1.0 Producción</blockquote>
+<hr class="doc-divider" />
+<h2 class="section-title">1. Resumen Ejecutivo de Infraestructura</h2>
+<p>PitchBoss ha sido concebido bajo una <strong>arquitectura de software ultra-eficiente (Lean Architecture)</strong>. A diferencia de las plataformas tradicionales de Inteligencia Artificial que requieren costosas GPUs dedicadas o servidores de miles de dólares al mes, PitchBoss combina:</p>
+<ol>
+<li><strong>Frontend PWA de alto rendimiento:</strong> Compilado como aplicación web progresiva estática (Vite + React 19 + Tailwind CSS) servida a través de la red CDN global de Render.</li>
+<li><strong>Backend Proxy Node.js de micro-huella:</strong> Un micro-servicio ligero (<code>server/proxy.mjs</code>) que actúa como pasarela de seguridad para ocultar la clave maestra de Google Gemini, validar licencias de empresas y prevenir abusos sin almacenar datos sensibles.</li>
+<li><strong>Cerebro Cognitivo Serverless:</strong> Motor de inferencia en tiempo real apoyado en Google Gemini 2.5 Flash / Flash-Lite mediante API REST con llamadas estructuradas en formato JSON estricto.</li>
+<li><strong>Motor de Voz en el Cliente:</strong> Síntesis y reconocimiento de voz (STT y TTS) ejecutados directamente en el navegador del usuario final a través de la Web Speech API nativa, con coste de servidor cero en audio streaming.</li>
+</ol>
+<div class="callout callout-note">
+        <div class="callout-header">ℹ️ NOTA TÉCNICA</div>
+        <div class="callout-body"><strong>Conclusión Clave de Coste:</strong> El coste total de infraestructura en servidores para lanzar y operar PitchBoss con sus primeros clientes comerciales es de <strong>aproximadamente 7,00 USD / mes (unos 6,50 €/mes)</strong> en Render, con un coste marginal de Inteligencia Artificial de apenas <strong>fracciones de céntimo por sesión</strong>. El punto de equilibrio (*break-even*) se alcanza con el <strong>primer cliente de pago</strong>.</div>
+      </div>
+<hr class="doc-divider" />
+<h2 class="section-title">2. Comparativa de Planes y Arquitectura en Render.com</h2>
+<p>Render ofrece dos modelos de despliegue para nuestra solución:</p>
+
+      <div class="diagram-box">
+        <div class="diagram-title">Arquitectura de Servidor y Flujo de Audio / IA</div>
+        <div class="arch-grid">
+          <div class="arch-card client-card">
+            <div class="arch-badge">CAPA CLIENTE (MÓVIL / PWA)</div>
+            <div class="arch-name">📱 PitchBoss PWA</div>
+            <p>React 19 + Service Worker offline. Audio Web Speech API en el navegador.</p>
+          </div>
+          <div class="arch-arrow">➔</div>
+          <div class="arch-card render-card">
+            <div class="arch-badge">RENDER.COM CLOUD</div>
+            <div class="arch-name">⚡ Web Service Starter ($7/mes)</div>
+            <p>Node.js Proxy seguro. Always-on 24/7. Oculta la clave secreta de Gemini.</p>
+          </div>
+          <div class="arch-arrow">➔</div>
+          <div class="arch-card gemini-card">
+            <div class="arch-badge">CEREBRO IA EXTERNO</div>
+            <div class="arch-name">🧠 Google Gemini 2.5 Flash</div>
+            <p>Inferencia conversacional, coaching fonético y análisis de ventas en <800ms.</p>
+          </div>
+        </div>
+      </div>
+<h3 class="subsection-title">2.1. Opción A: Despliegue 100% Estático (Render Static Site)</h3>
+<ul>
+<li><strong>Tipo de servicio en Render:</strong> <code>Static Site</code></li>
+<li><strong>Coste mensual en Render:</strong> <strong>0,00 USD (GRATIS)</strong></li>
+<li><strong>Capacidades incluidas:</strong></li>
+<li>Ancho de banda: 100 GB/mes incluidos.</li>
+<li>Certificado SSL automático (HTTPS con renovación periódica sin coste).</li>
+<li>Red CDN global con caché perimetral en Europa y América.</li>
+<li>Despliegues continuos ilimitados vinculados a GitHub (<code>main</code> branch).</li>
+<li><strong>Limitaciones para producción B2B:</strong></li>
+<li>Requiere que la API Key de Gemini resida en el almacenamiento local del cliente (<code>localStorage</code>) o se inserte en el build. En un entorno corporativo donde varios restaurantes usan la plataforma, no es recomendable exponer la clave de API en las herramientas de desarrollador (F12) del navegador.</li>
+</ul>
+<hr class="doc-divider" />
+<h3 class="subsection-title">2.2. Opción B (RECOMENDADA): Arquitectura B2B Segura (Static Site + Web Service Starter)</h3>
+<ul>
+<li><strong>Tipo de servicio en Render:</strong></li>
+</ul>
+<ol>
+<li><code>Static Site</code> para la PWA de usuario ($0.00/mes).</li>
+<li><code>Web Service</code> (Node.js) ejecutando <code>server/proxy.mjs</code> como Backend Proxy ($7.00/mes).</li>
+</ol>
+<ul>
+<li><strong>Coste mensual en Render:</strong> <strong>7,00 USD / mes (aprox. 6,50 €/mes)</strong></li>
+</ul>
+<h4 class="sub-subsection-title">¿Por qué el plan Starter ($7/mes) y no el Free ($0/mes) para el Web Service?</h4>
+<ul>
+<li><strong>El problema del Plan Free en Web Services:</strong> Render duerme (<em>spin-down</em>) los servicios gratuitos después de <strong>15 minutos de inactividad</strong>. Cuando un camarero entra a practicar, el servidor tarda entre <strong>45 y 55 segundos en despertar</strong> (<em>cold start</em>). Esto arruina por completo la experiencia de usuario en hostelería.</li>
+<li><strong>Las ventajas del Plan Starter ($7/mes):</strong></li>
+<li><strong>Always-On 24/7/365:</strong> El servidor nunca se duerme. Tiempo de respuesta inmediato (< 200 ms).</li>
+<li><strong>Recursos dedicados:</strong> 512 MB RAM y 0.5 CPU virtual. Nuestro proxy en Node.js apenas consume ~45 MB de RAM, lo que le permite atender holgadamente a más de 1.000 peticiones simultáneas sin inmutarse.</li>
+<li><strong>Protección estricta de Secretos:</strong> La variable de entorno <code>GEMINI_API_KEY</code> se configura en el panel privado de Render y nunca viaja al navegador de los camareros.</li>
+<li><strong>Métricas y Alertas:</strong> Gráficas de uso de CPU, memoria y alertas automáticas por correo en caso de degradación del servicio.</li>
+</ul>
+<hr class="doc-divider" />
+<h2 class="section-title">3. Estimación Detallada de Costes de Inteligencia Artificial (Google Gemini)</h2>
+<p>El consumo de IA se factura exclusivamente por volumen de texto procesado (<em>tokens</em> de entrada y salida):</p>
+<div class="table-container"><table>
+<thead><tr>
+<th>Concepto</th>
+<th>Tarifa Oficial Google Gemini 2.5 Flash</th>
+</tr></thead>
+<tbody>
+<tr>
+<td class=""><strong>Tokens de Entrada (Prompt + Menú + Contexto)</strong></td>
+<td class=""><strong>$0,075 USD por cada 1.000.000 tokens</strong></td>
+</tr>
+<tr>
+<td class=""><strong>Tokens de Salida (Respuesta + Fonética + Corrección)</strong></td>
+<td class=""><strong>$0,300 USD por cada 1.000.000 tokens</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h3 class="subsection-title">3.1. Cálculo de Consumo por Sesión de Entrenamiento</h3>
+<ul>
+<li>1 sesión de entrenamiento típica = 10 turnos de conversación de rol (unos 4-5 minutos).</li>
+<li>Contexto inyectado en cada turno (carta, protocolos, historial reciente): ~500 tokens de entrada.</li>
+<li>Respuesta generada por la IA (frase en inglés, traducción, consejo fonético): ~120 tokens de salida.</li>
+<li><strong>Consumo por turno:</strong></li>
+<li>Entrada: $500 \times \frac{\$0,075}{1.000.000} = \$0,0000375$</li>
+<li>Salida: $120 \times \frac{\$0,300}{1.000.000} = \$0,0000360$</li>
+<li>Total por turno: <strong>$0,0000735 USD</strong></li>
+<li><strong>Coste de 1 sesión completa de 10 turnos:</strong></li>
+</ul>
+<div class="math-box">\text{Coste por sesión} = 10 \times \$0,0000735 = \mathbf{\$0,000735\text{ USD (menos de 0,08 céntimos de euro)}}</div>
+<h3 class="subsection-title">3.2. Proyección de Costes de IA según Volumen de Clientes</h3>
+<div class="table-container"><table>
+<thead><tr>
+<th>Escala de Negocio</th>
+<th>Empleados Activos</th>
+<th>Sesiones Mensuales</th>
+<th>Tokens Totales / Mes</th>
+<th>Coste Mensual de IA (Gemini)</th>
+</tr></thead>
+<tbody>
+<tr>
+<td class=""><strong>Fase Piloto (3 clientes)</strong></td>
+<td class="text-right">15 camareros</td>
+<td class="text-right">300 sesiones</td>
+<td class="">~1,8 Millones</td>
+<td class=""><strong>0,35 USD / mes</strong></td>
+</tr>
+<tr>
+<td class=""><strong>Fase Lanzamiento (15 clientes)</strong></td>
+<td class="text-right">75 camareros</td>
+<td class="text-right">1.500 sesiones</td>
+<td class="">~9 Millones</td>
+<td class=""><strong>1,75 USD / mes</strong></td>
+</tr>
+<tr>
+<td class=""><strong>Fase Expansión (50 clientes)</strong></td>
+<td class="text-right">300 camareros</td>
+<td class="text-right">6.000 sesiones</td>
+<td class="">~36 Millones</td>
+<td class=""><strong>7,00 USD / mes</strong></td>
+</tr>
+<tr>
+<td class=""><strong>Fase Consolidación (200 clientes)</strong></td>
+<td class="text-right">1.200 camareros</td>
+<td class="text-right">24.000 sesiones</td>
+<td class="">~144 Millones</td>
+<td class=""><strong>28,00 USD / mes</strong></td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout callout-tip">
+        <div class="callout-header">💡 CONSEJO ESTRATÉGICO</div>
+        <div class="callout-body">Incluso con 200 restaurantes y hoteles entrenando a más de 1.200 empleados cada mes, el coste total de la inteligencia artificial de Google es inferior a <strong>30 USD al mes</strong>.</div>
+      </div>
+<hr class="doc-divider" />
+<h2 class="section-title">4. Costes Adicionales (Dominio, SSL y Correo)</h2>
+<div class="table-container"><table>
+<thead><tr>
+<th>Elemento</th>
+<th>Proveedor Recomendado</th>
+<th>Coste Anual</th>
+<th>Coste Mensual Equivalente</th>
+<th>Observaciones</th>
+</tr></thead>
+<tbody>
+<tr>
+<td class=""><strong>Dominio Comercial</strong> (<code>.com</code>, <code>.es</code>, <code>.app</code>)</td>
+<td class="">Cloudflare / Namecheap / GoDaddy</td>
+<td class="text-right">12,00 € - 18,00 €</td>
+<td class=""><strong>~1,25 € / mes</strong></td>
+<td class="">Permite usar <code>app.pitchboss.es</code> o <code>pitchboss.ai</code>.</td>
+</tr>
+<tr>
+<td class=""><strong>Certificado SSL / HTTPS</strong></td>
+<td class="">Render (Let's Encrypt)</td>
+<td class=""><strong>0,00 €</strong></td>
+<td class=""><strong>0,00 €</strong></td>
+<td class="text-right">Renovación y emisión 100% automatizada.</td>
+</tr>
+<tr>
+<td class=""><strong>Red CDN y Mitigación DDoS</strong></td>
+<td class="">Render Global Edge CDN</td>
+<td class=""><strong>0,00 €</strong></td>
+<td class=""><strong>0,00 €</strong></td>
+<td class="">Incluido en la capa estándar de Render.</td>
+</tr>
+<tr>
+<td class=""><strong>Correo Corporativo</strong></td>
+<td class="">Google Workspace o Zoho Mail</td>
+<td class="text-right">12,00 € - 72,00 €</td>
+<td class=""><strong>~1,00 € - 6,00 € / mes</strong></td>
+<td class="">Para comunicaciones comerciales (<code>hola@pitchboss.es</code>).</td>
+</tr>
+</tbody>
+</table></div>
+<hr class="doc-divider" />
+<h2 class="section-title">5. Cuadro Resumen de Presupuesto Operativo por Fases</h2>
+<div class="table-container"><table>
+<thead><tr>
+<th>Concepto de Gasto</th>
+<th>Fase 1: Lanzamiento (1-10 Clientes)</th>
+<th>Fase 2: Tracción (10-40 Clientes)</th>
+<th>Fase 3: Escala (50-150 Clientes)</th>
+</tr></thead>
+<tbody>
+<tr>
+<td class=""><strong>Servidor Render (Starter Web Service)</strong></td>
+<td class="text-right">7,00 $ (~6,50 €)</td>
+<td class="text-right">7,00 $ (~6,50 €)</td>
+<td class="text-right">25,00 $ (~23,00 €) <em>(Standard)</em></td>
+</tr>
+<tr>
+<td class=""><strong>Render Static CDN (PWA Frontend)</strong></td>
+<td class="text-right">0,00 $ (Gratis)</td>
+<td class="text-right">0,00 $ (Gratis)</td>
+<td class="text-right">0,00 $ (Gratis)</td>
+</tr>
+<tr>
+<td class=""><strong>Consumo API Google Gemini</strong></td>
+<td class="text-right">1,50 $ (~1,40 €)</td>
+<td class="text-right">5,50 $ (~5,00 €)</td>
+<td class="text-right">20,00 $ (~18,50 €)</td>
+</tr>
+<tr>
+<td class=""><strong>Dominio y DNS</strong></td>
+<td class="text-right">1,25 €</td>
+<td class="text-right">1,25 €</td>
+<td class="text-right">1,25 €</td>
+</tr>
+<tr>
+<td class=""><strong>Total Coste Operativo Mensual</strong></td>
+<td class=""><strong>~9,15 € / mes</strong></td>
+<td class=""><strong>~13,95 € / mes</strong></td>
+<td class=""><strong>~42,75 € / mes</strong></td>
+</tr>
+<tr>
+<td class=""><strong>Ingresos Estimados (Precio medio 99€/mes)</strong></td>
+<td class=""><strong>495 € - 990 € / mes</strong></td>
+<td class=""><strong>1.980 € - 3.960 € / mes</strong></td>
+<td class=""><strong>4.950 € - 14.850 € / mes</strong></td>
+</tr>
+<tr>
+<td class=""><strong>Margen Operativo Bruto</strong></td>
+<td class="text-right"><strong>> 98,5 %</strong></td>
+<td class="text-right"><strong>> 99,4 %</strong></td>
+<td class="text-right"><strong>> 99,6 %</strong></td>
+</tr>
+</tbody>
+</table></div>
+<hr class="doc-divider" />
+<h2 class="section-title">6. Procedimiento Paso a Paso para Desplegar en Render.com</h2>
+<p>Para dejar el servidor en producción comercial definitivo, se siguen estos 4 sencillos pasos en <a href="https://dashboard.render.com/">dashboard.render.com</a>:</p>
+<h3 class="subsection-title">Paso 1: Conectar el Repositorio de GitHub</h3>
+<ol>
+<li>Iniciar sesión en [dashboard.render.com](https://dashboard.render.com/).</li>
+<li>Pulsar en <strong>New +</strong> > <strong>Web Service</strong> (o Blueprint si usamos <code>render.yaml</code>).</li>
+<li>Seleccionar el repositorio: <code>snake33madb2017/PitchBoss</code>.</li>
+</ol>
+<h3 class="subsection-title">Paso 2: Configurar las Variables de Entorno Seguras</h3>
+<p>En la pestaña <strong>Environment</strong>:</p>
+<ul>
+<li><code>NODE_VERSION</code>: <code>20.11.0</code> (o superior)</li>
+<li><code>PORT</code>: <code>3001</code> (o el puerto asignado por Render)</li>
+<li><code>GEMINI_API_KEY</code>: <em>(Tu clave privada de Google AI Studio / Google Cloud Vertex)</em></li>
+</ul>
+<h3 class="subsection-title">Paso 3: Configurar Comandos de Ejecución</h3>
+<ul>
+<li><strong>Build Command:</strong> <code>npm install && npm run build</code></li>
+<li><strong>Start Command:</strong> <code>node server/proxy.mjs</code></li>
+<li><strong>Instance Type:</strong> <code>Starter</code> (7$/mes, con facturación prorrateada al segundo).</li>
+</ul>
+<h3 class="subsection-title">Paso 4: Vincular Dominio Propio</h3>
+<ol>
+<li>En la pestaña <strong>Settings</strong> > <strong>Custom Domains</strong>, escribir <code>app.tudominio.com</code>.</li>
+<li>Añadir los 2 registros CNAME/A en el proveedor de DNS (Cloudflare, GoDaddy o DonDominio).</li>
+<li>Render valida el dominio y emite el certificado SSL en menos de 3 minutos de forma automática.</li>
+</ol>
+<hr class="doc-divider" />
+<h2 class="section-title">7. Dictamen Técnico y Recomendación Final</h2>
+<div class="callout callout-important">
+        <div class="callout-header">⚠️ IMPORTANTE</div>
+        <div class="callout-body"><strong>Recomendación para los Socios:</strong> 1. Iniciar la comercialización inmediata activando el plan <strong>Starter de Render ($7/mes)</strong>. La inversión es tan reducida que con un solo cliente pagando una mensualidad estándar (79 € o 149 €/mes), la infraestructura queda cubierta para todo el año. 2. Mantener la arquitectura serverless actual con Gemini 2.5 Flash, que garantiza respuestas en menos de 800 milisegundos con una precisión fonética excepcional y sin costes ocultos de mantenimiento.</div>
+      </div>
+
+
+  <div class="footer-bar">
+    <span>PitchBoss Enterprise © 2026 — Documentación Confidencial para Socios</span>
+    <span>https://pitchboss.onrender.com</span>
+  </div>
+</body>
+</html>

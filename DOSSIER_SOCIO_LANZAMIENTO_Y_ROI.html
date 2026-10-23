@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Dossier Estratégico para Socios: Solución, Lanzamiento y ROI</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 16mm 14mm 18mm 14mm;
+      @bottom-right {
+        content: counter(page);
+      }
+    }
+    
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 10.5pt;
+      line-height: 1.55;
+      color: #1E293B;
+      background: #FFFFFF;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Executive Header */
+    .doc-header {
+      background: linear-gradient(135deg, #090D16 0%, #1E293B 100%);
+      color: #FFFFFF;
+      padding: 24px 28px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      border: 1px solid #334155;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .doc-badge {
+      display: inline-block;
+      background: rgba(56, 189, 248, 0.15);
+      color: #38BDF8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 8pt;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .doc-header h1 {
+      margin: 6px 0 8px 0;
+      font-size: 18pt;
+      color: #F8FAFC;
+      letter-spacing: -0.5px;
+      line-height: 1.25;
+    }
+
+    .doc-subtitle {
+      font-size: 9.5pt;
+      color: #94A3B8;
+      margin: 0;
+    }
+
+    .doc-meta {
+      display: flex;
+      gap: 16px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      font-size: 8.5pt;
+      color: #CBD5E1;
+    }
+
+    .doc-meta span strong {
+      color: #38BDF8;
+    }
+
+    /* Titles */
+    h1.main-title {
+      display: none; /* Already in banner */
+    }
+
+    h2.section-title {
+      font-size: 13pt;
+      color: #0F172A;
+      margin-top: 24px;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #E2E8F0;
+      letter-spacing: -0.3px;
+      page-break-after: avoid;
+    }
+
+    h3.subsection-title {
+      font-size: 11pt;
+      color: #0284C7;
+      margin-top: 16px;
+      margin-bottom: 6px;
+      page-break-after: avoid;
+    }
+
+    h4.sub-subsection-title {
+      font-size: 10pt;
+      color: #334155;
+      margin-top: 12px;
+      margin-bottom: 4px;
+      page-break-after: avoid;
+    }
+
+    p {
+      margin: 0 0 10px 0;
+      text-align: justify;
+    }
+
+    strong {
+      color: #0F172A;
+    }
+
+    code {
+      background: #F1F5F9;
+      color: #0284C7;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 9pt;
+      border: 1px solid #E2E8F0;
+      font-family: Consolas, Monaco, monospace;
+    }
+
+    hr.doc-divider {
+      border: none;
+      border-top: 1px solid #E2E8F0;
+      margin: 20px 0;
+    }
+
+    ul, ol {
+      margin: 0 0 12px 0;
+      padding-left: 22px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    /* Tables */
+    .table-container {
+      margin: 14px 0 18px 0;
+      page-break-inside: avoid;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9pt;
+      border: 1px solid #CBD5E1;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    th {
+      background: #F1F5F9;
+      color: #0F172A;
+      font-weight: 700;
+      text-align: left;
+      padding: 8px 10px;
+      border: 1px solid #CBD5E1;
+      font-size: 8.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    td {
+      padding: 7px 10px;
+      border: 1px solid #E2E8F0;
+      vertical-align: middle;
+    }
+
+    tr:nth-child(even) td {
+      background: #F8FAFC;
+    }
+
+    .text-right {
+      text-align: right;
+      font-weight: 600;
+    }
+
+    /* Callout Boxes */
+    .callout {
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin: 14px 0;
+      page-break-inside: avoid;
+      font-size: 9.5pt;
+    }
+
+    .callout-header {
+      font-weight: 700;
+      font-size: 9pt;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .callout-note {
+      background: #F0F9FF;
+      border-left: 4px solid #0284C7;
+      color: #0369A1;
+    }
+    .callout-note .callout-header { color: #0284C7; }
+
+    .callout-tip {
+      background: #F0FDF4;
+      border-left: 4px solid #10B981;
+      color: #166534;
+    }
+    .callout-tip .callout-header { color: #10B981; }
+
+    .callout-important {
+      background: #FFFBEB;
+      border-left: 4px solid #F59E0B;
+      color: #92400E;
+    }
+    .callout-important .callout-header { color: #D97706; }
+
+    /* Diagram Styling */
+    .diagram-box {
+      background: #F8FAFC;
+      border: 1px solid #CBD5E1;
+      border-radius: 10px;
+      padding: 16px;
+      margin: 18px 0;
+      page-break-inside: avoid;
+    }
+
+    .diagram-title {
+      font-size: 9.5pt;
+      font-weight: 700;
+      color: #334155;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .arch-grid {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .arch-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      flex: 1;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .arch-badge {
+      font-size: 7pt;
+      font-weight: 700;
+      color: #0284C7;
+      background: #E0F2FE;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+
+    .arch-name {
+      font-size: 9.5pt;
+      font-weight: 700;
+      color: #0F172A;
+      margin-bottom: 4px;
+    }
+
+    .arch-card p {
+      font-size: 8pt;
+      color: #64748B;
+      margin: 0;
+      text-align: center;
+    }
+
+    .arch-arrow {
+      font-size: 14pt;
+      color: #94A3B8;
+      font-weight: bold;
+    }
+
+    /* Bar Chart for MRR */
+    .chart-container {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      height: 270px;
+      padding: 20px 10px 10px 10px;
+      background: #FFFFFF;
+      border-radius: 8px;
+      border: 1px solid #E2E8F0;
+    }
+
+    .bar-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      height: 100%;
+      width: 75px;
+    }
+
+    .bar-val {
+      font-size: 8.5pt;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    .highlight-val {
+      color: #0284C7;
+      font-size: 10pt;
+    }
+
+    .bar {
+      width: 44px;
+      background: #94A3B8;
+      border-radius: 4px 4px 0 0;
+      transition: all 0.3s ease;
+    }
+
+    .highlight-bar {
+      background: linear-gradient(180deg, #38BDF8 0%, #0284C7 100%);
+    }
+
+    .bar-label {
+      font-size: 8pt;
+      color: #64748B;
+      text-align: center;
+      margin-top: 8px;
+      line-height: 1.2;
+    }
+
+    .chart-footer {
+      font-size: 8.5pt;
+      color: #64748B;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    /* ROI Flow */
+    .roi-flow {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .roi-step {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 12px;
+      flex: 1;
+      text-align: center;
+    }
+
+    .roi-cost {
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: #DC2626;
+    }
+
+    .roi-gain {
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: #D97706;
+    }
+
+    .roi-winner {
+      background: #F0FDF4;
+      border: 1px solid #86EFAC;
+    }
+
+    .roi-result {
+      font-size: 13pt;
+      font-weight: 800;
+      color: #16A34A;
+    }
+
+    .roi-desc {
+      font-size: 8pt;
+      color: #64748B;
+      margin-top: 4px;
+    }
+
+    .roi-arrow {
+      font-size: 16pt;
+      font-weight: bold;
+      color: #94A3B8;
+    }
+
+    /* Tracks Grid */
+    .tracks-grid {
+      display: flex;
+      gap: 10px;
+    }
+
+    .track-card {
+      flex: 1;
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .track-header {
+      font-size: 8.5pt;
+      font-weight: 700;
+      color: #0284C7;
+      margin-bottom: 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #F1F5F9;
+    }
+
+    .track-card ul {
+      padding-left: 16px;
+      margin: 0;
+      font-size: 8pt;
+      color: #475569;
+    }
+
+    /* Footer Branding */
+    .footer-bar {
+      margin-top: 30px;
+      padding-top: 10px;
+      border-top: 1px solid #E2E8F0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 8pt;
+      color: #94A3B8;
+    }
+  </style>
+</head>
+<body>
+  <div class="doc-header">
+    <div class="doc-badge">DOSSIER ESTRATÉGICO CONFIDENCIAL PARA SOCIOS</div>
+    <h1>Dossier Estratégico para Socios: Solución, Lanzamiento y ROI</h1>
+    <p class="doc-subtitle">Qué hace la solución, por qué supera a la competencia, plan de lanzamiento a 15 días y modelo financiero con ROI</p>
+    <div class="doc-meta">
+      <span>Fecha: <strong>Octubre 2026</strong></span>
+      <span>Versión: <strong>1.0 Producción</strong></span>
+      <span>Plataforma: <strong>PitchBoss Enterprise PWA</strong></span>
+      <span>Cloud Host: <strong>dashboard.render.com</strong></span>
+    </div>
+  </div>
+
+  <h1 class="main-title">PitchBoss Enterprise — Dossier Estratégico para Socios</h1>
+<blockquote><strong>Fecha:</strong> Octubre 2026 | <strong>Versión:</strong> 1.0 Ejecutivo</blockquote>
+<hr class="doc-divider" />
+<h1 class="main-title">ÍNDICE GENERAL</h1>
+<ol>
+<li>[RESUMEN EJECUTIVO: LA OPORTUNIDAD DE NEGOCIO](#1-resumen-ejecutivo-la-oportunidad-de-negocio)</li>
+<li>[QUÉ HACE EXACTAMENTE LA SOLUCIÓN (PRODUCTO Y DIFERENCIACIÓN)](#2-qué-hace-exactamente-la-solución-producto-y-diferenciación)</li>
+<li>[POR QUÉ LAS SOLUCIONES ACTUALES (PRAKTIKA, DUOLINGO, ACADEMIAS) NO SIRVEN](#3-por-qué-las-soluciones-actuales-no-sirven)</li>
+<li>[QUÉ NECESITAMOS PARA SACARLO AL MERCADO (ROADMAP Y REQUISITOS)](#4-qué-necesitamos-para-sacarlo-al-mercado-roadmap-y-requisitos)</li>
+<li>[ESTRATEGIA DE LANZAMIENTO Y CAPTACIÓN DE CLIENTES (GO-TO-MARKET)](#5-estrategia-de-lanzamiento-y-captación-de-clientes-go-to-market)</li>
+<li>[MODELO DE PRECIOS, INGRESOS Y ROI PARA EL CLIENTE](#6-modelo-de-precios-ingresos-y-roi-para-el-cliente)</li>
+<li>[ESTUDIO ECONÓMICO Y ROI PARA LOS SOCIOS (PROYECCIÓN FINANCIERA)](#7-estudio-económico-y-roi-para-los-socios-proyección-financiera)</li>
+<li>[PLAN DE ACCIÓN INMEDIATO (LOS PRÓXIMOS 15 DÍAS)](#8-plan-de-acción-inmediato-los-próximos-15-días)</li>
+</ol>
+<hr class="doc-divider" />
+<h2 class="section-title">1. RESUMEN EJECUTIVO: LA OPORTUNIDAD DE NEGOCIO</h2>
+<p>En España y los principales destinos turísticos internacionales, <strong>el 85% de los clientes en restaurantes de ticket medio-alto, coctelerías de autor, hoteles boutique y tiendas de lujo son extranjeros</strong> que consumen en inglés.</p>
+<p>Sin embargo, los negocios se enfrentan a un problema dramático: <strong>su personal de barra, sala y recepción no se siente seguro hablando en inglés.</strong></p>
+<ul>
+<li>Cuando un cliente extranjero pregunta por un cóctel de autor o un maridaje, el empleado se bloquea, se pone nervioso y recomienda lo más básico (<em>"beer"</em> o <em>"house wine"</em>).</li>
+<li>Se pierden ventas de alto ticket (<em>up-selling</em> de destilados premium, botellas, raciones especiales).</li>
+<li>Las propinas caen en picado y los clientes dejan reseñas mediocres en Google y TripAdvisor por falta de empatía o malentendidos.</li>
+</ul>
+<p><strong>La solución que hemos desarrollado se llama PitchBoss:</strong></p>
+<p>Un entrenador conversacional por voz basado en Inteligencia Artificial en el que <strong>el empleado practica por teléfono/voz llamadas interactivas de 5 minutos directamente con la carta, precios y protocolos reales de su establecimiento</strong>.</p>
+<div class="callout callout-important">
+        <div class="callout-header">⚠️ IMPORTANTE</div>
+        <div class="callout-body"><strong>El gran hito técnico ya está conseguido:</strong> La tecnología está programada, probada y desplegada en producción. En apenas <strong>60 segundos</strong>, cualquier restaurante u hotel puede inyectar su carta y tener a todo su equipo entrenando sin instalar nada en sus teléfonos móviles. Los costes de servidor e IA son de apenas <strong>fracciones de céntimo por llamada</strong>, lo que nos permite un margen de beneficio superior al <strong>95%</strong>.</div>
+      </div>
+<hr class="doc-divider" />
+<h2 class="section-title">2. QUÉ HACE EXACTAMENTE LA SOLUCIÓN (PRODUCTO Y DIFERENCIACIÓN)</h2>
+<p>PitchBoss no es una aplicación genérica para aprender inglés; es una <strong>herramienta de aceleración comercial y estandarización de servicio para hostelería y lujo</strong>.</p>
+
+      <div class="diagram-box">
+        <div class="diagram-title">Ciclo Operativo PitchBoss Enterprise</div>
+        <div class="arch-grid">
+          <div class="arch-card">
+            <div class="arch-badge">PASO 1: DIRECTOR</div>
+            <div class="arch-name">Pega la Carta en 1 Clic</div>
+            <p>Carga de menú y protocolos en 60 segundos.</p>
+          </div>
+          <div class="arch-arrow">➔</div>
+          <div class="arch-card">
+            <div class="arch-badge">PASO 2: EMPLEADOS</div>
+            <div class="arch-name">Práctica de Voz 5 min</div>
+            <p>Simulación con cliente extranjero y fonética.</p>
+          </div>
+          <div class="arch-arrow">➔</div>
+          <div class="arch-card">
+            <div class="arch-badge">PASO 3: RETORNO</div>
+            <div class="arch-name">Panel del Director</div>
+            <p>Métricas de ventas, soltura y asimilación.</p>
+          </div>
+        </div>
+      </div>
+<h3 class="subsection-title">2.1. Funcionalidades Clave ya Implementadas:</h3>
+<ol>
+<li><strong>Onboarding B2B en 3 Pasos ("Zero-Config"):</strong></li>
+</ol>
+<ul>
+<li>El dueño del negocio entra, pega su menú o carta en texto plano, selecciona el nivel deseado (ej. B1 Intermedio) y la IA genera el simulador al instante.</li>
+<li>Genera un <strong>enlace directo único</strong> para enviar por WhatsApp a los empleados.</li>
+</ul>
+<ol>
+<li><strong>Interacción de Voz Real (Estilo Walkie-Talkie):</strong></li>
+</ol>
+<ul>
+<li>El empleado habla con su voz natural por el micrófono. Un cliente extranjero nativo (con acento realista y exigencia calibrada) le hace pedidos, preguntas sobre ingredientes, alergias y objeciones de precio.</li>
+</ul>
+<ol>
+<li><strong>Coaching Fonético para Hispanohablantes:</strong></li>
+</ol>
+<ul>
+<li>La IA no solo evalúa; si el empleado duda, le ofrece una tarjeta de ayuda en pantalla indicándole la frase exacta a decir en inglés con su transcripción fonética adaptada para hispanohablantes:</li>
+</ul>
+<blockquote><em>Di en inglés: "Certainly! I recommend our Manabi cocktail. It's fruity and spicy with Bumbu rum and a hint of chili." [Sér-ten-li! Ai re-co-mend au-er Ma-na-bi cóc-teil...]</em></blockquote>
+<ol>
+<li><strong>Verificación de Venta Sugestiva (Up-Selling):</strong></li>
+</ol>
+<ul>
+<li>El sistema detecta activamente si el empleado intentó ofrecer un producto superior (ej. un whisky de gama alta en la segunda copa, un postre o un aperitivo de jamón ibérico).</li>
+</ul>
+<ol>
+<li><strong>Panel de Analítica y Reportes para el Director:</strong></li>
+</ol>
+<ul>
+<li>El dueño o director de alimentos y bebidas tiene acceso a su propio panel privado:</li>
+<li>Cuántas sesiones ha completado cada empleado (Carlos, Lucía, David).</li>
+<li>Porcentaje de asimilación de la carta (ej. 85%).</li>
+<li>Tasa de fluidez oral y objetivos de servicio superados.</li>
+<li>Botón de exportación e impresión de informe ejecutivo para dirección.</li>
+</ul>
+<hr class="doc-divider" />
+<h2 class="section-title">3. POR QUÉ LAS SOLUCIONES ACTUALES NO SIRVEN</h2>
+<div class="table-container"><table>
+<thead><tr>
+<th>Criterio</th>
+<th>Cursos de Academia / Profesores</th>
+<th>Apps B2C (Duolingo, Praktika.ai)</th>
+<th>PitchBoss Enterprise (Nuestra Solución)</th>
+</tr></thead>
+<tbody>
+<tr>
+<td class=""><strong>Contenido</strong></td>
+<td class="">Gramática teórica y situaciones abstractas.</td>
+<td class="">Frases genéricas (<em>"El perro come manzanas"</em> o entrevistas de trabajo de oficina).</td>
+<td class=""><strong>La carta real del local:</strong> Los cócteles exactos, los platos, los precios y los protocolos de servicio del negocio.</td>
+</tr>
+<tr>
+<td class=""><strong>Tiempo de estudio</strong></td>
+<td class="text-right">1 a 2 horas semanales en horario rígido (interrumpe turnos).</td>
+<td class="text-right">15-20 minutos pasivos de lectura y rellenar huecos.</td>
+<td class=""><strong>Micro-entrenamientos de 4 a 5 minutos al día</strong> antes del servicio o en tiempos muertos.</td>
+</tr>
+<tr>
+<td class=""><strong>Canal</strong></td>
+<td class="">Papel, libros o llamadas Zoom incómodas.</td>
+<td class="">Texto y toques en pantalla (poca voz real).</td>
+<td class=""><strong>Voz interactiva pura:</strong> Hablar y escuchar por el móvil como si fuera una llamada telefónica real.</td>
+</tr>
+<tr>
+<td class=""><strong>Control para el Dueño</strong></td>
+<td class="">Cero visibilidad. No sabe si el personal aprovecha el curso.</td>
+<td class="">Cero métricas corporativas. Es una app individual de consumidor.</td>
+<td class=""><strong>Panel de Analítica B2B:</strong> El dueño ve el progreso real de su plantilla y el impacto en sus ventas.</td>
+</tr>
+<tr>
+<td class=""><strong>Coste por empleado</strong></td>
+<td class="text-right">60 € - 150 € / mes por alumno.</td>
+<td class="text-right">15 € - 25 € / mes (suscripción individual).</td>
+<td class=""><strong>Tarifa plana por local (desde 79 €/mes para toda la plantilla).</strong></td>
+</tr>
+</tbody>
+</table></div>
+<hr class="doc-divider" />
+<h2 class="section-title">4. QUÉ NECESITAMOS PARA SACARLO AL MERCADO (ROADMAP Y REQUISITOS)</h2>
+<p>La plataforma tecnológica está lista en un 95%. Los requisitos indispensables para iniciar la venta comercial son sumamente asequibles:</p>
+
+      <div class="diagram-box">
+        <div class="diagram-title">Pilares de Lanzamiento al Mercado</div>
+        <div class="tracks-grid">
+          <div class="track-card">
+            <div class="track-header">1. Infraestructura Cloud (~20€)</div>
+            <ul>
+              <li>Dominio pitchboss.es / .app</li>
+              <li>Servidor Render Starter ($7/mes)</li>
+              <li>Google Cloud AI billing</li>
+            </ul>
+          </div>
+          <div class="track-card">
+            <div class="track-header">2. Operativa B2B (0€)</div>
+            <ul>
+              <li>Stripe Billing para suscripciones</li>
+              <li>Contrato de servicio de 1 página</li>
+              <li>Dossier comercial para el dueño</li>
+            </ul>
+          </div>
+          <div class="track-card">
+            <div class="track-header">3. Captación In Situ</div>
+            <ul>
+              <li>Campaña 5 Clientes Faro (14 días)</li>
+              <li>Demostración en barra con Tablet</li>
+              <li>Caso de éxito LOVO Bar</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+<h3 class="subsection-title">4.1. Requisitos Técnicos y de Servidor</h3>
+<ul>
+<li><strong>Dominio Corporativo Propio:</strong> Comprar un dominio corto y profesional (ej. <code>pitchboss.app</code>, <code>pitchboss.es</code> o <code>pitchboss.ai</code>). Coste: <strong>~12 € a 20 € al año</strong>.</li>
+<li><strong>Servidor en Render.com (Plan Starter):</strong> Activar el plan de $7/mes (6,50 €/mes) para que el servidor esté activo 24/7 sin latencia de espera.</li>
+<li><strong>API Key de Google Gemini:</strong> Habilitar una cuenta en Google Cloud Console vinculando una tarjeta corporativa. Los primeros meses el gasto será inferior a <strong>5 €/mes</strong>.</li>
+</ul>
+<h3 class="subsection-title">4.2. Requisitos de Cobro y Facturación B2B</h3>
+<ul>
+<li><strong>Pasarela de Cobro Recurrente:</strong> Configurar una cuenta en <strong>Stripe Billing</strong>. Permite cobrar a los restaurantes mediante tarjeta de crédito corporativa o domiciliación bancaria SEPA automática cada mes.</li>
+</ul>
+<h3 class="subsection-title">4.3. Requisitos Legales Básicos</h3>
+<ul>
+<li><strong>Contrato de Prestación de Servicios SaaS (1 página):</strong></li>
+<li>Objeto: Acceso a la plataforma de entrenamiento por suscripción mensual.</li>
+<li>Cancelación: En cualquier momento sin permanencia (o con descuento anual).</li>
+<li>Privacidad: Las grabaciones de voz no se almacenan para entrenar modelos públicos; se procesan en tiempo real cumpliendo el RGPD europeo.</li>
+</ul>
+<hr class="doc-divider" />
+<h2 class="section-title">5. ESTRATEGIA DE LANZAMIENTO Y CAPTACIÓN DE CLIENTES (GO-TO-MARKET)</h2>
+<p>Para alcanzar los primeros 1.000 € y 5.000 € de ingresos mensuales recurrentes (MRR), no necesitamos grandes presupuestos de publicidad en Meta o Google. La estrategia más efectiva es la <strong>Venta Consultiva Directa In Situ</strong>:</p>
+<h3 class="subsection-title">Fase 1: La Campaña de los "5 Clientes Faro" (Semanas 1 y 2)</h3>
+<ul>
+<li><strong>Objetivo:</strong> Conseguir 5 establecimientos de hostelería o coctelerías reconocidas que utilicen la herramienta durante 14 días a cambio de su feedback y testimonio.</li>
+<li><strong>El gancho irresistible:</strong></li>
+</ul>
+<p><em>"Nos sentamos 10 minutos contigo, fotografiamos tu carta de cócteles, la metemos en la IA y te dejamos la app gratis 14 días para tus 5 mejores camareros. Si tras 14 días no ves que atienden a los turistas con el doble de soltura y seguridad, no pagas nada."</em></p>
+<ul>
+<li><strong>Establecimiento ideal de muestra:</strong> Ya tenemos configurado y afinado el caso de <strong>LOVO Bar (Madrid)</strong>, que nos sirve como demostración inmediata ante cualquier hostelero de la zona de Huertas, Malasaña, Salamanca o Chueca.</li>
+</ul>
+<h3 class="subsection-title">Fase 2: Demostración en Vivo con Tablet (Efecto "Wow" Inmediato)</h3>
+<ul>
+<li>La venta de software tradicional fracasa en hostelería porque el dueño no tiene tiempo de leer dossiers.</li>
+<li>Con PitchBoss, entras al local a las 17:00 (antes del servicio), le pides la carta física, copias 3 cócteles en el móvil y le pones el walkie-talkie en la mano al dueño diciéndole:</li>
+</ul>
+<p><em>"Hazle un pedido en inglés al móvil fingiendo que eres un turista exigente de Nueva York"</em>.</p>
+<ul>
+<li>Cuando el dueño ve responder a la IA con los nombres de sus propios cócteles, la traducción y el consejo de up-selling, <strong>la venta se cierra en menos de 10 minutos</strong>.</li>
+</ul>
+<h3 class="subsection-title">Fase 3: Prospección en LinkedIn y F&B Managers (Mes 2 en adelante)</h3>
+<ul>
+<li>Contactar directamente con <strong>Directores de Alimentos y Bebidas (F&B Managers)</strong> y Directores de Operaciones de cadenas de restauración organizada y hoteles boutique de 4 y 5 estrellas.</li>
+</ul>
+<hr class="doc-divider" />
+<h2 class="section-title">6. MODELO DE PRECIOS, INGRESOS Y ROI PARA EL CLIENTE</h2>
+<h3 class="subsection-title">6.1. Propuesta de Tarifas Comerciales (SaaS B2B Recurrente)</h3>
+<div class="table-container"><table>
+<thead><tr>
+<th>Plan Comercial</th>
+<th>Perfil de Negocio</th>
+<th>Usuarios Incluidos</th>
+<th>Precio Mensual</th>
+<th>Facturación Anual (Pago único)</th>
+</tr></thead>
+<tbody>
+<tr>
+<td class=""><strong>Plan Boutique</strong></td>
+<td class="">Bares de cócteles, cafeterías de especialidad, bistrós.</td>
+<td class="">Hasta 5 empleados</td>
+<td class=""><strong>79 € / mes</strong></td>
+<td class="text-right">790 € / año <em>(2 meses gratis)</em></td>
+</tr>
+<tr>
+<td class=""><strong>Plan Sala Pro</strong></td>
+<td class="">Restaurantes de carta media/alta, gastrobares concurridos.</td>
+<td class="">Hasta 15 empleados</td>
+<td class=""><strong>149 € / mes</strong></td>
+<td class="text-right">1.490 € / año <em>(2 meses gratis)</em></td>
+</tr>
+<tr>
+<td class=""><strong>Plan Hotel & Cadena</strong></td>
+<td class="">Hoteles boutique, rooftops de lujo, grupos gastronómicos.</td>
+<td class="">Hasta 40 empleados</td>
+<td class=""><strong>299 € / mes</strong></td>
+<td class="text-right">2.990 € / año <em>(2 meses gratis)</em></td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>Servicio Adicional de Onboarding Premium (Opcional):</strong></li>
+</ul>
+<p><em>Digitalización e inyección profesional de carta + diseño de objeciones a medida:</em> <strong>99 € pago único</strong> (gratuito para clientes con suscripción anual).</p>
+<hr class="doc-divider" />
+<h3 class="subsection-title">6.2. El Retorno de Inversión (ROI) para el Dueño del Restaurante</h3>
+<p>Para que un hostelero pague una suscripción todos los meses, el software debe generarle más dinero del que cuesta. El cálculo matemático para vendérselo al dueño es aplastante:</p>
+
+      <div class="diagram-box">
+        <div class="diagram-title">Ecuación Económica del Retorno de Inversión (ROI) para el Restaurante</div>
+        <div class="roi-flow">
+          <div class="roi-step">
+            <div class="roi-cost">Inversión: 149 €/mes</div>
+            <div class="roi-desc">Plan Sala Pro (hasta 15 empleados)</div>
+          </div>
+          <div class="roi-arrow">+</div>
+          <div class="roi-step">
+            <div class="roi-gain">1 Cóctel Extra al Día</div>
+            <div class="roi-desc">+12 € a 15 € por turno en up-selling</div>
+          </div>
+          <div class="roi-arrow">=</div>
+          <div class="roi-step roi-winner">
+            <div class="roi-result">+1.800 € / mes</div>
+            <div class="roi-desc">Facturación adicional neta en sala</div>
+          </div>
+        </div>
+      </div>
+<h4 class="sub-subsection-title">Caso Real: Restaurante con 5 camareros contratando el Plan Sala Pro (149 €/mes):</h4>
+<ul>
+<li>Si gracias al entrenamiento en inglés, cada uno de los 5 camareros logra colocar <strong>solamente 1 cóctel de autor de 14 € o una tabla de jamón de 18 € adicional a la semana</strong> a clientes extranjeros:</li>
+<li>5 camareros × 1 venta extra a la semana × 15 € media = <strong>75 € extra a la semana</strong>.</li>
+<li>En un mes (4 semanas): <strong>300 € de ingresos adicionales directos</strong>.</li>
+<li>Si el camarero domina la venta sugestiva a diario (1 venta extra por turno):</li>
+</ul>
+<div class="math-box">5\text{ camareros} \times 20\text{ días} \times 12\text{ €} = \mathbf{1.200\text{ € de ingresos adicionales al mes}}</div>
+<ul>
+<li><strong>Resultado para el hostelero:</strong></li>
+</ul>
+<p>Invierte 149 € al mes y genera entre 300 € y 1.200 € en facturación extra que antes se escapaba. <strong>El ROI para el restaurante oscila entre el 200% y el 800% directo cada mes.</strong></p>
+<hr class="doc-divider" />
+<h2 class="section-title">7. ESTUDIO ECONÓMICO Y ROI PARA LOS SOCIOS (PROYECCIÓN FINANCIERA)</h2>
+<p>Nuestros costes de explotación son prácticamente inexistentes en comparación con los ingresos, lo que convierte a este proyecto en un <strong>negocio SaaS de alto margen y rápido flujo de caja</strong>.</p>
+<h3 class="subsection-title">7.1. Estructura de Costes Unitarios por Cliente</h3>
+<ul>
+<li>Coste de servidor Render prorrateado: <strong>< 0,50 € / mes por cliente</strong>.</li>
+<li>Coste de tokens de IA (Google Gemini 2.5 Flash): <strong>~0,30 € / mes por restaurante</strong> (suponiendo 100 sesiones de entrenamiento al mes).</li>
+<li>Pasarela de cobro Stripe (1,5% + 0,25€): <strong>~2,50 € por cuota</strong>.</li>
+<li><strong>Margen de Contribución por cada cuota de 149 €: más de 145 € limpios (97,3% de margen bruto).</strong></li>
+</ul>
+<h3 class="subsection-title">7.2. Proyección Financiera a 12 Meses</h3>
+<div class="table-container"><table>
+<thead><tr>
+<th>Mes</th>
+<th>Clientes Activos</th>
+<th>Ingresos Mensuales (MRR)</th>
+<th>Costes de Servidores e IA</th>
+<th>Costes Pasarela y Admin</th>
+<th>Beneficio Neto Mensual</th>
+<th>Margen Neto</th>
+</tr></thead>
+<tbody>
+<tr>
+<td class=""><strong>Mes 1</strong></td>
+<td class="text-right">3 <em>(Pilotos)</em></td>
+<td class="text-right">237 €</td>
+<td class="text-right">7,50 €</td>
+<td class="text-right">5,00 €</td>
+<td class=""><strong>+224,50 €</strong></td>
+<td class="text-right">94,7 %</td>
+</tr>
+<tr>
+<td class=""><strong>Mes 3</strong></td>
+<td class="text-right">10</td>
+<td class="text-right">1.190 €</td>
+<td class="text-right">9,00 €</td>
+<td class="text-right">25,00 €</td>
+<td class=""><strong>+1.156,00 €</strong></td>
+<td class="text-right">97,1 %</td>
+</tr>
+<tr>
+<td class=""><strong>Mes 6</strong></td>
+<td class="text-right">30</td>
+<td class="text-right">3.870 €</td>
+<td class="text-right">15,00 €</td>
+<td class="text-right">85,00 €</td>
+<td class=""><strong>+3.770,00 €</strong></td>
+<td class="text-right">97,4 %</td>
+</tr>
+<tr>
+<td class=""><strong>Mes 9</strong></td>
+<td class="text-right">65</td>
+<td class="text-right">8.685 €</td>
+<td class="text-right">25,00 €</td>
+<td class="text-right">195,00 €</td>
+<td class=""><strong>+8.465,00 €</strong></td>
+<td class="text-right">97,5 %</td>
+</tr>
+<tr>
+<td class=""><strong>Mes 12</strong></td>
+<td class="text-right">120</td>
+<td class=""><strong>16.380 €</strong></td>
+<td class=""><strong>45,00 €</strong></td>
+<td class=""><strong>370,00 €</strong></td>
+<td class=""><strong>+15.965,00 €</strong></td>
+<td class="text-right"><strong>97,5 %</strong></td>
+</tr>
+</tbody>
+</table></div>
+<div class="callout callout-tip">
+        <div class="callout-header">💡 CONSEJO ESTRATÉGICO</div>
+        <div class="callout-body"><strong>El Secreto del Retorno para los Socios:</strong> Alcanzar 120 clientes en el sector de la hostelería en España (donde existen más de 300.000 locales, de los cuales más de 20.000 son locales de ticket medio-alto en zonas turísticas) representa apenas el <strong>0,6% del mercado objetivo</strong>. Con 120 clientes, los socios se reparten más de <strong>15.000 € netos al mes</strong> de forma recurrente con un coste técnico que no supera los 50 € al mes.</div>
+      </div>
+<hr class="doc-divider" />
+<h2 class="section-title">8. PLAN DE ACCIÓN INMEDIATO (LOS PRÓXIMOS 15 DÍAS)</h2>
+<div class="table-container"><table>
+<thead><tr>
+<th>Día</th>
+<th>Tarea Concreta</th>
+<th>Responsable</th>
+<th>Estado</th>
+</tr></thead>
+<tbody>
+<tr>
+<td class=""><strong>Día 1-2</strong></td>
+<td class="">Comprar dominio comercial (<code>pitchboss.es</code> o <code>.app</code>) y enlazar a Render Starter.</td>
+<td class="">Técnico</td>
+<td class="">Pendiente</td>
+</tr>
+<tr>
+<td class=""><strong>Día 3</strong></td>
+<td class="">Activar cuenta de Stripe para generar enlaces de pago de suscripción.</td>
+<td class="">Socios</td>
+<td class="">Pendiente</td>
+</tr>
+<tr>
+<td class=""><strong>Día 4-5</strong></td>
+<td class="">Imprimir 10 carpetas con el dossier comercial de 1 página y la demo de LOVO Bar.</td>
+<td class="">Comercial</td>
+<td class="">Pendiente</td>
+</tr>
+<tr>
+<td class=""><strong>Día 6-10</strong></td>
+<td class="">Visitar presencialmente 10 locales de hostelería de alto ticket en Madrid.</td>
+<td class="">Ambos</td>
+<td class="">Pendiente</td>
+</tr>
+<tr>
+<td class=""><strong>Día 11-15</strong></td>
+<td class="">Instalar los 5 pilotos gratuitos de 14 días y medir el uso en el panel del director.</td>
+<td class="">Ambos</td>
+<td class="">Pendiente</td>
+</tr>
+<tr>
+<td class=""><strong>Día 16</strong></td>
+<td class="">Cierre de las primeras 3 suscripciones de pago (primeros 400 € MRR).</td>
+<td class="">Comercial</td>
+<td class="">Pendiente</td>
+</tr>
+</tbody>
+</table></div>
+<hr class="doc-divider" />
+<h2 class="section-title">9. CONCLUSIÓN PARA EL SOCIO</h2>
+<p>Tenemos en nuestras manos un producto funcional, testado, que resuelve un problema que duele en el bolsillo de los hosteleros todos los días y cuyos costes fijos de mantenimiento son prácticamente cero (menos de 10 €/mes).</p>
+<p><strong>El riesgo financiero es inexistente; la oportunidad de capturar mercado y generar un negocio de suscripción altamente rentable es inmediata.</strong></p>
+
+
+  <div class="footer-bar">
+    <span>PitchBoss Enterprise © 2026 — Documentación Confidencial para Socios</span>
+    <span>https://pitchboss.onrender.com</span>
+  </div>
+</body>
+</html>
