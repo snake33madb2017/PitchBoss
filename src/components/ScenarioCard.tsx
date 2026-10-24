@@ -154,6 +154,21 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
             <span className="px-2 py-0.5 rounded-full text-xs font-mono font-bold border bg-[#12161F] text-[#38BDF8] border-[#2A344A]">
               {scenario.targetEnglishLevel}
             </span>
+            {scenario.title.includes('Pitch One') && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-sky-500/20 text-sky-300 border border-sky-500/40">
+                Pitch One (A1-A2)
+              </span>
+            )}
+            {scenario.title.includes('Pitch Two') && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                Pitch Two (B1-B2)
+              </span>
+            )}
+            {scenario.title.includes('Pitch Three') && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-purple-500/20 text-purple-300 border border-purple-500/40">
+                Pitch Three (C1-C2)
+              </span>
+            )}
           </div>
 
           {!isAdmin && scenario.isCustom && onDelete && (

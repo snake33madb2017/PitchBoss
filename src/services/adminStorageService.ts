@@ -22,7 +22,7 @@ export class AdminStorageService {
           const syncedScenarios = parsed.map((s: Scenario) => {
             const presetMatch = PRESET_SCENARIOS.find((p) => p.id === s.id);
             // If it's a default preset and missing the full master business knowledge, auto-upgrade it
-            if (presetMatch && (!s.businessKnowledge || s.businessKnowledge.length < 500)) {
+            if (presetMatch && (!s.businessKnowledge || !s.businessKnowledge.includes("TOMO I: LA MUSA"))) {
               hasSynced = true;
               return {
                 ...s,
@@ -42,17 +42,24 @@ export class AdminStorageService {
             return s;
           });
 
+          // Remove obsolete legacy LOVO scenario IDs if present
+          const OLD_PRESET_IDS = ['lovo-tomo1-la-musa', 'lovo-tomo2-taxonomia-animal', 'lovo-tomo3-la-tribu'];
+          const cleanedScenarios = syncedScenarios.filter((s: Scenario) => !OLD_PRESET_IDS.includes(s.id));
+          if (cleanedScenarios.length !== syncedScenarios.length) {
+            hasSynced = true;
+          }
+
           // Auto-merge newly added preset scenarios if they are not yet in storage
           const missingPresets = PRESET_SCENARIOS.filter(
             (p) => !syncedScenarios.some((s: Scenario) => s.id === p.id)
           );
 
           if (missingPresets.length > 0 || hasSynced) {
-            const merged = [...syncedScenarios, ...missingPresets];
+            const merged = [...cleanedScenarios, ...missingPresets];
             this.saveScenarios(merged);
             return merged;
           }
-          return syncedScenarios;
+          return cleanedScenarios;
         }
       }
 

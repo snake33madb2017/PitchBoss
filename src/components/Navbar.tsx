@@ -13,6 +13,7 @@ import {
   History,
   Award,
   Presentation,
+  Wine,
   Menu,
   X
 } from 'lucide-react';
@@ -32,6 +33,7 @@ interface NavbarProps {
   subscriptionStatus: 'active' | 'free_trial' | 'expired';
   daysRemaining?: number;
   onOpenSubscriptionModal: () => void;
+  onOpenLovoMenu?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -46,7 +48,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onInstallPwa,
   subscriptionStatus,
   daysRemaining,
-  onOpenSubscriptionModal
+  onOpenSubscriptionModal,
+  onOpenLovoMenu
 }) => {
   const { t, language, setLanguage, currentLanguageOption, allLanguages } = useTranslation();
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
@@ -228,6 +231,19 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           )}
 
+          {/* LOVO Cocktail Trilogy Menu Button */}
+          {onOpenLovoMenu && (
+            <button
+              onClick={onOpenLovoMenu}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-xs font-bold text-amber-400 hover:text-amber-300 transition-all cursor-pointer shadow-sm shadow-amber-950/30 shrink-0"
+              title="Carta Trilogía LOVO Bar"
+            >
+              <Wine className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>Carta LOVO</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+            </button>
+          )}
+
           {/* Language Selector Dropdown */}
           <div className="relative shrink-0" ref={langMenuRef}>
             <button
@@ -283,7 +299,29 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           )}
 
-          {/* History Button */}
+          {/* LOVO Menu Button */}
+              {onOpenLovoMenu && (
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    onOpenLovoMenu();
+                  }}
+                  className="w-full flex items-center gap-3 p-3 rounded-2xl border border-amber-500/40 bg-amber-500/10 active:bg-amber-500/20 text-left transition-colors cursor-pointer"
+                >
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                    <Wine className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+                      <span>Carta Trilogía LOVO Bar</span>
+                      <span className="text-[10px] bg-amber-500/20 px-1.5 py-0.5 rounded font-mono">71</span>
+                    </p>
+                    <p className="text-[11px] text-[#94A3B8] truncate">Tomo I (La Musa), Tomo II (Lobo), Tomo III (La Tribu)</p>
+                  </div>
+                </button>
+              )}
+
+              {/* History Button */}
           {onOpenHistory && (
             <button
               onClick={onOpenHistory}

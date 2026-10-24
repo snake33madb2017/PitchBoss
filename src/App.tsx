@@ -15,6 +15,7 @@ import { SettingsModal } from './components/SettingsModal';
 import { AdminPinModal } from './components/AdminPinModal';
 import { AdminHubModal } from './components/AdminHubModal';
 import { SubscriptionModal } from './components/SubscriptionModal';
+import { LovoMenuModal } from './components/LovoMenuModal';
 import { LanguageProvider, useTranslation } from './i18n/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
 import {
@@ -46,6 +47,7 @@ function AppContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedNiche, setSelectedNiche] = useState<string>('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
+  const [selectedPitchTier, setSelectedPitchTier] = useState<string>('all');
 
   // Active call & modals
   const [activeCallScenario, setActiveCallScenario] = useState<Scenario | null>(null);
@@ -61,6 +63,7 @@ function AppContent() {
     SubscriptionService.getSubscriptionState()
   );
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
+  const [isLovoMenuOpen, setIsLovoMenuOpen] = useState(false);
   const [activationToast, setActivationToast] = useState<string | null>(null);
 
   // Collaborator CEFR Level & Promotion state
@@ -78,6 +81,14 @@ function AppContent() {
       setSubscriptionState(SubscriptionService.getSubscriptionState());
       setActivationToast(activation.message || '¡Licencia activada con éxito!');
       setTimeout(() => setActivationToast(null), 5000);
+    }
+  }, []);
+
+  // Auto-detect LOVO menu modal deep link (?modal=lovo)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('modal') === 'lovo' || params.get('menu') === 'lovo') {
+      setIsLovoMenuOpen(true);
     }
   }, []);
 
@@ -249,8 +260,13 @@ function AppContent() {
 
     const matchesNiche = selectedNiche === 'all' || scenario.niche === selectedNiche;
     const matchesDifficulty = selectedDifficulty === 'all' || scenario.difficulty === selectedDifficulty;
+    const matchesPitchTier =
+      selectedPitchTier === 'all' ||
+      (selectedPitchTier === 'pitch1' && (scenario.title.includes('Pitch One') || scenario.targetEnglishLevel === 'A1' || scenario.targetEnglishLevel === 'A2')) ||
+      (selectedPitchTier === 'pitch2' && (scenario.title.includes('Pitch Two') || scenario.targetEnglishLevel === 'B1' || scenario.targetEnglishLevel === 'B2')) ||
+      (selectedPitchTier === 'pitch3' && (scenario.title.includes('Pitch Three') || scenario.targetEnglishLevel === 'C1' || scenario.targetEnglishLevel === 'C2'));
 
-    return matchesSearch && matchesNiche && matchesDifficulty;
+    return matchesSearch && matchesNiche && matchesDifficulty && matchesPitchTier;
   });
 
   return (
@@ -269,6 +285,7 @@ function AppContent() {
         subscriptionStatus={subscriptionState.status}
         daysRemaining={subscriptionState.daysRemaining}
         onOpenSubscriptionModal={() => setIsSubscriptionModalOpen(true)}
+        onOpenLovoMenu={() => setIsLovoMenuOpen(true)}
       />
 
       {/* Floating Activation Toast Notification */}
@@ -384,6 +401,23 @@ function AppContent() {
                 placeholder={t('search.placeholder')}
                 className="w-full border rounded-2xl pl-10 pr-4 py-2.5 text-xs transition-colors focus:outline-none focus:border-[#38BDF8] bg-[#1C2331] border-[#2A344A] text-[#E2E8F0] placeholder:text-[#94A3B8]"
               />
+            </div>
+
+            {/* Pitch Tier Selector */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-[#94A3B8] flex items-center gap-1">
+                <Sparkles className="w-3.5 h-3.5 text-[#38BDF8]" /> Nivel Pitch
+              </span>
+              <select
+                value={selectedPitchTier}
+                onChange={(e) => setSelectedPitchTier(e.target.value)}
+                className="border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#38BDF8] cursor-pointer bg-[#1C2331] border-[#2A344A] text-[#E2E8F0]"
+              >
+                <option value="all">Todos los Niveles</option>
+                <option value="pitch1">Pitch One (A1-A2)</option>
+                <option value="pitch2">Pitch Two (B1-B2)</option>
+                <option value="pitch3">Pitch Three (C1-C2)</option>
+              </select>
             </div>
 
             {/* Difficulty Dropdown */}
@@ -599,6 +633,10 @@ function AppContent() {
       />
 
       {/* Subscription Paywall & License Management Modal */}
+      <LovoMenuModal
+        isOpen={isLovoMenuOpen}
+        onClose={() => setIsLovoMenuOpen(false)}
+      />
       <SubscriptionModal
         isOpen={isSubscriptionModalOpen}
         onClose={() => setIsSubscriptionModalOpen(false)}
