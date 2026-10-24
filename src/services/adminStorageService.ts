@@ -6,6 +6,7 @@ const LEGACY_STORAGE_KEY = 'persona_custom_scenarios';
 const PIN_STORAGE_KEY = 'persona_admin_pin';
 const ADMIN_SESSION_KEY = 'persona_admin_session_active';
 const DEFAULT_PIN = '1234';
+const DELETED_IDS_KEY = 'pitchboss_deleted_scenarios_v1';
 
 export class AdminStorageService {
   /**
@@ -42,16 +43,24 @@ export class AdminStorageService {
             return s;
           });
 
-          // Remove obsolete legacy LOVO scenario IDs if present
-          const OLD_PRESET_IDS = ['lovo-tomo1-la-musa', 'lovo-tomo2-taxonomia-animal', 'lovo-tomo3-la-tribu'];
-          const cleanedScenarios = syncedScenarios.filter((s: Scenario) => !OLD_PRESET_IDS.includes(s.id));
+          // Remove obsolete legacy LOVO scenario IDs and explicitly deleted scenarios if present
+          const deletedIds = this.getDeletedScenarioIds();
+          const PURGE_IDS = [
+            'lovo-bar-staff-hospitality',
+            'auxiliar-servicios-administrativos-generales',
+            'lovo-tomo1-la-musa',
+            'lovo-tomo2-taxonomia-animal',
+            'lovo-tomo3-la-tribu',
+            ...deletedIds
+          ];
+          const cleanedScenarios = syncedScenarios.filter((s: Scenario) => !PURGE_IDS.includes(s.id));
           if (cleanedScenarios.length !== syncedScenarios.length) {
             hasSynced = true;
           }
 
-          // Auto-merge newly added preset scenarios if they are not yet in storage
+          // Auto-merge newly added preset scenarios if they are not yet in storage and not in deleted list
           const missingPresets = PRESET_SCENARIOS.filter(
-            (p) => !syncedScenarios.some((s: Scenario) => s.id === p.id)
+            (p) => !cleanedScenarios.some((s: Scenario) => s.id === p.id) && !PURGE_IDS.includes(p.id)
           );
 
           if (missingPresets.length > 0 || hasSynced) {
@@ -152,7 +161,30 @@ export class AdminStorageService {
   /**
    * Deletes a scenario by ID.
    */
+  public static getDeletedScenarioIds(): string[] {
+    try {
+      const data = localStorage.getItem(DELETED_IDS_KEY);
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch {}
+    return [];
+  }
+
+  public static addDeletedScenarioId(id: string): void {
+    const list = this.getDeletedScenarioIds();
+    if (!list.includes(id)) {
+      list.push(id);
+      localStorage.setItem(DELETED_IDS_KEY, JSON.stringify(list));
+    }
+  }
+
+  /**
+   * Deletes a scenario by ID and persists deletion to prevent preset resurrection.
+   */
   public static deleteScenario(id: string): Scenario[] {
+    this.addDeletedScenarioId(id);
     const current = this.getScenarios();
     const updated = current.filter(s => s.id !== id);
     this.saveScenarios(updated);
@@ -178,6 +210,7 @@ export class AdminStorageService {
    * Restores original default scenarios.
    */
   public static restoreDefaults(): Scenario[] {
+    localStorage.removeItem(DELETED_IDS_KEY);
     const defaults = [...PRESET_SCENARIOS];
     this.saveScenarios(defaults);
     return defaults;

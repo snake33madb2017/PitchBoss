@@ -106,7 +106,7 @@ export const BusinessOnboardingModal: React.FC<BusinessOnboardingModalProps> = (
 
   const getShareableUrl = () => {
     const origin = typeof window !== 'undefined' ? window.location.origin : 'https://pitchboss.onrender.com';
-    return `${origin}/?scenario=${createdScenario?.id || 'lovo-bar-staff-hospitality'}`;
+    return `${origin}/?scenario=${createdScenario?.id || 'lovo-tomo1-pitch1'}`;
   };
 
   const handleCopyLink = () => {

@@ -390,9 +390,9 @@ function AppContent() {
 
         {/* Filter and Search Bar */}
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
             {/* Search Input */}
-            <div className="relative flex-1 max-w-md">
+            <div className="relative flex-1 max-w-full lg:max-w-md">
               <Search className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
@@ -403,39 +403,44 @@ function AppContent() {
               />
             </div>
 
-            {/* Pitch Tier Selector */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-[#94A3B8] flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5 text-[#38BDF8]" /> Nivel Pitch
-              </span>
-              <select
-                value={selectedPitchTier}
-                onChange={(e) => setSelectedPitchTier(e.target.value)}
-                className="border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#38BDF8] cursor-pointer bg-[#1C2331] border-[#2A344A] text-[#E2E8F0]"
-              >
-                <option value="all">Todos los Niveles</option>
-                <option value="pitch1">Pitch One (A1-A2)</option>
-                <option value="pitch2">Pitch Two (B1-B2)</option>
-                <option value="pitch3">Pitch Three (C1-C2)</option>
-              </select>
-            </div>
+            {/* Selectors Group: Responsive and neatly wrapped */}
+            <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto pb-1 sm:pb-0 shrink-0">
+              {/* Pitch Tier Selector */}
+              <div className="flex items-center gap-1.5 shrink-0">
+                <span className="text-xs text-[#94A3B8] flex items-center gap-1">
+                  <Sparkles className="w-3.5 h-3.5 text-[#38BDF8]" />
+                  <span className="hidden sm:inline">Nivel</span> Pitch
+                </span>
+                <select
+                  value={selectedPitchTier}
+                  onChange={(e) => setSelectedPitchTier(e.target.value)}
+                  className="border rounded-xl px-2.5 sm:px-3 py-2 text-xs focus:outline-none focus:border-[#38BDF8] cursor-pointer bg-[#1C2331] border-[#2A344A] text-[#E2E8F0] font-medium"
+                >
+                  <option value="all">Todos los Niveles</option>
+                  <option value="pitch1">Pitch One (A1-A2)</option>
+                  <option value="pitch2">Pitch Two (B1-B2)</option>
+                  <option value="pitch3">Pitch Three (C1-C2)</option>
+                </select>
+              </div>
 
-            {/* Difficulty Dropdown */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-[#94A3B8] flex items-center gap-1">
-                <Filter className="w-3.5 h-3.5 text-[#38BDF8]" /> {t('filter.difficulty')}
-              </span>
-              <select
-                value={selectedDifficulty}
-                onChange={(e) => setSelectedDifficulty(e.target.value)}
-                className="border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#38BDF8] cursor-pointer bg-[#1C2331] border-[#2A344A] text-[#E2E8F0]"
-              >
-                <option value="all">{t('filter.allDifficulties')}</option>
-                <option value="easy">{t('filter.easy')}</option>
-                <option value="medium">{t('filter.medium')}</option>
-                <option value="hard">{t('filter.hard')}</option>
-                <option value="hostile">{t('filter.hostile')}</option>
-              </select>
+              {/* Difficulty Dropdown */}
+              <div className="flex items-center gap-1.5 shrink-0">
+                <span className="text-xs text-[#94A3B8] flex items-center gap-1">
+                  <Filter className="w-3.5 h-3.5 text-[#38BDF8]" />
+                  <span className="hidden sm:inline">{t('filter.difficulty')}</span>
+                </span>
+                <select
+                  value={selectedDifficulty}
+                  onChange={(e) => setSelectedDifficulty(e.target.value)}
+                  className="border rounded-xl px-2.5 sm:px-3 py-2 text-xs focus:outline-none focus:border-[#38BDF8] cursor-pointer bg-[#1C2331] border-[#2A344A] text-[#E2E8F0] font-medium"
+                >
+                  <option value="all">{t('filter.allDifficulties')}</option>
+                  <option value="easy">{t('filter.easy')}</option>
+                  <option value="medium">{t('filter.medium')}</option>
+                  <option value="hard">{t('filter.hard')}</option>
+                  <option value="hostile">{t('filter.hostile')}</option>
+                </select>
+              </div>
             </div>
           </div>
 

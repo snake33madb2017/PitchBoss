@@ -93,7 +93,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className="sticky top-0 z-30 border-b border-[#2A344A] bg-[#12161F]/95 backdrop-blur-md px-3.5 sm:px-8 py-2.5 sm:py-3 transition-colors">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Brand */}
-        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 shrink-0">
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl border border-[#2A344A] bg-[#1C2331] p-0.5 overflow-hidden flex items-center justify-center shadow-lg shadow-black/40 shrink-0">
             <img src="/logo-icon.png" alt="PitchBoss Logo" className="w-full h-full object-cover rounded-lg sm:rounded-xl" />
           </div>
@@ -116,6 +116,19 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* MOBILE CONTROLS (< 768px): Clean, Spacious & Zero Clutter */}
         {/* ========================================================= */}
         <div className="flex md:hidden items-center gap-1.5 shrink-0">
+          {/* Quick Carta LOVO button on mobile */}
+          {onOpenLovoMenu && (
+            <button
+              onClick={onOpenLovoMenu}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-amber-500/40 bg-amber-500/15 active:bg-amber-500/30 text-amber-300 transition-colors cursor-pointer shadow-sm text-xs font-bold"
+              title="Carta Trilogía LOVO Bar"
+            >
+              <Wine className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span className="text-[11px] font-bold">Carta</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+            </button>
+          )}
+
           {/* Quick CEFR Level Pill */}
           {onOpenLevelModal && (
             <button
@@ -153,7 +166,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             ) : (
               <Menu className="w-5 h-5" />
             )}
-            {/* Status indicator dot if Pro or Admin is active */}
             {subscriptionStatus === 'active' && (
               <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-400 border-2 border-[#12161F]" />
             )}
@@ -164,6 +176,20 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* DESKTOP CONTROLS (>= 768px): Full expansive quick-bar    */}
         {/* ========================================================= */}
         <div className="hidden md:flex items-center gap-2 lg:gap-2.5 shrink-0">
+          {/* LOVO Cocktail Trilogy Menu Button */}
+          {onOpenLovoMenu && (
+            <button
+              onClick={onOpenLovoMenu}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-xs font-bold text-amber-400 hover:text-amber-300 transition-all cursor-pointer shadow-sm shadow-amber-950/30 shrink-0"
+              title="Carta Trilogía LOVO Bar (71 cócteles)"
+            >
+              <Wine className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>Carta LOVO</span>
+              <span className="text-[10px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-mono font-bold">71</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse ml-0.5" />
+            </button>
+          )}
+
           {/* User CEFR Level Badge */}
           {onOpenLevelModal && (
             <button
@@ -173,7 +199,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <Award className="w-3.5 h-3.5 text-[#38BDF8] shrink-0" />
               <span className="text-xs">
-                <span className="text-[#94A3B8] font-normal">Nivel </span>
+                <span className="text-[#94A3B8] font-normal hidden lg:inline">Nivel </span>
                 <strong className="text-[#38BDF8]">{currentLevel}</strong>
               </span>
             </button>
@@ -188,7 +214,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <Crown className="w-3.5 h-3.5 text-[#FBBF24] shrink-0" />
               <span className="text-xs font-bold text-[#FBBF24]">PRO</span>
-              <span className="text-[10px] text-amber-300 font-mono">({daysRemaining}d)</span>
+              <span className="text-[10px] text-amber-300 font-mono hidden lg:inline">({daysRemaining}d)</span>
             </button>
           ) : subscriptionStatus === 'free_trial' ? (
             <button
@@ -197,7 +223,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               title="Prueba gratuita disponible"
             >
               <Sparkles className="w-3.5 h-3.5 text-[#38BDF8] shrink-0" />
-              <span className="text-[#E2E8F0]">1 Prueba Gratis</span>
+              <span className="text-[#E2E8F0] text-xs hidden lg:inline">1 Prueba Gratis</span>
+              <span className="text-[#E2E8F0] text-xs lg:hidden">Prueba</span>
             </button>
           ) : (
             <button
@@ -218,7 +245,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               title="Panel de Administración PWA"
             >
               <ShieldCheck className="w-4 h-4 text-[#FBBF24]" />
-              <span>Admin PWA</span>
+              <span className="hidden xl:inline">Admin PWA</span>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             </button>
           ) : (
@@ -228,19 +255,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               title="Acceso Administrador (PIN)"
             >
               <Shield className="w-4 h-4" />
-            </button>
-          )}
-
-          {/* LOVO Cocktail Trilogy Menu Button */}
-          {onOpenLovoMenu && (
-            <button
-              onClick={onOpenLovoMenu}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-xs font-bold text-amber-400 hover:text-amber-300 transition-all cursor-pointer shadow-sm shadow-amber-950/30 shrink-0"
-              title="Carta Trilogía LOVO Bar"
-            >
-              <Wine className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span>Carta LOVO</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
             </button>
           )}
 
@@ -295,33 +309,11 @@ export const Navbar: React.FC<NavbarProps> = ({
               title={t('nav.installPwa')}
             >
               <Download className="w-4 h-4 text-[#38BDF8]" />
-              <span>{t('nav.installPwa')}</span>
+              <span className="hidden xl:inline">{t('nav.installPwa')}</span>
             </button>
           )}
 
-          {/* LOVO Menu Button */}
-              {onOpenLovoMenu && (
-                <button
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    onOpenLovoMenu();
-                  }}
-                  className="w-full flex items-center gap-3 p-3 rounded-2xl border border-amber-500/40 bg-amber-500/10 active:bg-amber-500/20 text-left transition-colors cursor-pointer"
-                >
-                  <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
-                    <Wine className="w-4 h-4" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
-                      <span>Carta Trilogía LOVO Bar</span>
-                      <span className="text-[10px] bg-amber-500/20 px-1.5 py-0.5 rounded font-mono">71</span>
-                    </p>
-                    <p className="text-[11px] text-[#94A3B8] truncate">Tomo I (La Musa), Tomo II (Lobo), Tomo III (La Tribu)</p>
-                  </div>
-                </button>
-              )}
-
-              {/* History Button */}
+          {/* History Button */}
           {onOpenHistory && (
             <button
               onClick={onOpenHistory}
@@ -329,21 +321,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               title="Historial de conversaciones y transcripciones"
             >
               <History className="w-4 h-4 text-[#38BDF8]" />
-              <span className="hidden lg:inline">Historial</span>
+              <span className="hidden xl:inline">Historial</span>
             </button>
           )}
-
-          {/* Interactive Corporate Presentation Link */}
-          <a
-            href="/presentation/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl border border-[#2A344A] bg-[#1C2331] hover:bg-[#242D3E] text-xs font-semibold text-[#E2E8F0] transition-colors shadow-sm cursor-pointer shrink-0"
-            title="Ver Presentación Corporativa Interactiva"
-          >
-            <Presentation className="w-3.5 h-3.5 text-[#38BDF8]" />
-            <span className="hidden xl:inline">Presentación</span>
-          </a>
 
           {/* New Scenario Button */}
           <button
@@ -352,7 +332,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             title={t('nav.newScenario')}
           >
             <Plus className="w-4 h-4 text-white" />
-            <span>{t('nav.newScenario')}</span>
+            <span className="hidden lg:inline">{t('nav.newScenario')}</span>
           </button>
 
           {/* Settings Button */}
@@ -375,6 +355,28 @@ export const Navbar: React.FC<NavbarProps> = ({
             ref={mobileMenuRef}
             className="bg-[#12161F] border-b border-[#2A344A] shadow-2xl max-h-[calc(100vh-60px)] overflow-y-auto p-4 space-y-4 animate-in slide-in-from-top-3 duration-200"
           >
+            {/* LOVO Menu Featured Card in Mobile Drawer */}
+            {onOpenLovoMenu && (
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  onOpenLovoMenu();
+                }}
+                className="w-full flex items-center gap-3 p-3.5 rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-transparent active:from-amber-500/25 text-left transition-all cursor-pointer shadow-lg shadow-amber-950/20"
+              >
+                <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+                  <Wine className="w-5 h-5" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-1">
+                    <p className="text-xs font-black text-amber-400 uppercase tracking-wide">Carta Trilogía LOVO Bar</p>
+                    <span className="text-[10px] bg-amber-400 text-zinc-950 px-2 py-0.5 rounded-full font-black">71 Cócteles</span>
+                  </div>
+                  <p className="text-[11px] text-zinc-400 truncate mt-0.5">Tomo I (La Musa), Tomo II (Lobo), Tomo III (La Tribu)</p>
+                </div>
+              </button>
+            )}
+
             {/* Status Summary: Level & Subscription */}
             <div className="grid grid-cols-2 gap-2.5">
               {/* CEFR Level Card */}
