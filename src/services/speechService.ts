@@ -91,25 +91,49 @@ export class SpeechService {
     return this.latestTranscript;
   }
 
+  public static getIsListening(): boolean {
+    return this.isListening;
+  }
+
+  /**
+   * Prompts the browser for microphone permission safely and releases the track.
+   */
+  public static async requestMicrophonePermission(): Promise<{ granted: boolean; error?: string }> {
+    if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+      return { granted: false, error: 'unsupported' };
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((track) => track.stop());
+      return { granted: true };
+    } catch (err: any) {
+      console.warn('Microphone permission request error:', err);
+      return { granted: false, error: err.name || err.message || 'not-allowed' };
+    }
+  }
+
   /**
    * Starts speech recognition listening for input (defaults to en-US for English training)
    * enableAutoSilence: false for Walkie-Talkie (hold to speak, release to send)
+   * silenceTimeoutMs: configurable milliseconds of silence before auto-submitting (default 800ms for fast conversational rhythm)
    */
   public static startListening({
     lang = 'en-US',
     enableAutoSilence = false,
+    silenceTimeoutMs = 800,
     onTranscript,
     onSpeechEnd,
     onError
   }: {
     lang?: string;
     enableAutoSilence?: boolean;
+    silenceTimeoutMs?: number;
     onTranscript: (text: string, isFinal: boolean) => void;
     onSpeechEnd?: (finalTranscript: string) => void;
     onError?: (error: string) => void;
   }): void {
     if (!this.isRecognitionSupported()) {
-      if (onError) onError('Speech recognition is not supported in this browser.');
+      if (onError) onError('unsupported');
       return;
     }
 
@@ -159,7 +183,7 @@ export class SpeechService {
           this.silenceTimer = setTimeout(() => {
             this.stopListening();
             if (onSpeechEnd) onSpeechEnd(currentText);
-          }, 1300);
+          }, silenceTimeoutMs);
         }
       }
     };
@@ -176,8 +200,9 @@ export class SpeechService {
 
     try {
       this.recognition.start();
-    } catch (e) {
+    } catch (e: any) {
       console.error('Failed to start speech recognition:', e);
+      if (onError) onError(e?.message || 'start_failed');
     }
   }
 

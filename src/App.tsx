@@ -197,13 +197,15 @@ function AppContent() {
     }
     return {
       apiKey: localStorage.getItem('persona_gemini_api_key') || '',
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.0-flash',
       preferredVoice: '',
-      speechRate: 1.0,
+      speechRate: 1.05,
       speechPitch: 1.0,
       autoListen: true,
       showRealtimeHints: true,
-      hapticFeedback: true
+      hapticFeedback: true,
+      fastResponseMode: true,
+      silenceThresholdMs: 800
     };
   });
 
@@ -1656,6 +1658,7 @@ function AppContent() {
         <CallScreen
           scenario={activeCallScenario}
           initialSession={activeSessionToResume}
+          settings={settings}
           onEndCall={(report) => {
             setActiveCallScenario(null);
             setActiveSessionToResume(null);

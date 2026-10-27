@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import type { Scenario, Message, SessionReport, SavedSession } from '../types';
+import type { Scenario, Message, SessionReport, SavedSession, AppSettings } from '../types';
 import { GeminiService } from '../services/geminiService';
 import { SpeechService } from '../services/speechService';
 import { SessionHistoryService } from '../services/sessionHistoryService';
@@ -25,18 +25,21 @@ import {
   Radio,
   BookOpen,
   Trophy,
-  Zap
+  Zap,
+  AlertCircle,
+  Globe
 } from 'lucide-react';
 import { CorporateAvatar } from './CorporateAvatar';
 
 interface CallScreenProps {
   scenario: Scenario;
   initialSession?: SavedSession | null;
+  settings?: AppSettings;
   onEndCall: (report: SessionReport) => void;
   onExit: () => void;
 }
 
-export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession, onEndCall, onExit }) => {
+export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession, settings, onEndCall, onExit }) => {
   const { t } = useTranslation();
 
   const sessionIdRef = useRef<string>(
@@ -66,12 +69,28 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
   const [durationSeconds, setDurationSeconds] = useState(initialSession?.durationSeconds || 0);
   const [isMuted, setIsMuted] = useState(false);
 
-  // Walkie-Talkie Push-To-Talk state
+  // Voice & Interaction Mode State
+  const [isHandsFree, setIsHandsFree] = useState<boolean>(settings?.autoListen ?? false);
+  const isHandsFreeRef = useRef(isHandsFree);
+  useEffect(() => {
+    isHandsFreeRef.current = isHandsFree;
+  }, [isHandsFree]);
+
+  const [speechLang, setSpeechLang] = useState<'en-US' | 'es-ES'>('en-US');
+  const speechLangRef = useRef<'en-US' | 'es-ES'>('en-US');
+  useEffect(() => {
+    speechLangRef.current = speechLang;
+  }, [speechLang]);
+
+  const [micErrorMessage, setMicErrorMessage] = useState<string | null>(null);
+  const silenceThreshold = settings?.silenceThresholdMs || 800;
+  const fastMode = settings?.fastResponseMode !== false;
+
+  // Walkie-Talkie & Push-To-Talk state
   const [isHoldingMic, setIsHoldingMic] = useState(false);
   const isHoldingMicRef = useRef(false);
   const isSubmittingRef = useRef(false);
   const hasSpokenInitialRef = useRef(false);
-  const walkieTimeoutRef = useRef<any>(null);
   const [walkieTalkieTip, setWalkieTalkieTip] = useState<string | null>(null);
   const transcriptRef = useRef('');
   const pressStartTimeRef = useRef(0);
@@ -99,7 +118,11 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
   } | null>(null);
 
   // Scenario objectives state
+  const currentObjectivesRef = useRef(initialSession?.objectives || scenario.objectives);
   const [currentObjectives, setCurrentObjectives] = useState(initialSession?.objectives || scenario.objectives);
+  useEffect(() => {
+    currentObjectivesRef.current = currentObjectives;
+  }, [currentObjectives]);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -128,7 +151,6 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
       };
     }
 
-    // Guard against React double-invoking mount effect in dev/StrictMode
     if (hasSpokenInitialRef.current) {
       return;
     }
@@ -157,13 +179,21 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
       objectives: scenario.objectives
     });
 
-    // Speak initial greeting
+    // Speak initial greeting with natural cadence
     setCallState('ai_speaking');
+    const effectiveRate = settings?.speechRate || (fastMode ? 1.08 : 1.0);
     SpeechService.speakText({
       text: scenario.initialGreeting,
+      voiceName: settings?.preferredVoice,
+      rate: effectiveRate,
       onStart: () => setCallState('ai_speaking'),
       onEnd: () => {
         setCallState('idle');
+        if (isHandsFreeRef.current) {
+          setTimeout(() => {
+            startListeningSession(true);
+          }, 300);
+        }
       },
       onError: () => {
         setCallState('idle');
@@ -183,108 +213,147 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
     }
   }, [messages, showChatLog]);
 
-  // Walkie-Talkie Push-To-Talk: press to start speaking
+  // Speech error translator & diagnostics
+  const handleSpeechError = (err: string) => {
+    console.warn('Speech error received:', err);
+    if (err === 'not-allowed' || err === 'denied' || err === 'permission-denied') {
+      setMicErrorMessage('El navegador ha bloqueado el micrófono. Haz clic en "Activar Micrófono" o desbloquea el candado 🔒 en la barra de direcciones.');
+    } else if (err === 'audio-capture') {
+      setMicErrorMessage('No se detecta entrada de audio. Comprueba que el micrófono esté conectado y no esté en uso por otra app.');
+    } else if (err === 'unsupported') {
+      setMicErrorMessage('Tu navegador actual no admite reconocimiento de voz nativo (Web Speech API). Te recomendamos Google Chrome o Microsoft Edge.');
+    } else if (err === 'network') {
+      setMicErrorMessage('Error de red al conectar con el servicio de voz de Google. Revisa tu conexión a internet o usa el teclado.');
+    } else if (err !== 'no-speech' && err !== 'aborted') {
+      setMicErrorMessage(`Error de micrófono: ${err}. Puedes usar el teclado para responder.`);
+    }
+    setCallState('idle');
+    setIsHoldingMic(false);
+    isHoldingMicRef.current = false;
+  };
+
+  const handleRequestMicPermission = async () => {
+    const res = await SpeechService.requestMicrophonePermission();
+    if (res.granted) {
+      setMicErrorMessage(null);
+      startListeningSession(isHandsFreeRef.current);
+    } else {
+      handleSpeechError(res.error || 'not-allowed');
+    }
+  };
+
+  // Helper to start listening session
+  const startListeningSession = (handsFreeMode = false) => {
+    if (callState === 'processing' || isSubmittingRef.current) return;
+    if (callState === 'ai_speaking') {
+      SpeechService.cancelSpeech();
+    }
+
+    setMicErrorMessage(null);
+    pressStartTimeRef.current = Date.now();
+    transcriptRef.current = '';
+    setInterimTranscript('');
+    setCallState('user_listening');
+
+    if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+      try {
+        navigator.vibrate(35);
+      } catch {}
+    }
+
+    try {
+      AudioRecordingService.startRecording();
+    } catch {}
+
+    SpeechService.startListening({
+      lang: speechLangRef.current,
+      enableAutoSilence: handsFreeMode || isHandsFreeRef.current,
+      silenceTimeoutMs: silenceThreshold,
+      onTranscript: (text) => {
+        transcriptRef.current = text;
+        setInterimTranscript(text);
+      },
+      onSpeechEnd: (finalText) => {
+        const raw = finalText || transcriptRef.current;
+        const cleaned = SpeechService.cleanDuplicatePhrases(raw);
+        if (cleaned && cleaned.length >= 2) {
+          handleUserSubmission(cleaned);
+        } else {
+          setCallState('idle');
+        }
+      },
+      onError: (err) => {
+        handleSpeechError(err);
+      }
+    });
+  };
+
+  // Immediate stop and submit without buffering lag
+  const handleStopListeningAndSubmit = () => {
+    const immediateText = (transcriptRef.current || SpeechService.getLatestTranscript()).trim();
+    SpeechService.stopListening();
+    setInterimTranscript('');
+
+    if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+      try {
+        navigator.vibrate(25);
+      } catch {}
+    }
+
+    const cleaned = SpeechService.cleanDuplicatePhrases(immediateText);
+    if (cleaned && cleaned.length >= 2) {
+      AudioRecordingService.stopRecording().catch(() => {});
+      handleUserSubmission(cleaned);
+    } else {
+      setCallState('idle');
+      setWalkieTalkieTip('No se detectó voz. Vuelve a pulsar o mantén presionado para hablar.');
+      setTimeout(() => setWalkieTalkieTip(null), 3000);
+    }
+  };
+
+  // Smart Mic Pointer Down: starts listening or handles click-to-send
   const handleWalkieTalkieStart = (e?: React.SyntheticEvent) => {
     if (e) {
       e.stopPropagation();
     }
 
-    if (callState === 'processing' || isSubmittingRef.current || isHoldingMicRef.current) return;
+    if (callState === 'processing' || isSubmittingRef.current) return;
 
-    if (walkieTimeoutRef.current) {
-      clearTimeout(walkieTimeoutRef.current);
-      walkieTimeoutRef.current = null;
-    }
-
-    // Interrupt AI audio immediately if it is currently speaking
-    if (callState === 'ai_speaking') {
-      SpeechService.cancelSpeech();
-    }
-
-    // Haptic buzz feedback
-    if (typeof window !== 'undefined' && 'vibrate' in navigator) {
-      try {
-        navigator.vibrate(40);
-      } catch (err) {
-        // ignore
-      }
+    // If currently listening in Tap-to-Talk mode, tapping again submits immediately!
+    if (callState === 'user_listening' && !isHoldingMicRef.current) {
+      handleStopListeningAndSubmit();
+      return;
     }
 
     pressStartTimeRef.current = Date.now();
-    transcriptRef.current = '';
-    setInterimTranscript('');
     isHoldingMicRef.current = true;
     setIsHoldingMic(true);
     setWalkieTalkieTip(null);
-    setCallState('user_listening');
 
-    // Start recording audio for review playback
-    AudioRecordingService.startRecording();
-
-    SpeechService.startListening({
-      lang: 'en-US',
-      enableAutoSilence: false, // Walkie-Talkie mode stays open until button release!
-      onTranscript: (text) => {
-        transcriptRef.current = text;
-        setInterimTranscript(text);
-      },
-      onError: (err) => {
-        console.warn('Speech err:', err);
-      }
-    });
+    startListeningSession(isHandsFreeRef.current);
   };
 
-  // Walkie-Talkie Push-To-Talk: release button to submit speech to AI
+  // Smart Mic Pointer Up: determines if it was a quick tap or a held press
   const handleWalkieTalkieEnd = (e?: React.SyntheticEvent) => {
     if (e) {
       e.stopPropagation();
     }
 
     if (!isHoldingMicRef.current) return;
+    const holdDuration = Date.now() - pressStartTimeRef.current;
     isHoldingMicRef.current = false;
     setIsHoldingMic(false);
 
-    if (walkieTimeoutRef.current) {
-      clearTimeout(walkieTimeoutRef.current);
-      walkieTimeoutRef.current = null;
+    // If quick tap (< 350ms): user clicked to activate Tap-to-Talk! Keep listening!
+    if (holdDuration < 350) {
+      return;
     }
 
-    // Subtle release haptic buzz
-    if (typeof window !== 'undefined' && 'vibrate' in navigator) {
-      try {
-        navigator.vibrate(25);
-      } catch (err) {
-        // ignore
-      }
-    }
-
-    const holdDuration = Date.now() - pressStartTimeRef.current;
-    const immediateText = SpeechService.stopListening();
-    if (immediateText) {
-      transcriptRef.current = immediateText;
-    }
-
-    // Stop audio recording and capture URL
-    AudioRecordingService.stopRecording().then((audioUrl) => {
-      // Allow 180ms grace period for browser speech buffer to flush last syllables
-      walkieTimeoutRef.current = setTimeout(() => {
-        const raw = (transcriptRef.current || SpeechService.getLatestTranscript()).trim();
-        const cleaned = SpeechService.cleanDuplicatePhrases(raw);
-
-        if (cleaned && cleaned.length >= 2) {
-          handleUserSubmission(cleaned, audioUrl || undefined);
-        } else {
-          setCallState('idle');
-          if (holdDuration < 320) {
-            setWalkieTalkieTip('Mantén presionado mientras hablas y suelta al terminar');
-            setTimeout(() => setWalkieTalkieTip(null), 3500);
-          }
-        }
-      }, 180);
-    });
+    // Held > 350ms: Walkie-Talkie release to send
+    handleStopListeningAndSubmit();
   };
 
-  // Process user speech or typed text
+  // Process user speech or typed text with ultra-low latency
   const handleUserSubmission = async (text: string, audioUrl?: string) => {
     if (isSubmittingRef.current || callState === 'processing') return;
     isSubmittingRef.current = true;
@@ -323,6 +392,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
       setMessages(updatedHistory);
       setCallState('processing');
 
+      // Fast turn generation using Gemini 2.0 Flash
       const response = await GeminiService.sendTurn({
         scenario,
         conversationHistory: updatedHistory,
@@ -365,18 +435,25 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
         durationSeconds,
         status: 'in_progress',
         messages: nextMessages,
-        objectives: currentObjectives
+        objectives: currentObjectivesRef.current
       });
 
-      // Speak response out loud using Neural TTS or browser fallback
+      // Speak response out loud using instant local browser speech synthesis
       if (!isMuted) {
         setCallState('ai_speaking');
-        SpeechService.speakTextNeuralOrFallback({
+        const effectiveRate = settings?.speechRate || (fastMode ? 1.08 : 1.0);
+        SpeechService.speakText({
           text: response.reply,
-          voiceGender: scenario.aiCharacter?.voiceGender || 'female',
+          voiceName: settings?.preferredVoice,
+          rate: effectiveRate,
           onStart: () => setCallState('ai_speaking'),
           onEnd: () => {
             setCallState('idle');
+            if (isHandsFreeRef.current) {
+              setTimeout(() => {
+                startListeningSession(true);
+              }, 250);
+            }
           },
           onError: () => {
             setCallState('idle');
@@ -408,8 +485,11 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
       }
       SpeechService.cancelSpeech();
       setCallState('ai_speaking');
+      const effectiveRate = settings?.speechRate || (fastMode ? 1.08 : 1.0);
       SpeechService.speakText({
         text: lastAi.text,
+        voiceName: settings?.preferredVoice,
+        rate: effectiveRate,
         onStart: () => setCallState('ai_speaking'),
         onEnd: () => {
           setCallState('idle');
@@ -597,14 +677,48 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
 
       {/* Main Center Stage: Scrollable, clean, breathing layout */}
       <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-2 sm:py-6 flex flex-col items-center justify-start space-y-3 sm:space-y-4 max-w-xl mx-auto w-full scrollbar-thin pb-8">
-        {/* Visualizer & Orb - Walkie-talkie enabled */}
+        
+        {/* Microphone Diagnostic / Permission Alert Banner */}
+        {micErrorMessage && (
+          <div className="w-full p-3 rounded-2xl bg-rose-500/15 border border-rose-500/40 text-rose-200 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 shadow-xl animate-in fade-in shrink-0">
+            <div className="flex items-start sm:items-center gap-2 min-w-0">
+              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5 sm:mt-0" />
+              <p className="leading-tight text-[11px] font-medium">{micErrorMessage}</p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+              <button
+                type="button"
+                onClick={handleRequestMicPermission}
+                className="px-2.5 py-1 rounded-xl bg-rose-500 hover:bg-rose-400 text-slate-950 font-bold text-[11px] transition-colors cursor-pointer shadow-sm"
+              >
+                Activar Micrófono
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowTextInput(true)}
+                className="px-2 py-1 rounded-xl bg-[#1C2331] hover:bg-[#2A344A] text-[#E2E8F0] text-[11px] border border-[#2A344A] cursor-pointer"
+              >
+                Escribir
+              </button>
+              <button
+                type="button"
+                onClick={() => setMicErrorMessage(null)}
+                className="p-1 text-rose-300 hover:text-white cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Visualizer & Orb - Tap or Walkie-talkie enabled */}
         <div
           onPointerDown={handleWalkieTalkieStart}
           onPointerUp={handleWalkieTalkieEnd}
           onPointerCancel={handleWalkieTalkieEnd}
           onContextMenu={(e) => e.preventDefault()}
           className="relative cursor-pointer group shrink-0 pt-1 touch-none select-none"
-          title="Mantén presionado para hablar, suelta para enviar"
+          title={callState === 'user_listening' ? 'Toca para enviar tu voz ahora' : 'Toca una vez o mantén presionado para hablar'}
         >
           <AudioVisualizer state={callState} />
 
@@ -612,12 +726,12 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div
               className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-[#1C2331] border-2 transition-all flex items-center justify-center shadow-2xl backdrop-blur-md ${
-                isHoldingMic
+                callState === 'user_listening'
                   ? 'border-rose-500 scale-110 shadow-rose-500/50'
                   : 'border-[#2A344A] group-hover:border-[#38BDF8]'
               }`}
             >
-              {isHoldingMic ? (
+              {callState === 'user_listening' ? (
                 <Mic className="w-6 h-6 sm:w-8 sm:h-8 text-rose-400 animate-pulse" />
               ) : (
                 <CorporateAvatar
@@ -631,7 +745,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
           </div>
         </div>
 
-        {/* Clean Status Pill with Walkie-Talkie Guidance */}
+        {/* Clean Status Pill with Smart Guidance */}
         <div className="shrink-0 flex flex-col items-center gap-1.5">
           {callState === 'ai_speaking' && (
             <button
@@ -649,25 +763,63 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
           )}
 
           {callState === 'user_listening' && (
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/50 animate-pulse shadow-lg">
+            <button
+              type="button"
+              onClick={handleStopListeningAndSubmit}
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/50 animate-pulse shadow-lg hover:bg-rose-500/30 cursor-pointer transition-all"
+              title="Toca para enviar tu intervención"
+            >
               <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-              <span>{isHoldingMic ? 'Habla ahora • Suelta para enviar' : 'Escuchando en inglés...'}</span>
-            </div>
+              <span>{isHoldingMic ? 'Habla ahora • Suelta para enviar' : 'Escuchando... Toca para enviar'}</span>
+              {!isHoldingMic && <Send className="w-3 h-3 text-rose-300 ml-0.5" />}
+            </button>
           )}
 
           {callState === 'processing' && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#1C2331] text-[#E2E8F0] border border-[#2A344A]">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold bg-[#1C2331] text-[#38BDF8] border border-sky-500/40 shadow-sm animate-pulse">
               <Sparkles className="w-3.5 h-3.5 text-[#38BDF8] animate-spin" />
-              <span>Pensando respuesta...</span>
+              <span>Generando respuesta rápida...</span>
             </span>
           )}
 
           {callState === 'idle' && (
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-[#1C2331] text-[#E2E8F0] border border-[#2A344A] shadow-sm">
+            <button
+              type="button"
+              onClick={() => startListeningSession(isHandsFree)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-medium bg-[#1C2331] text-[#E2E8F0] border border-[#2A344A] hover:border-[#38BDF8] shadow-sm transition-all cursor-pointer"
+              title="Toca para empezar a hablar"
+            >
               <Radio className="w-3 h-3 text-[#38BDF8] animate-pulse" />
-              <span>Walkie-Talkie: Mantén presionado para hablar</span>
-            </div>
+              <span>Toca o mantén presionado para hablar</span>
+            </button>
           )}
+
+          {/* Quick Voice Mode Bar: Hands-free & Language Pill */}
+          <div className="flex items-center gap-2 pt-0.5">
+            <button
+              type="button"
+              onClick={() => setIsHandsFree(!isHandsFree)}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all cursor-pointer ${
+                isHandsFree
+                  ? 'bg-amber-500/15 border-amber-500/50 text-amber-300 shadow-sm shadow-amber-500/20'
+                  : 'bg-[#12161F] border-[#2A344A] text-[#94A3B8] hover:text-[#E2E8F0]'
+              }`}
+              title={isHandsFree ? 'Modo Manos Libres activo: se envía y escucha automáticamente' : 'Activar modo manos libres continuo'}
+            >
+              <Zap className={`w-3 h-3 ${isHandsFree ? 'text-amber-400 fill-amber-400' : 'text-[#94A3B8]'}`} />
+              <span>{isHandsFree ? 'Manos Libres: ON' : 'Manos Libres: OFF'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setSpeechLang(speechLang === 'en-US' ? 'es-ES' : 'en-US')}
+              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#12161F] border border-[#2A344A] text-[#E2E8F0] hover:border-[#38BDF8] transition-all cursor-pointer"
+              title="Cambiar idioma del micrófono (Inglés / Español)"
+            >
+              <Globe className="w-3 h-3 text-[#38BDF8]" />
+              <span>{speechLang === 'en-US' ? 'Micro: 🇺🇸 EN' : 'Micro: 🇪🇸 ES'}</span>
+            </button>
+          </div>
 
           {walkieTalkieTip && (
             <span className="text-[11px] font-medium text-[#FBBF24] bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-xl animate-in fade-in">
@@ -1014,7 +1166,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
           </span>
         </button>
 
-        {/* Central Prominent Walkie-Talkie Button */}
+        {/* Central Prominent Mic Button (Dual-Mode: Tap to talk / Hold Walkie-talkie) */}
         <div className="flex flex-col items-center gap-1 -mt-1 select-none shrink-0">
           <button
             type="button"
@@ -1023,24 +1175,38 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
             onPointerCancel={handleWalkieTalkieEnd}
             onContextMenu={(e) => e.preventDefault()}
             className={`w-13 h-13 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-all duration-150 cursor-pointer touch-none select-none relative ${
-              isHoldingMic
+              callState === 'user_listening'
                 ? 'bg-rose-600 text-white ring-6 sm:ring-8 ring-rose-500/30 scale-105 sm:scale-110 shadow-2xl shadow-rose-600/50'
                 : 'bg-[#0EA5E9] hover:bg-[#38BDF8] text-slate-950 shadow-lg shadow-sky-950/40 active:scale-95'
             }`}
-            title="Mantén presionado para hablar, suelta para enviar"
+            title={
+              callState === 'user_listening'
+                ? isHoldingMic
+                  ? 'Suelta para enviar'
+                  : 'Toca para enviar intervención'
+                : 'Toca o mantén presionado para hablar'
+            }
           >
-            {isHoldingMic ? (
-              <Mic className="w-6 h-6 sm:w-7 sm:h-7 text-white animate-pulse" />
+            {callState === 'user_listening' ? (
+              isHoldingMic ? (
+                <Mic className="w-6 h-6 sm:w-7 sm:h-7 text-white animate-pulse" />
+              ) : (
+                <Send className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              )
             ) : (
               <Mic className="w-5 h-5 sm:w-6 sm:h-6 text-slate-950" />
             )}
           </button>
           <span
             className={`text-[9px] sm:text-[10px] font-semibold tracking-tight transition-colors ${
-              isHoldingMic ? 'text-rose-400 font-bold animate-pulse' : 'text-[#94A3B8]'
+              callState === 'user_listening' ? 'text-rose-400 font-bold animate-pulse' : 'text-[#94A3B8]'
             }`}
           >
-            {isHoldingMic ? '¡Suelta para enviar!' : 'Mantén presionado'}
+            {callState === 'user_listening'
+              ? isHoldingMic
+                ? '¡Suelta para enviar!'
+                : '¡Toca para enviar!'
+              : 'Toca o mantén'}
           </span>
         </div>
 

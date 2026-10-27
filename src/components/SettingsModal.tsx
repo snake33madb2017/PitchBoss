@@ -4,7 +4,7 @@ import { SpeechService } from '../services/speechService';
 import { CloudSyncService } from '../services/cloudSyncService';
 import { NotificationService } from '../services/notificationService';
 import { useTranslation } from '../i18n/LanguageContext';
-import { Settings, Volume2, Mic, Check, X, Download, User, Bell, Shield } from 'lucide-react';
+import { Settings, Volume2, Mic, Check, X, Download, User, Bell, Shield, Zap, CheckCircle2, AlertCircle } from 'lucide-react';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -29,10 +29,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const [speechRate, setSpeechRate] = useState(settings.speechRate);
   const [autoListen, setAutoListen] = useState(settings.autoListen);
+  const [fastResponseMode, setFastResponseMode] = useState(settings.fastResponseMode ?? true);
+  const [silenceThresholdMs, setSilenceThresholdMs] = useState(settings.silenceThresholdMs ?? 800);
   const [preferredVoice, setPreferredVoice] = useState(settings.preferredVoice);
   const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [employeeName, setEmployeeName] = useState(() => CloudSyncService.getEmployeeName());
   const [remindersEnabled, setRemindersEnabled] = useState(() => NotificationService.isEnabled());
+  const [micTestStatus, setMicTestStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
+  const [micTestMsg, setMicTestMsg] = useState<string>('');
 
   useEffect(() => {
     SpeechService.getEnglishVoices().then((voices) => {
@@ -41,6 +45,23 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   }, []);
 
   if (!isOpen) return null;
+
+  const handleTestMic = async () => {
+    setMicTestStatus('testing');
+    const res = await SpeechService.requestMicrophonePermission();
+    if (res.granted) {
+      setMicTestStatus('success');
+      setMicTestMsg('¡Micrófono activo y con permisos concedidos!');
+      setTimeout(() => setMicTestStatus('idle'), 4000);
+    } else {
+      setMicTestStatus('error');
+      setMicTestMsg(
+        res.error === 'unsupported'
+          ? 'Este navegador no soporta reconocimiento de voz nativo.'
+          : 'Permiso denegado. Permite el micrófono en la barra del navegador.'
+      );
+    }
+  };
 
   const handleToggleReminders = async () => {
     if (remindersEnabled) {
@@ -58,6 +79,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       ...settings,
       speechRate,
       autoListen,
+      fastResponseMode,
+      silenceThresholdMs,
       preferredVoice,
       employeeName
     });
@@ -191,6 +214,103 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 }`}
               />
             </button>
+          </div>
+
+          {/* Ultra-Fast Response Mode Toggle */}
+          <div className="flex items-center justify-between gap-3 p-3 sm:p-3.5 rounded-2xl border bg-[#12161F] border-sky-500/30">
+            <div className="space-y-0.5 min-w-0 flex-1">
+              <span className="text-xs font-semibold flex items-center gap-1.5 text-[#38BDF8]">
+                <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                Modo Respuesta Ultrarrápida (&lt; 1s)
+              </span>
+              <p className="text-[11px] text-[#94A3B8] leading-tight">
+                Prioriza la síntesis de voz local y el modelo Gemini 2.0 Flash para que la IA responda casi al instante sin esperas.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFastResponseMode(!fastResponseMode)}
+              className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors cursor-pointer shrink-0 ${
+                fastResponseMode ? 'bg-[#0EA5E9]' : 'bg-[#1C2331] border border-[#2A344A]'
+              }`}
+            >
+              <div
+                className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${
+                  fastResponseMode ? 'translate-x-5' : 'translate-x-0'
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Silence Detection Speed */}
+          <div className="space-y-1.5 p-3 sm:p-3.5 rounded-2xl border bg-[#12161F] border-[#2A344A]">
+            <div className="flex items-center justify-between text-xs font-semibold">
+              <span className="text-[#E2E8F0] flex items-center gap-1.5">
+                <Mic className="w-3.5 h-3.5 text-[#38BDF8]" />
+                Pausa de Silencio para Responder
+              </span>
+              <span className="text-[11px] text-[#38BDF8] font-bold">
+                {silenceThresholdMs <= 750 ? 'Ultrarrápido (750ms)' : silenceThresholdMs <= 950 ? 'Equilibrado (900ms)' : 'Relajado (1300ms)'}
+              </span>
+            </div>
+            <p className="text-[11px] text-[#94A3B8] leading-tight">
+              Cuánto tiempo espera la app tras dejar de hablar antes de enviar tu voz al interlocutor.
+            </p>
+            <div className="grid grid-cols-3 gap-2 pt-1">
+              {[
+                { ms: 750, label: 'Rápido (0.75s)' },
+                { ms: 900, label: 'Medio (0.9s)' },
+                { ms: 1300, label: 'Pausado (1.3s)' }
+              ].map((opt) => (
+                <button
+                  key={opt.ms}
+                  type="button"
+                  onClick={() => setSilenceThresholdMs(opt.ms)}
+                  className={`py-1.5 px-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer text-center ${
+                    silenceThresholdMs === opt.ms
+                      ? 'bg-sky-500/20 border-[#38BDF8] text-[#38BDF8]'
+                      : 'bg-[#1C2331] border-[#2A344A] text-[#94A3B8] hover:text-[#E2E8F0]'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Microphone Diagnostic / Tester Button */}
+          <div className="p-3 sm:p-3.5 rounded-2xl border bg-[#12161F] border-[#2A344A] space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <span className="text-xs font-bold text-[#E2E8F0] flex items-center gap-1.5">
+                  <Mic className="w-3.5 h-3.5 text-[#38BDF8]" />
+                  Diagnóstico y Prueba de Micrófono
+                </span>
+                <p className="text-[11px] text-[#94A3B8]">
+                  Verifica que tu navegador tenga permiso para captar tu voz.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleTestMic}
+                disabled={micTestStatus === 'testing'}
+                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-[#1C2331] hover:bg-[#2A344A] text-[#38BDF8] border border-[#38BDF8]/40 transition-colors cursor-pointer shrink-0"
+              >
+                {micTestStatus === 'testing' ? 'Comprobando...' : 'Probar Micrófono'}
+              </button>
+            </div>
+            {micTestStatus === 'success' && (
+              <div className="flex items-center gap-2 p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs animate-in fade-in">
+                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                <span>{micTestMsg}</span>
+              </div>
+            )}
+            {micTestStatus === 'error' && (
+              <div className="flex items-center gap-2 p-2 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs animate-in fade-in">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+                <span>{micTestMsg}</span>
+              </div>
+            )}
           </div>
 
           {/* PWA Install Quick Action (Android / Desktop) */}

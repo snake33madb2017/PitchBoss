@@ -7,11 +7,13 @@ export class GeminiService {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed.model && typeof parsed.model === 'string' && parsed.model.trim().length > 0) {
-          return parsed.model.trim();
+          const val = parsed.model.trim();
+          if (val === 'gemini-2.5-flash') return 'gemini-2.0-flash';
+          return val;
         }
       }
     } catch {}
-    return 'gemini-2.5-flash';
+    return 'gemini-2.0-flash';
   }
 
   private static getApiKey(): string {
@@ -332,6 +334,7 @@ ${pendingObjectives.map((o) => `- [${o.id}] ${o.description}`).join('\n')}
       generationConfig: {
         temperature: 0.25,
         topP: 0.9,
+        maxOutputTokens: 380,
         responseMimeType: 'application/json',
         responseSchema: {
           type: 'OBJECT',

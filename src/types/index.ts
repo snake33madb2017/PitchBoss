@@ -95,6 +95,8 @@ export interface AppSettings {
   employeeName?: string; // Current user / employee name
   enableDailyReminders?: boolean;
   reminderHour?: number;
+  fastResponseMode?: boolean; // Ultra-fast low latency mode
+  silenceThresholdMs?: number; // Silence detection timeout in ms
 }
 
 export interface SavedSession {

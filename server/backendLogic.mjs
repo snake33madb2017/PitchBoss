@@ -495,7 +495,8 @@ export async function handleBackendRoute(req, res, body = '') {
     try {
       const parsed = JSON.parse(body || '{}');
       const serverApiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || parsed.clientApiKey || '';
-      const model = parsed.model || 'gemini-2.5-flash';
+      let model = parsed.model || 'gemini-2.0-flash';
+      if (model === 'gemini-2.5-flash') model = 'gemini-2.0-flash';
 
       if (!serverApiKey) {
         return sendJson(res, 400, { error: 'No GEMINI_API_KEY configured on server or in request.' });
