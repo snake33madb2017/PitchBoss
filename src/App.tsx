@@ -117,13 +117,14 @@ function AppContent() {
 
   // Auto-detect Magic Activation Link from URL (?key=PB-...) & company locks
   useEffect(() => {
-    const activation = SubscriptionService.checkUrlForActivationKey();
-    if (activation.activated) {
-      setSubscriptionState(SubscriptionService.getSubscriptionState());
-      setActiveWorkspaceId(CloudSyncService.getCurrentWorkspaceId());
-      setActivationToast(activation.message || '¡Licencia activada con éxito!');
-      setTimeout(() => setActivationToast(null), 5000);
-    }
+    SubscriptionService.checkUrlForActivationKeyAsync().then((activation) => {
+      if (activation.activated) {
+        setSubscriptionState(SubscriptionService.getSubscriptionState());
+        setActiveWorkspaceId(CloudSyncService.getCurrentWorkspaceId());
+        setActivationToast(activation.message || '¡Licencia activada con éxito!');
+        setTimeout(() => setActivationToast(null), 5000);
+      }
+    });
   }, []);
 
   // Auto-sync with cloud backend & schedule daily practice notifications
@@ -140,10 +141,23 @@ function AppContent() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const companyParam = params.get('company') || params.get('workspace');
-    if (companyParam) {
+    const currentSub = SubscriptionService.getSubscriptionState();
+    const isUserCompanyLocked = Boolean(
+      currentSub.status === 'active' &&
+      currentSub.activeLicense?.workspaceId &&
+      currentSub.activeLicense.workspaceId !== 'default'
+    );
+
+    // If an employee is licensed to a company, strictly lock their environment to that company
+    if (isUserCompanyLocked && !AdminStorageService.isAdminSessionActive()) {
+      const lockedWs = currentSub.activeLicense!.workspaceId!;
+      CloudSyncService.setCurrentWorkspaceId(lockedWs);
+      setActiveWorkspaceId(lockedWs);
+    } else if (companyParam) {
       CloudSyncService.setCurrentWorkspaceId(companyParam);
       setActiveWorkspaceId(companyParam);
     }
+
     const viewParam = params.get('view') || params.get('portal');
     if (viewParam === 'login' || viewParam === 'empresa') {
       setIsCorporateLoginView(true);
@@ -365,7 +379,7 @@ function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleCorporateLoginSubmit = (e: React.FormEvent) => {
+  const handleCorporateLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!corporateLicenseInput.trim()) {
       setCorporateLoginError('Por favor ingresa tu código de licencia corporativa.');
@@ -374,66 +388,82 @@ function AppContent() {
     setIsSubmittingCorporateLogin(true);
     setCorporateLoginError(null);
 
-    const result = SubscriptionService.activateLicense(corporateLicenseInput.trim());
-    if (result.success && result.license) {
-      const wsId = result.license.workspaceId || 'default';
-      setSubscriptionState(SubscriptionService.getSubscriptionState());
-      setActiveWorkspaceId(wsId);
+    try {
+      const result = await SubscriptionService.activateLicenseAsync(corporateLicenseInput.trim());
+      if (result.success && result.license) {
+        const wsId = result.license.workspaceId || 'default';
+        setSubscriptionState(SubscriptionService.getSubscriptionState());
+        setActiveWorkspaceId(wsId);
+        CloudSyncService.setCurrentWorkspaceId(wsId);
 
-      // If collaborator name provided, register and assign session to them
-      if (corporateEmployeeInput.trim()) {
-        const cleanName = corporateEmployeeInput.trim();
-        const members = TeamAnalyticsService.getTeamMembers(wsId);
-        let m = members.find((mem) => mem.name.toLowerCase() === cleanName.toLowerCase());
-        if (!m) {
-          m = TeamAnalyticsService.addMember({
-            name: cleanName,
-            role: 'Personal de Sala',
-            email: `${cleanName.toLowerCase().replace(/\s+/g, '.')}@empresa.com`,
-            workspaceId: wsId,
-            scenarioId: '',
-            scenarioTitle: 'Entrenamiento Inicial',
-            totalSessions: 0,
-            menuFluencyScore: 70,
-            pronunciationScore: 70,
-            upSellingScore: 65,
-            objectionsMastered: 0,
-            totalObjections: 3,
-            totalSpokenMinutes: 0,
-            lastActiveDate: Date.now(),
-            status: 'in_progress',
-            executiveFeedback: 'Registrado para entrenamiento en el portal corporativo.'
-          });
+        // If collaborator name provided, register and assign session to them
+        if (corporateEmployeeInput.trim()) {
+          const cleanName = corporateEmployeeInput.trim();
+          const members = TeamAnalyticsService.getTeamMembers(wsId);
+          let m = members.find((mem) => mem.name.toLowerCase() === cleanName.toLowerCase());
+          if (!m) {
+            m = TeamAnalyticsService.addMember({
+              name: cleanName,
+              role: 'Personal de Sala',
+              email: `${cleanName.toLowerCase().replace(/\s+/g, '.')}@empresa.com`,
+              workspaceId: wsId,
+              scenarioId: '',
+              scenarioTitle: 'Entrenamiento Inicial',
+              totalSessions: 0,
+              menuFluencyScore: 70,
+              pronunciationScore: 70,
+              upSellingScore: 65,
+              objectionsMastered: 0,
+              totalObjections: 3,
+              totalSpokenMinutes: 0,
+              lastActiveDate: Date.now(),
+              status: 'in_progress',
+              executiveFeedback: 'Registrado para entrenamiento en el portal corporativo.'
+            });
+          }
+          if (m) {
+            TeamAnalyticsService.setActiveEmployeeId(wsId, m.id);
+            setActiveEmployee(m);
+          }
         }
-        if (m) {
-          TeamAnalyticsService.setActiveEmployeeId(wsId, m.id);
-          setActiveEmployee(m);
+
+        setIsCorporateLoginView(false);
+        setCorporateLicenseInput('');
+        setCorporateEmployeeInput('');
+
+        // Update URL to company
+        const url = new URL(window.location.href);
+        url.searchParams.delete('view');
+        url.searchParams.delete('portal');
+        if (wsId && wsId !== 'default') {
+          url.searchParams.set('company', wsId);
         }
+        window.history.pushState({}, '', url.toString());
+
+        setActivationToast(`¡Bienvenido a ${result.license.companyName}! Tu entorno exclusivo está activo.`);
+        setTimeout(() => setActivationToast(null), 5000);
+      } else {
+        setCorporateLoginError(result.message || 'Código de licencia no válido o no encontrado.');
       }
-
-      setIsCorporateLoginView(false);
-      setCorporateLicenseInput('');
-      setCorporateEmployeeInput('');
-
-      // Update URL to company
-      const url = new URL(window.location.href);
-      url.searchParams.delete('view');
-      url.searchParams.delete('portal');
-      if (wsId && wsId !== 'default') {
-        url.searchParams.set('company', wsId);
-      }
-      window.history.pushState({}, '', url.toString());
-
-      setActivationToast(result.message);
-      setTimeout(() => setActivationToast(null), 5000);
-    } else {
-      setCorporateLoginError(result.message || 'Código de licencia no válido o no encontrado.');
+    } catch (err: any) {
+      setCorporateLoginError(err.message || 'Error al validar la licencia con el servidor.');
+    } finally {
+      setIsSubmittingCorporateLogin(false);
     }
-    setIsSubmittingCorporateLogin(false);
   };
 
-  // Effective company / workspace identifier
-  const effectiveWorkspaceId = subscriptionState.activeLicense?.workspaceId || activeWorkspaceId;
+  // Effective company / workspace identifier:
+  // Licensed employee is strictly locked to their company; Admin has free workspace switching
+  const isLicensedCompany = Boolean(
+    subscriptionState.status === 'active' &&
+    subscriptionState.activeLicense?.workspaceId &&
+    subscriptionState.activeLicense.workspaceId !== 'default'
+  );
+
+  const effectiveWorkspaceId = (!isAdmin && isLicensedCompany)
+    ? subscriptionState.activeLicense!.workspaceId!
+    : (subscriptionState.activeLicense?.workspaceId || activeWorkspaceId);
+
   const isScopedToCompany = Boolean(effectiveWorkspaceId && effectiveWorkspaceId !== 'default');
   const activeWorkspaceName =
     subscriptionState.activeLicense?.companyName ||
@@ -468,13 +498,13 @@ function AppContent() {
     setActiveEmployee(TeamAnalyticsService.getActiveEmployee(effectiveWorkspaceId));
   }, [effectiveWorkspaceId]);
 
-  const handleUnlockCompanyWithKey = (e?: React.FormEvent) => {
+  const handleUnlockCompanyWithKey = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!companyKeyInput.trim()) {
       setCompanyKeyError('Por favor ingresa tu código de licencia corporativa.');
       return;
     }
-    const result = SubscriptionService.activateLicense(companyKeyInput.trim(), effectiveWorkspaceId);
+    const result = await SubscriptionService.activateLicenseAsync(companyKeyInput.trim(), effectiveWorkspaceId);
     if (result.success && result.license) {
       setSubscriptionState(SubscriptionService.getSubscriptionState());
       setActiveWorkspaceId(result.license.workspaceId || effectiveWorkspaceId);
@@ -584,20 +614,20 @@ function AppContent() {
 
       {/* Floating Activation Toast Notification */}
       {activationToast && (
-        <div className="fixed top-18 right-4 z-50 max-w-sm p-3.5 rounded-2xl bg-emerald-950/95 border border-emerald-500/50 text-emerald-200 shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 backdrop-blur-md">
+        <div className="fixed top-16 left-3 right-3 sm:left-auto sm:right-4 z-50 max-w-sm p-3.5 rounded-2xl bg-emerald-950/95 border border-emerald-500/50 text-emerald-200 shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 backdrop-blur-md">
           <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0">
             <Check className="w-4 h-4 text-emerald-400" />
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="font-bold text-xs text-white">¡Suscripción Activada!</p>
-            <p className="text-[11px] text-emerald-300 leading-snug">{activationToast}</p>
+            <p className="text-[11px] text-emerald-300 leading-snug break-words">{activationToast}</p>
           </div>
         </div>
       )}
 
       {/* Admin Quick Action Banner (When Master Admin Mode is Active) */}
       {isAdmin && (
-        <div className="bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-amber-500/5 border-b border-amber-500/30 px-4 sm:px-8 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs transition-all animate-in fade-in">
+        <div className="bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-amber-500/5 border-b border-amber-500/30 px-3.5 sm:px-8 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs transition-all animate-in fade-in">
           <div className="flex items-center gap-2 flex-wrap">
             <ShieldCheck className="w-4 h-4 text-[#FBBF24] shrink-0" />
             <span className="font-bold text-[#FBBF24]">Modo Administrador Maestro</span>
@@ -615,12 +645,12 @@ function AppContent() {
             )}
           </div>
 
-          <div className="flex items-center gap-2 self-end sm:self-auto">
+          <div className="flex items-center gap-2 flex-wrap self-stretch sm:self-auto justify-end">
             <button
               onClick={() => setIsCompanyAccessModalOpen(true)}
               className="flex items-center gap-1 px-2.5 py-1 rounded-xl text-sky-400 hover:bg-sky-500/10 border border-sky-500/30 transition-colors cursor-pointer text-xs"
             >
-              <Building2 className="w-3.5 h-3.5" />
+              <Building2 className="w-3.5 h-3.5 shrink-0" />
               <span>Cambiar Portal</span>
             </button>
 
@@ -628,7 +658,7 @@ function AppContent() {
               onClick={() => setIsAdminHubOpen(true)}
               className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#0EA5E9] hover:bg-[#38BDF8] text-slate-950 font-bold transition-colors cursor-pointer shadow-sm text-xs"
             >
-              <Settings2 className="w-3.5 h-3.5" />
+              <Settings2 className="w-3.5 h-3.5 shrink-0" />
               <span>Panel de Control</span>
             </button>
 
@@ -637,7 +667,7 @@ function AppContent() {
               className="flex items-center gap-1 px-2.5 py-1 rounded-xl text-[#94A3B8] hover:text-rose-400 hover:bg-[#1C2331] border border-[#2A344A] transition-colors cursor-pointer text-xs"
               title="Cerrar sesión de administrador"
             >
-              <LogOut className="w-3.5 h-3.5" />
+              <LogOut className="w-3.5 h-3.5 shrink-0" />
               <span>Salir</span>
             </button>
           </div>
@@ -646,9 +676,9 @@ function AppContent() {
 
       {/* Company Manager Quick Action Banner (When Company License is Active and NOT Super Admin) */}
       {!isAdmin && hasCompanyLicense && (
-        <div className="bg-gradient-to-r from-emerald-500/15 via-sky-500/10 to-transparent border-b border-emerald-500/30 px-4 sm:px-8 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs transition-all animate-in fade-in">
+        <div className="bg-gradient-to-r from-emerald-500/15 via-sky-500/10 to-transparent border-b border-emerald-500/30 px-3.5 sm:px-8 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs transition-all animate-in fade-in">
           <div className="flex items-center gap-2 flex-wrap">
-            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
             <span className="font-bold text-emerald-400">Licencia Corporativa Activa</span>
             <span className="text-[#94A3B8]">
               — {activeWorkspaceName} · Plan con{' '}
@@ -658,20 +688,20 @@ function AppContent() {
             </span>
           </div>
 
-          <div className="flex items-center gap-2 self-end sm:self-auto">
+          <div className="flex items-center gap-2 self-stretch sm:self-auto justify-end">
             <button
               onClick={() => setIsAdminHubOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-gradient-to-r from-emerald-500 to-sky-500 hover:from-emerald-400 hover:to-sky-400 text-slate-950 font-bold transition-all cursor-pointer shadow-sm text-xs"
+              className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-sky-500 hover:from-emerald-400 hover:to-sky-400 text-slate-950 font-bold transition-all cursor-pointer shadow-sm text-xs"
             >
-              <Users className="w-3.5 h-3.5" />
-              <span>Gestión de Equipo & Reportes ({teamCount}/{maxSeats})</span>
+              <Users className="w-3.5 h-3.5 shrink-0" />
+              <span><span className="hidden sm:inline">Gestión de </span>Equipo & Reportes ({teamCount}/{maxSeats})</span>
             </button>
           </div>
         </div>
       )}
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-8 py-8 space-y-8">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-3.5 sm:px-8 py-5 sm:py-8 space-y-6 sm:space-y-8">
         {isScopedToCompany && !hasCompanyAccess ? (
           /* ========================================================= */
           /* LOCKED COMPANY ACCESS PORTAL (Strict Multi-Tenant Gate)   */
@@ -744,10 +774,10 @@ function AppContent() {
                   )}
                 </form>
 
-                {/* Helpful testing hint for evaluators */}
-                {officialLicense && (
+                {/* Helpful testing hint for evaluators (Only visible in admin mode) */}
+                {isAdmin && officialLicense && (
                   <div className="pt-2 border-t border-[#2A344A]/60 flex items-center justify-between text-[11px] text-stone-400">
-                    <span className="truncate">Clave oficial emitida para esta empresa:</span>
+                    <span className="truncate">Clave oficial emitida para esta empresa (Admin):</span>
                     <button
                       type="button"
                       onClick={() => {
@@ -765,7 +795,7 @@ function AppContent() {
 
               {/* Alternative Owner, Demo & Navigation Actions */}
               <div className="pt-4 border-t border-[#2A344A] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-                {officialLicense && (
+                {isAdmin && officialLicense && (
                   <button
                     type="button"
                     onClick={() => {
@@ -1395,7 +1425,7 @@ function AppContent() {
             </div>
 
             {/* Selectors Group: Responsive and neatly wrapped */}
-            <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto pb-1 sm:pb-0 shrink-0">
+            <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto pb-1 sm:pb-0 shrink-0 scrollbar-none">
               {/* Pitch Tier Selector */}
               <div className="flex items-center gap-1.5 shrink-0">
                 <span className="text-xs text-[#94A3B8] flex items-center gap-1">

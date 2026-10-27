@@ -23,7 +23,7 @@ export const CompanyAccessModal: React.FC<CompanyAccessModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleActivateLicense = (e: React.FormEvent) => {
+  const handleActivateLicense = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!licenseKeyInput.trim()) {
       setErrorMsg('Por favor ingresa tu código de licencia corporativa.');
@@ -33,55 +33,60 @@ export const CompanyAccessModal: React.FC<CompanyAccessModalProps> = ({
     setIsActivating(true);
     setErrorMsg(null);
 
-    const result = SubscriptionService.activateLicense(licenseKeyInput.trim());
-    if (result.success && result.license) {
-      if (onLicenseActivated) {
-        onLicenseActivated(result.message);
+    try {
+      const result = await SubscriptionService.activateLicenseAsync(licenseKeyInput.trim());
+      if (result.success && result.license) {
+        if (onLicenseActivated) {
+          onLicenseActivated(result.message);
+        }
+        if (result.license.workspaceId) {
+          onSelectWorkspace(result.license.workspaceId);
+        }
+        onClose();
+      } else {
+        setErrorMsg(result.message || 'Código de licencia no válido o no encontrado.');
       }
-      if (result.license.workspaceId) {
-        onSelectWorkspace(result.license.workspaceId);
-      }
-      onClose();
-    } else {
-      setErrorMsg(result.message || 'Código de licencia no válido o no encontrado.');
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Error al validar la licencia corporativa.');
+    } finally {
+      setIsActivating(false);
     }
-    setIsActivating(false);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-hidden animate-in fade-in font-sans">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md overflow-hidden animate-in fade-in font-sans">
       <div className="w-full max-w-lg rounded-3xl bg-[#12161F] border border-[#2A344A] shadow-2xl overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="px-6 py-5 border-b border-[#2A344A] flex items-center justify-between bg-[#161D2B]">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-[#38BDF8]">
+        <div className="px-4 sm:px-6 py-3.5 sm:py-5 border-b border-[#2A344A] flex items-center justify-between bg-[#161D2B]">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 mr-2">
+            <div className="w-10 h-10 rounded-2xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-[#38BDF8] shrink-0">
               <Building2 className="w-5 h-5" />
             </div>
-            <div>
-              <h2 className="text-base font-bold text-white flex items-center gap-2">
-                <span>Portal Corporativo B2B</span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/15 text-sky-300 border border-sky-500/30">
+            <div className="min-w-0">
+              <h2 className="text-sm sm:text-base font-bold text-white flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                <span className="truncate">Portal Corporativo B2B</span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/15 text-sky-300 border border-sky-500/30 shrink-0">
                   Acceso Seguro
                 </span>
               </h2>
-              <p className="text-xs text-[#94A3B8]">
-                Entorno privado y confidencial para empresas acreditadas
+              <p className="text-[11px] sm:text-xs text-[#94A3B8] truncate">
+                Entorno privado y confidencial para empresas
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-xl flex items-center justify-center text-[#94A3B8] hover:text-white hover:bg-[#1C2331] transition cursor-pointer"
+            className="w-8 h-8 rounded-xl flex items-center justify-center text-[#94A3B8] hover:text-white hover:bg-[#1C2331] transition cursor-pointer shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-6 space-y-6 overflow-y-auto max-h-[80vh]">
+        <div className="p-4 sm:p-6 space-y-5 sm:space-y-6 overflow-y-auto max-h-[80vh]">
           {/* Welcome message */}
           <div className="space-y-1.5 text-center">
-            <h3 className="text-lg font-bold text-white">Ingresa a tu Portal de Empresa</h3>
+            <h3 className="text-base sm:text-lg font-bold text-white">Ingresa a tu Portal de Empresa</h3>
             <p className="text-xs text-[#94A3B8] max-w-sm mx-auto leading-relaxed">
               Introduce el código de licencia corporativa asignado a tu organización para acceder directamente a tus cartas oficiales, módulos de entrenamiento y reportes.
             </p>
@@ -90,12 +95,12 @@ export const CompanyAccessModal: React.FC<CompanyAccessModalProps> = ({
           {/* Standard License Key Login Form */}
           <form onSubmit={handleActivateLicense} className="space-y-4">
             <div className="space-y-2">
-              <label className="block text-xs font-semibold text-slate-300 flex items-center justify-between">
+              <label className="text-xs font-semibold text-slate-300 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                 <span className="flex items-center gap-1.5 text-sky-400">
-                  <Key className="w-3.5 h-3.5" />
+                  <Key className="w-3.5 h-3.5 shrink-0" />
                   <span>Código de Licencia Corporativa:</span>
                 </span>
-                <span className="text-[11px] text-[#94A3B8] font-mono">Formato: PB-XXXX-XXXX</span>
+                <span className="text-[10px] sm:text-[11px] text-[#94A3B8] font-mono">Formato: PB-XXXX-XXXX</span>
               </label>
               <div className="relative">
                 <input
@@ -107,7 +112,7 @@ export const CompanyAccessModal: React.FC<CompanyAccessModalProps> = ({
                   }}
                   placeholder="PB-365D-XXXX-YYYY"
                   autoFocus
-                  className="w-full px-4 py-3 rounded-2xl bg-[#18202F] border border-[#2A344A] text-white font-mono text-sm uppercase placeholder:text-stone-500 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"
+                  className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-2xl bg-[#18202F] border border-[#2A344A] text-white font-mono text-sm uppercase placeholder:text-stone-500 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"
                 />
               </div>
               {errorMsg && (
@@ -121,18 +126,18 @@ export const CompanyAccessModal: React.FC<CompanyAccessModalProps> = ({
             <button
               type="submit"
               disabled={isActivating}
-              className="w-full py-3 px-5 rounded-2xl bg-gradient-to-r from-sky-500 to-[#0284C7] hover:from-sky-400 hover:to-sky-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg shadow-sky-500/25 active:scale-98"
+              className="w-full py-3 px-4 sm:px-5 rounded-2xl bg-gradient-to-r from-sky-500 to-[#0284C7] hover:from-sky-400 hover:to-sky-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg shadow-sky-500/25 active:scale-98"
             >
-              <Sparkles className="w-4 h-4" />
+              <Sparkles className="w-4 h-4 shrink-0" />
               <span>Validar Licencia y Entrar al Portal</span>
-              <ArrowRight className="w-4 h-4 ml-1" />
+              <ArrowRight className="w-4 h-4 shrink-0" />
             </button>
           </form>
 
           {/* Privacy and Multi-Tenant Guarantee */}
-          <div className="p-4 rounded-2xl border border-[#2A344A] bg-[#161D2B]/60 space-y-2.5">
+          <div className="p-3.5 sm:p-4 rounded-2xl border border-[#2A344A] bg-[#161D2B]/60 space-y-2.5">
             <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>Garantía de Confidencialidad PitchBoss</span>
             </h4>
             <ul className="text-xs text-[#94A3B8] space-y-1.5 leading-relaxed">
@@ -153,11 +158,11 @@ export const CompanyAccessModal: React.FC<CompanyAccessModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-[#2A344A] bg-[#161D2B] flex items-center justify-between text-xs text-[#94A3B8]">
-          <span className="flex items-center gap-1.5">
-            <Lock className="w-3.5 h-3.5 text-stone-500" /> Cifrado y aislado por inquilino
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-[#2A344A] bg-[#161D2B] flex flex-col sm:flex-row items-center justify-between gap-1.5 text-xs text-[#94A3B8]">
+          <span className="flex items-center gap-1.5 text-[11px]">
+            <Lock className="w-3.5 h-3.5 text-stone-500 shrink-0" /> Cifrado y aislado por inquilino
           </span>
-          <span className="font-semibold text-slate-400">PitchBoss Enterprise v2.1</span>
+          <span className="font-semibold text-slate-400 text-[11px]">PitchBoss Enterprise v2.1</span>
         </div>
       </div>
     </div>

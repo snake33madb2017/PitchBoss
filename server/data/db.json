@@ -31,6 +31,44 @@
       "createdAt": 1793109485909
     }
   ],
+  "licenses": [
+    {
+      "key": "PB-RITZ-365D-2026-TEST",
+      "plan": "365D",
+      "planName": "Pase Anual Ritz",
+      "workspaceId": "hotel-ritz-madrid",
+      "companyName": "Hotel Ritz Madrid",
+      "employeeSeats": 20,
+      "clientNotes": "Emitida por Administración",
+      "createdAt": 1793122721704,
+      "expiresAt": 1824658721704,
+      "isRevoked": false
+    },
+    {
+      "key": "PB-TEPIC-365D-2026-VIP",
+      "plan": "365D",
+      "planName": "Pase Anual Corporativo (365 Días)",
+      "workspaceId": "tepic-madrid",
+      "companyName": "Restaurante Tepic (Ayala 14)",
+      "employeeSeats": 15,
+      "clientNotes": "Licencia Oficial Sala y Barra Restaurante Tepic (Ayala 14)",
+      "createdAt": 1770000000000,
+      "expiresAt": 1990000000000,
+      "isRevoked": false
+    },
+    {
+      "key": "PB-LOVO-365D-2026-VIP",
+      "plan": "365D",
+      "planName": "Pase Anual Corporativo (365 Días)",
+      "workspaceId": "lovo-bar",
+      "companyName": "LOVO Bar & Hospitality",
+      "employeeSeats": 10,
+      "clientNotes": "Licencia Oficial Trilogía Cócteles LOVO Bar Madrid",
+      "createdAt": 1770000000000,
+      "expiresAt": 1990000000000,
+      "isRevoked": false
+    }
+  ],
   "scenarios": {
     "hotel-ritz-madrid": [
       {

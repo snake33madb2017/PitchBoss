@@ -80,34 +80,34 @@ export const LovoMenuModal: React.FC<LovoMenuModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md overflow-hidden animate-fade-in">
       <div className="relative w-full max-w-7xl h-[92vh] max-h-[920px] bg-[#0A0D14] border border-[#D3A548]/40 rounded-2xl flex flex-col shadow-2xl shadow-black/90 overflow-hidden text-[#E2E8F0]">
         {/* Header Bar */}
-        <div className="px-4 sm:px-6 py-4 border-b border-[#2A344A] bg-[#000000] flex flex-wrap items-center justify-between gap-3 shrink-0">
-          <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl bg-black border border-[#D3A548]/50 p-1 flex items-center justify-center shrink-0 shadow-lg shadow-black">
+        <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-[#2A344A] bg-[#000000] flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 mr-2">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-black border border-[#D3A548]/50 p-1 flex items-center justify-center shrink-0 shadow-lg shadow-black">
               <img src="/images/logos/lovo-logo.webp" alt="LOVO Bar Logo" className="w-full h-full object-contain" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg sm:text-xl font-serif font-black text-[#D3A548] uppercase tracking-wider">
-                  Carta Trilogía LOVO Bar
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                <h2 className="text-sm sm:text-xl font-serif font-black text-[#D3A548] uppercase tracking-wider truncate">
+                  Carta LOVO Bar
                 </h2>
-                <span className="text-[11px] font-bold uppercase tracking-wider bg-[#D3A548]/20 text-[#D3A548] border border-[#D3A548]/40 px-2 py-0.5 rounded-full shrink-0">
-                  71 Signature Cocktails
+                <span className="text-[10px] font-bold uppercase tracking-wider bg-[#D3A548]/20 text-[#D3A548] border border-[#D3A548]/40 px-2 py-0.5 rounded-full shrink-0">
+                  71 Cócteles
                 </span>
               </div>
-              <p className="text-xs text-zinc-400">
-                Coctelería Emocional · Inspirada en Josephine Baker · Calle Echegaray 20, Madrid
+              <p className="text-[11px] sm:text-xs text-zinc-400 truncate hidden xs:block">
+                Coctelería Emocional · Josephine Baker · Echegaray 20, Madrid
               </p>
             </div>
           </div>
 
           {/* Right Controls */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             {/* View Mode */}
             <div className="inline-flex rounded-lg border border-[#2A344A] bg-[#0E121B] p-0.5 text-xs font-bold">
               <button
                 type="button"
                 onClick={() => setViewMode('cards')}
-                className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 ${
+                className={`px-2.5 sm:px-3 py-1.5 rounded-md transition-all flex items-center gap-1 sm:gap-1.5 ${
                   viewMode === 'cards' ? 'bg-[#D3A548] text-black shadow-md font-black' : 'text-zinc-400 hover:text-white'
                 }`}
               >
@@ -117,12 +117,12 @@ export const LovoMenuModal: React.FC<LovoMenuModalProps> = ({
               <button
                 type="button"
                 onClick={() => setViewMode('book')}
-                className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 ${
+                className={`px-2.5 sm:px-3 py-1.5 rounded-md transition-all flex items-center gap-1 sm:gap-1.5 ${
                   viewMode === 'book' ? 'bg-[#D3A548] text-black shadow-md font-black' : 'text-zinc-400 hover:text-white'
                 }`}
               >
                 <span>📖</span>
-                <span className="hidden sm:inline">Libro Spread</span>
+                <span className="hidden sm:inline">Libro</span>
               </button>
             </div>
 
@@ -131,7 +131,7 @@ export const LovoMenuModal: React.FC<LovoMenuModalProps> = ({
               <button
                 type="button"
                 onClick={() => setLang('es')}
-                className={`px-2.5 py-1.5 rounded-md transition-all ${
+                className={`px-2 sm:px-2.5 py-1.5 rounded-md transition-all ${
                   lang === 'es' ? 'bg-white text-zinc-950 shadow-md' : 'text-zinc-400 hover:text-white'
                 }`}
               >
@@ -140,7 +140,7 @@ export const LovoMenuModal: React.FC<LovoMenuModalProps> = ({
               <button
                 type="button"
                 onClick={() => setLang('en')}
-                className={`px-2.5 py-1.5 rounded-md transition-all ${
+                className={`px-2 sm:px-2.5 py-1.5 rounded-md transition-all ${
                   lang === 'en' ? 'bg-white text-zinc-950 shadow-md' : 'text-zinc-400 hover:text-white'
                 }`}
               >
@@ -152,22 +152,22 @@ export const LovoMenuModal: React.FC<LovoMenuModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="w-9 h-9 rounded-lg border border-[#2A344A] bg-[#0E121B] hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition-colors"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg border border-[#2A344A] bg-[#0E121B] hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer shrink-0"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </div>
         </div>
 
         {/* Toolbar: Volume Tabs + Search + Filter Pills */}
-        <div className="px-4 sm:px-6 py-3 border-b border-[#2A344A] bg-[#12161F] flex flex-col gap-3 shrink-0">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            {/* Volume Tabs */}
-            <div className="flex flex-wrap gap-1.5">
+        <div className="px-3 sm:px-6 py-2.5 sm:py-3 border-b border-[#2A344A] bg-[#12161F] flex flex-col gap-2.5 sm:gap-3 shrink-0">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            {/* Volume Tabs: Horizontally scrollable on mobile */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => setActiveVolume('all')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border shrink-0 ${
                   activeVolume === 'all'
                     ? 'bg-amber-400 text-zinc-950 border-amber-400 shadow-md'
                     : 'bg-[#1C2331] text-zinc-300 border-[#2A344A] hover:border-zinc-500'
@@ -178,35 +178,35 @@ export const LovoMenuModal: React.FC<LovoMenuModalProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveVolume('tomo1')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border shrink-0 ${
                   activeVolume === 'tomo1'
                     ? 'bg-amber-400 text-zinc-950 border-amber-400 shadow-md'
                     : 'bg-[#1C2331] text-zinc-300 border-[#2A344A] hover:border-zinc-500'
                 }`}
               >
-                Tomo I: La Musa (24)
+                Tomo I (24)
               </button>
               <button
                 type="button"
                 onClick={() => setActiveVolume('tomo2')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border shrink-0 ${
                   activeVolume === 'tomo2'
                     ? 'bg-amber-400 text-zinc-950 border-amber-400 shadow-md'
                     : 'bg-[#1C2331] text-zinc-300 border-[#2A344A] hover:border-zinc-500'
                 }`}
               >
-                Tomo II: Taxonomía (24)
+                Tomo II (24)
               </button>
               <button
                 type="button"
                 onClick={() => setActiveVolume('tomo3')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border shrink-0 ${
                   activeVolume === 'tomo3'
                     ? 'bg-amber-400 text-zinc-950 border-amber-400 shadow-md'
                     : 'bg-[#1C2331] text-zinc-300 border-[#2A344A] hover:border-zinc-500'
                 }`}
               >
-                Tomo III: La Tribu (23)
+                Tomo III (23)
               </button>
             </div>
 

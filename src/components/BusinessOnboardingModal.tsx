@@ -153,23 +153,23 @@ export const BusinessOnboardingModal: React.FC<BusinessOnboardingModalProps> = (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-[#0B0F17]/90 backdrop-blur-md overflow-hidden animate-in fade-in">
       <div className="relative w-full max-w-3xl rounded-3xl border border-[#2A344A] bg-[#1C2331] text-[#E2E8F0] shadow-2xl flex flex-col h-[94vh] sm:h-auto sm:max-h-[90vh] overflow-hidden">
         {/* Header with 3-Step Progress */}
-        <div className="px-6 py-4 border-b border-[#2A344A] bg-[#12161F] flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center">
+        <div className="px-3.5 sm:px-6 py-3 sm:py-4 border-b border-[#2A344A] bg-[#12161F] flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2.5 min-w-0 mr-2">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center shrink-0">
               <Sparkles className="w-4 h-4 text-sky-400" />
             </div>
-            <div>
-              <h2 className="text-base sm:text-lg font-bold text-[#E2E8F0]">
-                Asistente de Activación para Nuevas Empresas
+            <div className="min-w-0">
+              <h2 className="text-sm sm:text-lg font-bold text-[#E2E8F0] truncate">
+                Activación Nuevas Empresas
               </h2>
-              <p className="text-xs text-[#94A3B8]">
-                Configura el simulador con tu carta y envíalo a tu equipo en 3 pasos
+              <p className="text-[11px] sm:text-xs text-[#94A3B8] truncate hidden xs:block">
+                Configura el simulador con tu carta y envíalo a tu equipo
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-[#94A3B8] hover:text-white hover:bg-[#222B3D] transition-colors cursor-pointer"
+            className="p-1.5 sm:p-2 rounded-xl text-[#94A3B8] hover:text-white hover:bg-[#222B3D] transition-colors cursor-pointer shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
@@ -178,39 +178,39 @@ export const BusinessOnboardingModal: React.FC<BusinessOnboardingModalProps> = (
         {/* Step Indicator Bar */}
         <div className="grid grid-cols-3 border-b border-[#2A344A] bg-[#151B27] text-xs font-semibold shrink-0">
           <div
-            className={`py-3 px-4 text-center border-b-2 transition-colors flex items-center justify-center gap-2 ${
+            className={`py-2.5 sm:py-3 px-1.5 sm:px-4 text-center border-b-2 transition-colors flex items-center justify-center gap-1.5 sm:gap-2 ${
               step === 1 ? 'border-sky-400 text-sky-400 bg-sky-500/5' : step > 1 ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-slate-500'
             }`}
           >
-            <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold border border-current">
+            <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center text-[9px] sm:text-[10px] font-bold border border-current shrink-0">
               {step > 1 ? '✓' : '1'}
             </span>
             <span className="hidden sm:inline">1. Pega tu Menú / Carta</span>
-            <span className="sm:hidden">1. Menú</span>
+            <span className="sm:hidden text-[11px]">1. Menú</span>
           </div>
 
           <div
-            className={`py-3 px-4 text-center border-b-2 transition-colors flex items-center justify-center gap-2 ${
+            className={`py-2.5 sm:py-3 px-1.5 sm:px-4 text-center border-b-2 transition-colors flex items-center justify-center gap-1.5 sm:gap-2 ${
               step === 2 ? 'border-sky-400 text-sky-400 bg-sky-500/5' : step > 2 ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-slate-500'
             }`}
           >
-            <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold border border-current">
+            <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center text-[9px] sm:text-[10px] font-bold border border-current shrink-0">
               {step > 2 ? '✓' : '2'}
             </span>
             <span className="hidden sm:inline">2. Calibra Dificultad</span>
-            <span className="sm:hidden">2. Nivel</span>
+            <span className="sm:hidden text-[11px]">2. Nivel</span>
           </div>
 
           <div
-            className={`py-3 px-4 text-center border-b-2 transition-colors flex items-center justify-center gap-2 ${
+            className={`py-2.5 sm:py-3 px-1.5 sm:px-4 text-center border-b-2 transition-colors flex items-center justify-center gap-1.5 sm:gap-2 ${
               step === 3 ? 'border-sky-400 text-sky-400 bg-sky-500/5' : 'border-transparent text-slate-500'
             }`}
           >
-            <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold border border-current">
+            <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center text-[9px] sm:text-[10px] font-bold border border-current shrink-0">
               3
             </span>
             <span className="hidden sm:inline">3. Pasa el Link al Equipo</span>
-            <span className="sm:hidden">3. Compartir</span>
+            <span className="sm:hidden text-[11px]">3. Link</span>
           </div>
         </div>
 

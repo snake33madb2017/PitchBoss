@@ -68,25 +68,25 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0B0F17]/85 backdrop-blur-md overflow-y-auto">
       <div className="relative w-full max-w-lg border rounded-3xl shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 bg-[#1C2331] border-[#2A344A] text-[#E2E8F0]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b bg-[#12161F] border-[#2A344A]">
-          <div className="flex items-center gap-2 text-[#38BDF8]">
-            <Settings className="w-5 h-5" />
-            <h2 className="text-base font-bold text-[#E2E8F0]">{t('settings.title')}</h2>
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b bg-[#12161F] border-[#2A344A]">
+          <div className="flex items-center gap-2 text-[#38BDF8] min-w-0">
+            <Settings className="w-5 h-5 shrink-0" />
+            <h2 className="text-sm sm:text-base font-bold text-[#E2E8F0] truncate">{t('settings.title')}</h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-xl transition-colors cursor-pointer text-[#94A3B8] hover:text-[#E2E8F0] hover:bg-[#12161F]"
+            className="p-1.5 rounded-xl transition-colors cursor-pointer text-[#94A3B8] hover:text-[#E2E8F0] hover:bg-[#12161F] shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Form Body */}
-        <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 max-h-[70vh] overflow-y-auto">
           {/* Employee Name (For Live Audit Reports) */}
-          <div className="space-y-2 p-3.5 rounded-2xl border border-sky-500/20 bg-[#12161F]">
+          <div className="space-y-2 p-3 sm:p-3.5 rounded-2xl border border-sky-500/20 bg-[#12161F]">
             <label className="text-xs font-semibold flex items-center gap-1.5 text-white">
-              <User className="w-3.5 h-3.5 text-[#38BDF8]" />
+              <User className="w-3.5 h-3.5 text-[#38BDF8] shrink-0" />
               Tu Nombre / Colaborador
             </label>
             <p className="text-[11px] text-[#94A3B8]">
@@ -102,20 +102,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
 
           {/* Daily Retention Reminders (PWA Notifications) */}
-          <div className="flex items-center justify-between p-3.5 rounded-2xl border bg-[#12161F] border-[#2A344A]">
-            <div className="space-y-0.5 max-w-[75%]">
+          <div className="flex items-center justify-between gap-3 p-3 sm:p-3.5 rounded-2xl border bg-[#12161F] border-[#2A344A]">
+            <div className="space-y-0.5 min-w-0 flex-1">
               <span className="text-xs font-semibold flex items-center gap-1.5 text-[#E2E8F0]">
-                <Bell className="w-3.5 h-3.5 text-[#FBBF24]" />
-                Recordatorio Diario de Práctica (PWA)
+                <Bell className="w-3.5 h-3.5 text-[#FBBF24] shrink-0" />
+                Recordatorio Diario (PWA)
               </span>
-              <p className="text-[11px] text-[#94A3B8]">
+              <p className="text-[11px] text-[#94A3B8] leading-tight">
                 Recibe un aviso diario para hacer 3 minutos de roleplay antes de tu turno.
               </p>
             </div>
             <button
               type="button"
               onClick={handleToggleReminders}
-              className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors cursor-pointer ${
+              className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors cursor-pointer shrink-0 ${
                 remindersEnabled ? 'bg-[#0EA5E9]' : 'bg-[#1C2331] border border-[#2A344A]'
               }`}
             >
@@ -128,9 +128,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
 
           {/* Voice Selector */}
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <label className="text-xs font-semibold flex items-center gap-1.5 text-[#E2E8F0]">
-              <Volume2 className="w-3.5 h-3.5 text-[#38BDF8]" />
+              <Volume2 className="w-3.5 h-3.5 text-[#38BDF8] shrink-0" />
               {t('settings.voice')}
             </label>
             <select
@@ -148,11 +148,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
 
           {/* Speech Speed / Rate Slider */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-[#E2E8F0]">
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs font-semibold">
+              <span className="text-[#E2E8F0]">
                 {t('settings.speed')} {speechRate.toFixed(1)}x
-              </label>
+              </span>
               <span className="text-[11px] text-[#94A3B8]">
                 {speechRate < 1 ? t('settings.speedSlow') : speechRate > 1 ? t('settings.speedFast') : t('settings.speedNormal')}
               </span>
@@ -169,19 +169,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
 
           {/* Hands-Free Auto-Listen Mode Toggle */}
-          <div className="flex items-center justify-between p-3.5 rounded-2xl border bg-[#12161F] border-[#2A344A]">
-            <div className="space-y-0.5">
+          <div className="flex items-center justify-between gap-3 p-3 sm:p-3.5 rounded-2xl border bg-[#12161F] border-[#2A344A]">
+            <div className="space-y-0.5 min-w-0 flex-1">
               <span className="text-xs font-semibold flex items-center gap-1.5 text-[#E2E8F0]">
-                <Mic className="w-3.5 h-3.5 text-[#38BDF8]" />
+                <Mic className="w-3.5 h-3.5 text-[#38BDF8] shrink-0" />
                 {t('settings.handsFreeTitle')}
               </span>
-              <p className="text-[11px] text-[#94A3B8]">
+              <p className="text-[11px] text-[#94A3B8] leading-tight">
                 {t('settings.handsFreeDesc')}
               </p>
             </div>
             <button
               onClick={() => setAutoListen(!autoListen)}
-              className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors cursor-pointer ${
+              className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors cursor-pointer shrink-0 ${
                 autoListen ? 'bg-[#0EA5E9]' : 'bg-[#1C2331] border border-[#2A344A]'
               }`}
             >
@@ -195,10 +195,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
           {/* PWA Install Quick Action (Android / Desktop) */}
           {canInstallPwa && onInstallPwa && (
-            <div className="p-3.5 rounded-2xl border border-[#2A344A] bg-[#12161F] flex items-center justify-between">
-              <div className="space-y-0.5">
+            <div className="p-3 sm:p-3.5 rounded-2xl border border-[#2A344A] bg-[#12161F] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+              <div className="space-y-0.5 min-w-0">
                 <span className="text-xs font-bold text-[#E2E8F0] flex items-center gap-1.5">
-                  <Download className="w-4 h-4 text-[#38BDF8]" /> Instalar Aplicación PWA
+                  <Download className="w-4 h-4 text-[#38BDF8] shrink-0" /> Instalar Aplicación PWA
                 </span>
                 <p className="text-[11px] text-[#94A3B8]">
                   Añade PitchBoss a tu dispositivo como una App nativa.
@@ -210,7 +210,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   onClose();
                   onInstallPwa();
                 }}
-                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-[#0EA5E9] hover:bg-[#38BDF8] text-white transition-colors cursor-pointer shadow-sm"
+                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-[#0EA5E9] hover:bg-[#38BDF8] text-white transition-colors cursor-pointer shadow-sm shrink-0 self-start sm:self-auto"
               >
                 Instalar
               </button>
@@ -221,9 +221,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {typeof navigator !== 'undefined' &&
             /iPad|iPhone|iPod/.test(navigator.userAgent || '') &&
             !(navigator as unknown as { standalone?: boolean }).standalone && (
-              <div className="p-3.5 rounded-2xl border border-sky-500/20 bg-sky-500/5 space-y-2">
+              <div className="p-3 sm:p-3.5 rounded-2xl border border-sky-500/20 bg-sky-500/5 space-y-2">
                 <span className="text-xs font-bold text-[#38BDF8] flex items-center gap-1.5">
-                  <Download className="w-4 h-4 text-[#38BDF8]" /> Cómo Instalar en iPhone / iPad
+                  <Download className="w-4 h-4 text-[#38BDF8] shrink-0" /> Cómo Instalar en iPhone / iPad
                 </span>
                 <p className="text-[11px] text-[#E2E8F0] leading-relaxed">
                   1. En <strong>Safari</strong>, pulsa el botón <strong>Compartir</strong> (icono del cuadrado con la flecha hacia arriba <span className="text-[#38BDF8] font-bold">[ ↑ ]</span>).<br />
@@ -235,8 +235,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
           {/* Admin Panel Quick Access */}
           {onOpenAdmin && (
-            <div className="p-3.5 rounded-2xl border border-[#2A344A] bg-[#12161F] flex items-center justify-between">
-              <div className="space-y-0.5">
+            <div className="p-3 sm:p-3.5 rounded-2xl border border-[#2A344A] bg-[#12161F] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+              <div className="space-y-0.5 min-w-0">
                 <span className="text-xs font-bold text-[#FBBF24] flex items-center gap-1.5">
                   🛡️ Administración de la PWA
                 </span>
@@ -250,7 +250,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   onClose();
                   onOpenAdmin();
                 }}
-                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-[#0EA5E9] hover:bg-[#38BDF8] text-white transition-colors cursor-pointer shadow-sm"
+                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-[#0EA5E9] hover:bg-[#38BDF8] text-white transition-colors cursor-pointer shadow-sm shrink-0 self-start sm:self-auto"
               >
                 Abrir Admin
               </button>
@@ -259,19 +259,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-2.5 px-4 sm:px-6 py-3.5 sm:py-4 border-t bg-[#12161F] border-[#2A344A]">
+        <div className="flex items-center justify-end gap-2.5 px-4 sm:px-6 py-3 sm:py-4 border-t bg-[#12161F] border-[#2A344A]">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-xs font-semibold transition-colors cursor-pointer text-[#94A3B8] hover:text-[#E2E8F0] hover:bg-[#1C2331] rounded-xl"
+            className="flex-1 sm:flex-initial px-4 py-2 text-xs font-semibold transition-colors cursor-pointer text-[#94A3B8] hover:text-[#E2E8F0] hover:bg-[#1C2331] rounded-xl text-center"
           >
             {t('modal.cancel')}
           </button>
           <button
             onClick={handleSave}
-            className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold shadow-lg transition-all cursor-pointer bg-[#0EA5E9] hover:bg-[#38BDF8] text-slate-950 shadow-sky-950/40"
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold shadow-lg transition-all cursor-pointer bg-[#0EA5E9] hover:bg-[#38BDF8] text-slate-950 shadow-sky-950/40 text-center"
           >
             <Check className="w-3.5 h-3.5" />
-            {t('settings.save')}
+            <span>{t('settings.save')}</span>
           </button>
         </div>
       </div>

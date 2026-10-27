@@ -106,42 +106,42 @@ ${report.executiveSummary}
   }, []);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto print:p-0 print:bg-white print:static">
-      <div className="relative w-full max-w-2xl border rounded-3xl shadow-2xl overflow-hidden my-8 animate-in fade-in zoom-in-95 bg-[#1C2331] border-[#2A344A] text-[#E2E8F0] shadow-black/80 print:border-none print:shadow-none print:text-black print:bg-white print:my-0">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto print:p-0 print:bg-white print:static">
+      <div className="relative w-full max-w-2xl border rounded-3xl shadow-2xl overflow-hidden my-3 sm:my-8 animate-in fade-in zoom-in-95 bg-[#1C2331] border-[#2A344A] text-[#E2E8F0] shadow-black/80 print:border-none print:shadow-none print:text-black print:bg-white print:my-0">
         {/* Top Header Badge */}
-        <div className="p-6 border-b flex items-start justify-between bg-[#12161F] border-[#2A344A] print:bg-white print:border-b-2 print:border-zinc-300">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl border flex items-center justify-center text-[#38BDF8] shadow-md bg-[#1C2331] border-sky-500/30 print:border-zinc-300 print:text-sky-600">
-              <Trophy className="w-6 h-6" />
+        <div className="p-4 sm:p-6 border-b flex items-start justify-between bg-[#12161F] border-[#2A344A] print:bg-white print:border-b-2 print:border-zinc-300">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 mr-2">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl border flex items-center justify-center text-[#38BDF8] shadow-md bg-[#1C2331] border-sky-500/30 shrink-0 print:border-zinc-300 print:text-sky-600">
+              <Trophy className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
-            <div>
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#38BDF8] print:text-sky-600">
+            <div className="min-w-0">
+              <span className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-[#38BDF8] print:text-sky-600 block">
                 {t('report.badge')}
               </span>
-              <h2 className="text-xl font-bold text-[#E2E8F0] print:text-zinc-900">{report.scenarioTitle}</h2>
+              <h2 className="text-base sm:text-xl font-bold text-[#E2E8F0] truncate print:text-zinc-900">{report.scenarioTitle}</h2>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-xl transition-colors cursor-pointer text-[#94A3B8] hover:text-[#E2E8F0] hover:bg-[#12161F] print:hidden"
+            className="p-1.5 rounded-xl transition-colors cursor-pointer text-[#94A3B8] hover:text-[#E2E8F0] hover:bg-[#12161F] shrink-0 print:hidden"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Content Body */}
-        <div className="p-6 max-h-[72vh] overflow-y-auto space-y-6 print:max-h-none print:overflow-visible">
+        <div className="p-4 sm:p-6 max-h-[70vh] sm:max-h-[72vh] overflow-y-auto space-y-5 sm:space-y-6 print:max-h-none print:overflow-visible">
           {/* Employee Link Confirmation Badge */}
           {report.employeeName && (
-            <div className="p-3.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/40 flex items-center justify-between gap-3 text-xs print:border-zinc-300 print:bg-zinc-50">
-              <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse print:hidden" />
-                <span className="text-stone-300 print:text-zinc-800">
-                  Práctica de voz registrada para el alumno:{' '}
+            <div className="p-3 sm:p-3.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 text-xs print:border-zinc-300 print:bg-zinc-50">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0 print:hidden" />
+                <span className="text-stone-300 truncate print:text-zinc-800">
+                  Práctica de voz registrada para:{' '}
                   <strong className="text-white print:text-black font-bold">{report.employeeName}</strong>
                 </span>
               </div>
-              <span className="text-[10px] px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40 print:text-emerald-700">
+              <span className="text-[10px] px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40 shrink-0 self-start sm:self-auto print:text-emerald-700">
                 ✓ Reportado a Gerencia
               </span>
             </div>

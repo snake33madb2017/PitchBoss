@@ -31,6 +31,32 @@ function getDefaultDb() {
       { id: 'lovo-bar', name: 'LOVO Bar & Hospitality', createdAt: Date.now() },
       { id: 'tepic-madrid', name: 'Restaurante Tepic (Ayala 14)', createdAt: Date.now() }
     ],
+    licenses: [
+      {
+        key: 'PB-TEPIC-365D-2026-VIP',
+        plan: '365D',
+        planName: 'Pase Anual Corporativo (365 Días)',
+        workspaceId: 'tepic-madrid',
+        companyName: 'Restaurante Tepic (Ayala 14)',
+        employeeSeats: 15,
+        clientNotes: 'Licencia Oficial Sala y Barra Restaurante Tepic (Ayala 14)',
+        createdAt: 1770000000000,
+        expiresAt: 1990000000000,
+        isRevoked: false
+      },
+      {
+        key: 'PB-LOVO-365D-2026-VIP',
+        plan: '365D',
+        planName: 'Pase Anual Corporativo (365 Días)',
+        workspaceId: 'lovo-bar',
+        companyName: 'LOVO Bar & Hospitality',
+        employeeSeats: 10,
+        clientNotes: 'Licencia Oficial Trilogía Cócteles LOVO Bar Madrid',
+        createdAt: 1770000000000,
+        expiresAt: 1990000000000,
+        isRevoked: false
+      }
+    ],
     scenarios: {},
     reports: [],
     admin: {
@@ -46,7 +72,11 @@ let db = getDefaultDb();
 try {
   if (fs.existsSync(DB_FILE)) {
     const raw = fs.readFileSync(DB_FILE, 'utf-8');
-    db = { ...getDefaultDb(), ...JSON.parse(raw) };
+    const parsed = JSON.parse(raw);
+    db = { ...getDefaultDb(), ...parsed };
+    if (!db.licenses || !Array.isArray(db.licenses) || db.licenses.length === 0) {
+      db.licenses = getDefaultDb().licenses;
+    }
   } else {
     fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), 'utf-8');
   }
@@ -156,6 +186,168 @@ export async function handleBackendRoute(req, res, body = '') {
       db.workspaces.push(newWs);
       persistDb();
       return sendJson(res, 201, { workspace: newWs });
+    } catch {
+      return sendJson(res, 400, { error: 'Payload inválido' });
+    }
+  }
+
+  // 3.5. Multi-Tenant Enterprise Licenses Management & Validation
+  if (pathname === '/api/licenses' && method === 'GET') {
+    const wsFilter = urlObj.searchParams.get('workspaceId') || req.headers['x-pitchboss-workspace'];
+    let list = db.licenses || [];
+    if (wsFilter && wsFilter !== 'all' && wsFilter !== 'default') {
+      list = list.filter(l => l.workspaceId === wsFilter);
+    }
+    return sendJson(res, 200, { licenses: list });
+  }
+
+  if (pathname === '/api/licenses' && method === 'POST') {
+    try {
+      const payload = JSON.parse(body || '{}');
+      if (!payload.key) {
+        return sendJson(res, 400, { error: 'Clave de licencia requerida' });
+      }
+      const cleanKey = payload.key.trim().toUpperCase();
+      const ws = payload.workspaceId || 'default';
+      const compName = payload.companyName || (ws === 'tepic-madrid' ? 'Restaurante Tepic (Ayala 14)' : ws === 'lovo-bar' ? 'LOVO Bar & Hospitality' : 'General');
+      const seats = Number(payload.employeeSeats) || 10;
+      const now = Date.now();
+      const expiresAt = Number(payload.expiresAt) || (now + 365 * 24 * 60 * 60 * 1000);
+
+      const licenseObj = {
+        key: cleanKey,
+        plan: payload.plan || '365D',
+        planName: payload.planName || 'Pase Corporativo',
+        workspaceId: ws,
+        companyName: compName,
+        employeeSeats: seats,
+        clientNotes: payload.clientNotes || 'Emitida por Administración',
+        createdAt: payload.createdAt || now,
+        expiresAt,
+        isRevoked: false
+      };
+
+      if (!db.licenses) db.licenses = [];
+      const idx = db.licenses.findIndex(l => l.key === cleanKey);
+      if (idx >= 0) {
+        db.licenses[idx] = { ...db.licenses[idx], ...licenseObj };
+      } else {
+        db.licenses.unshift(licenseObj);
+      }
+      persistDb();
+      return sendJson(res, 201, { success: true, license: licenseObj });
+    } catch (err) {
+      return sendJson(res, 400, { error: 'Payload de licencia inválido', details: err.message });
+    }
+  }
+
+  // Validate license endpoint (used by employees when entering their portal)
+  if ((pathname === '/api/licenses/validate') && (method === 'GET' || method === 'POST')) {
+    try {
+      let keyToValidate = '';
+      if (method === 'GET') {
+        keyToValidate = urlObj.searchParams.get('key') || '';
+      } else {
+        const parsed = JSON.parse(body || '{}');
+        keyToValidate = parsed.key || '';
+      }
+
+      if (!keyToValidate) {
+        return sendJson(res, 400, { valid: false, message: 'Ingresa un código de licencia.' });
+      }
+
+      const cleanKey = keyToValidate.trim().toUpperCase();
+
+      // 1. Direct match in db.licenses
+      let found = (db.licenses || []).find(l => l.key.toUpperCase() === cleanKey);
+
+      // 2. Friendly enterprise aliases
+      if (!found) {
+        if (cleanKey.includes('TEPIC')) {
+          found = (db.licenses || []).find(l => l.workspaceId === 'tepic-madrid' && !l.isRevoked);
+        } else if (cleanKey.includes('LOVO')) {
+          found = (db.licenses || []).find(l => l.workspaceId === 'lovo-bar' && !l.isRevoked);
+        }
+      }
+
+      // 3. Fallback: Check if key encodes workspace code (e.g. PB-HOTELRITZ-... or similar)
+      if (!found && cleanKey.startsWith('PB-')) {
+        const parts = cleanKey.split('-');
+        if (parts.length >= 4) {
+          // Format might be PB-{COMPANY}-{PLAN}-{EXPIRY}-{CHECKSUM}
+          const candidateWs = parts[1].toLowerCase();
+          const matchedWs = db.workspaces.find(w => w.id.includes(candidateWs) || candidateWs.includes(w.id));
+          if (matchedWs) {
+            found = {
+              key: cleanKey,
+              plan: '365D',
+              planName: 'Pase Anual Corporativo',
+              workspaceId: matchedWs.id,
+              companyName: matchedWs.name,
+              employeeSeats: 15,
+              clientNotes: 'Validada por clave corporativa codificada',
+              createdAt: Date.now(),
+              expiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000,
+              isRevoked: false
+            };
+            db.licenses.unshift(found);
+            persistDb();
+          }
+        }
+      }
+
+      if (!found) {
+        return sendJson(res, 404, {
+          valid: false,
+          message: 'Código de licencia no registrado en el sistema. Consulta con la administración de tu empresa.'
+        });
+      }
+
+      if (found.isRevoked) {
+        return sendJson(res, 403, {
+          valid: false,
+          message: `Esta licencia corporativa para ${found.companyName} ha sido revocada por el administrador.`
+        });
+      }
+
+      if (found.expiresAt && Date.now() > found.expiresAt) {
+        return sendJson(res, 403, {
+          valid: false,
+          message: `La licencia corporativa para ${found.companyName} expiró el ${new Date(found.expiresAt).toLocaleDateString()}.`
+        });
+      }
+
+      return sendJson(res, 200, {
+        valid: true,
+        license: found,
+        message: `¡Licencia corporativa verificada con éxito para ${found.companyName}!`
+      });
+    } catch (err) {
+      return sendJson(res, 500, { valid: false, error: 'Error al validar la licencia', details: err.message });
+    }
+  }
+
+  // Revoke license endpoint
+  if (pathname === '/api/licenses/revoke' && method === 'POST') {
+    try {
+      const { key } = JSON.parse(body || '{}');
+      if (!key) return sendJson(res, 400, { error: 'Clave requerida' });
+      const cleanKey = key.trim().toUpperCase();
+      let modified = false;
+      if (db.licenses) {
+        db.licenses = db.licenses.map(l => {
+          if (l.key.toUpperCase() === cleanKey) {
+            modified = true;
+            return { ...l, isRevoked: true };
+          }
+          return l;
+        });
+      }
+      if (modified) {
+        persistDb();
+        return sendJson(res, 200, { success: true, message: 'Licencia revocada correctamente' });
+      }
+      return sendJson(res, 404, { error: 'Licencia no encontrada' });
     } catch {
       return sendJson(res, 400, { error: 'Payload inválido' });
     }

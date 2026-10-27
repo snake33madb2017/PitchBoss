@@ -36,83 +36,83 @@ export const LevelAssessmentModal: React.FC<LevelAssessmentModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md overflow-hidden">
       <div className="relative w-full max-w-2xl rounded-3xl border border-[#2A344A] bg-[#1C2331] text-[#E2E8F0] shadow-2xl flex flex-col h-[92vh] sm:h-auto sm:max-h-[88vh] overflow-hidden animate-in fade-in zoom-in-95">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 sm:px-7 py-4 border-b border-[#2A344A] bg-[#12161F] shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-[#38BDF8] shrink-0">
+        <div className="flex items-center justify-between px-3.5 sm:px-7 py-3 sm:py-4 border-b border-[#2A344A] bg-[#12161F] shrink-0">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 mr-2">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-[#38BDF8] shrink-0">
               <Award className="w-5 h-5" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-black text-[#E2E8F0]">
-                  Evaluación y <span className="text-[#38BDF8]">Nivel de Inglés</span>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                <h2 className="text-sm sm:text-lg font-black text-[#E2E8F0] truncate">
+                  Evaluación y <span className="text-[#38BDF8]">Nivel</span>
                 </h2>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-sky-500/15 border border-sky-500/30 text-[#38BDF8] font-bold uppercase tracking-wider">
+                <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-sky-500/15 border border-sky-500/30 text-[#38BDF8] font-bold uppercase tracking-wider shrink-0">
                   {LevelEvaluationService.getPitchTier(progress.currentLevel)}
                 </span>
               </div>
-              <p className="text-xs text-[#94A3B8]">
-                Auditoría continua de dominio lingüístico y criterio de promoción
+              <p className="text-[11px] sm:text-xs text-[#94A3B8] truncate hidden xs:block">
+                Auditoría continua de dominio y criterio de promoción
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl bg-[#1C2331] hover:bg-[#202838] text-[#94A3B8] hover:text-[#E2E8F0] border border-[#2A344A] transition-colors cursor-pointer"
+            className="p-1.5 sm:p-2 rounded-xl bg-[#1C2331] hover:bg-[#202838] text-[#94A3B8] hover:text-[#E2E8F0] border border-[#2A344A] transition-colors cursor-pointer shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Tab Navigator */}
-        <div className="flex items-center gap-2 px-5 sm:px-7 pt-3 pb-2 border-b border-[#2A344A] bg-[#12161F]/60 shrink-0 text-xs">
+        <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-7 pt-2.5 pb-2 border-b border-[#2A344A] bg-[#12161F]/60 shrink-0 text-xs overflow-x-auto scrollbar-none">
           <button
             onClick={() => setSelectedTab('status')}
-            className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer ${
+            className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 ${
               selectedTab === 'status'
                 ? 'bg-[#0EA5E9] text-slate-950 font-bold'
                 : 'bg-[#12161F] text-[#94A3B8] hover:text-[#E2E8F0] border border-[#2A344A]'
             }`}
           >
-            Mi Progreso Actual
+            Mi Progreso
           </button>
           <button
             onClick={() => setSelectedTab('levels')}
-            className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer ${
+            className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 ${
               selectedTab === 'levels'
                 ? 'bg-[#0EA5E9] text-slate-950 font-bold'
                 : 'bg-[#12161F] text-[#94A3B8] hover:text-[#E2E8F0] border border-[#2A344A]'
             }`}
           >
-            Escala de Niveles
+            Escala Niveles
           </button>
           <button
             onClick={() => setSelectedTab('history')}
-            className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer ${
+            className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 ${
               selectedTab === 'history'
                 ? 'bg-[#0EA5E9] text-slate-950 font-bold'
                 : 'bg-[#12161F] text-[#94A3B8] hover:text-[#E2E8F0] border border-[#2A344A]'
             }`}
           >
-            Historial de Ascensos ({progress.history.length})
+            Historial ({progress.history.length})
           </button>
         </div>
 
         {/* Tab Content */}
-        <div className="flex-1 overflow-y-auto p-5 sm:p-7 space-y-5">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-7 space-y-4 sm:space-y-5">
           {selectedTab === 'status' && (
-            <div className="space-y-5">
+            <div className="space-y-4 sm:space-y-5">
               {/* Current Level Main Card */}
-              <div className="p-5 rounded-2xl bg-[#12161F] border border-[#2A344A] space-y-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <span className="text-[11px] text-[#94A3B8] font-bold uppercase tracking-wider block">
+              <div className="p-4 sm:p-5 rounded-2xl bg-[#12161F] border border-[#2A344A] space-y-3 sm:space-y-4">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <span className="text-[10px] sm:text-[11px] text-[#94A3B8] font-bold uppercase tracking-wider block">
                       Tu Nivel Actual Certificado
                     </span>
-                    <h3 className="text-xl sm:text-2xl font-black text-[#E2E8F0] mt-0.5">
+                    <h3 className="text-lg sm:text-2xl font-black text-[#E2E8F0] mt-0.5 truncate">
                       {currentDesc.title}
                     </h3>
                   </div>
-                  <div className="px-3.5 py-2 rounded-2xl bg-sky-500/15 border border-sky-500/40 flex items-center justify-center text-sm font-black text-[#38BDF8]">
+                  <div className="px-3 py-1.5 rounded-xl bg-sky-500/15 border border-sky-500/40 flex items-center justify-center text-xs sm:text-sm font-black text-[#38BDF8] shrink-0">
                     {LevelEvaluationService.getPitchTier(progress.currentLevel)}
                   </div>
                 </div>
@@ -125,8 +125,8 @@ export const LevelAssessmentModal: React.FC<LevelAssessmentModalProps> = ({
                 {nextLevel && (
                   <div className="space-y-2 pt-2 border-t border-[#2A344A]">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-[#E2E8F0] font-medium">
-                        Progreso hacia el <strong className="text-[#38BDF8]">{LevelEvaluationService.getPitchTier(nextLevel)}</strong>:
+                      <span className="text-[#E2E8F0] font-medium text-[11px] sm:text-xs">
+                        Hacia <strong className="text-[#38BDF8]">{LevelEvaluationService.getPitchTier(nextLevel)}</strong>:
                       </span>
                       <span className="font-mono font-bold text-[#38BDF8]">{progress.masteryScore}%</span>
                     </div>
@@ -142,27 +142,27 @@ export const LevelAssessmentModal: React.FC<LevelAssessmentModalProps> = ({
               </div>
 
               {/* Promotion Requirements Checklist */}
-              <div className="p-4 rounded-2xl bg-[#12161F] border border-[#2A344A] space-y-3">
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-[#12161F] border border-[#2A344A] space-y-3">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-[#38BDF8] flex items-center gap-1.5">
-                  <Target className="w-4 h-4" /> Requisitos para el Siguiente Ascenso
+                  <Target className="w-4 h-4 shrink-0" /> Requisitos para el Siguiente Ascenso
                 </h4>
 
                 <div className="space-y-2 text-xs">
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#1C2331] border border-[#2A344A]">
-                    <span className="text-[#E2E8F0]">Prácticas consecutivas aprobadas (&ge;75% fluidez):</span>
-                    <span className="font-bold text-[#38BDF8]">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 p-2.5 rounded-xl bg-[#1C2331] border border-[#2A344A]">
+                    <span className="text-[#E2E8F0]">Prácticas aprobadas (&ge;75% fluidez):</span>
+                    <span className="font-bold text-[#38BDF8] self-start sm:self-auto">
                       {progress.consecutivePassingSessions} de 2 necesarias
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#1C2331] border border-[#2A344A]">
-                    <span className="text-[#E2E8F0]">Cumplimiento de metas de negocio por llamada:</span>
-                    <span className="font-bold text-emerald-400">&ge; 2 objetivos</span>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 p-2.5 rounded-xl bg-[#1C2331] border border-[#2A344A]">
+                    <span className="text-[#E2E8F0]">Metas de negocio por llamada:</span>
+                    <span className="font-bold text-emerald-400 self-start sm:self-auto">&ge; 2 objetivos</span>
                   </div>
 
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#1C2331] border border-[#2A344A]">
-                    <span className="text-[#E2E8F0]">Evaluaciones completadas registradas:</span>
-                    <span className="font-bold text-[#E2E8F0]">{progress.totalCompletedEvaluations}</span>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 p-2.5 rounded-xl bg-[#1C2331] border border-[#2A344A]">
+                    <span className="text-[#E2E8F0]">Evaluaciones completadas:</span>
+                    <span className="font-bold text-[#E2E8F0] self-start sm:self-auto">{progress.totalCompletedEvaluations}</span>
                   </div>
                 </div>
               </div>

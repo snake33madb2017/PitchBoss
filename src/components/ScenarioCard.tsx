@@ -62,7 +62,7 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
 
   return (
     <div
-      className={`group relative rounded-3xl p-6 flex flex-col justify-between transition-all duration-300 border ${
+      className={`group relative rounded-3xl p-4 sm:p-6 flex flex-col justify-between transition-all duration-300 border ${
         scenario.isHidden
           ? 'bg-[#1C2331]/60 border-[#2A344A]/60 opacity-80'
           : scenario.workspaceId === 'lovo-bar'
@@ -268,19 +268,19 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => (onResume ? onResume(inProgressSession) : onSelect(scenario))}
-              className="py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-md bg-[#0EA5E9] hover:bg-[#38BDF8] text-slate-950 transition-all cursor-pointer"
+              className="py-2.5 px-2.5 sm:px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-md bg-[#0EA5E9] hover:bg-[#38BDF8] text-slate-950 transition-all cursor-pointer min-w-0"
               title="Continuar conversación donde se dejó"
             >
-              <Play className="w-3.5 h-3.5 fill-current" />
-              <span>Continuar</span>
+              <Play className="w-3.5 h-3.5 fill-current shrink-0" />
+              <span className="truncate">Continuar</span>
             </button>
             <button
               onClick={() => onSelect(scenario)}
-              className="py-2.5 px-3 rounded-xl font-medium text-xs flex items-center justify-center gap-1.5 border border-[#2A344A] bg-[#12161F] hover:bg-[#202838] text-[#94A3B8] hover:text-[#E2E8F0] transition-all cursor-pointer"
+              className="py-2.5 px-2.5 sm:px-3 rounded-xl font-medium text-xs flex items-center justify-center gap-1.5 border border-[#2A344A] bg-[#12161F] hover:bg-[#202838] text-[#94A3B8] hover:text-[#E2E8F0] transition-all cursor-pointer min-w-0"
               title="Iniciar una nueva llamada desde el principio"
             >
-              <RotateCcw className="w-3 h-3 text-[#94A3B8]" />
-              <span>Reiniciar</span>
+              <RotateCcw className="w-3 h-3 text-[#94A3B8] shrink-0" />
+              <span className="truncate">Reiniciar</span>
             </button>
           </div>
         </div>
@@ -289,8 +289,8 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
           onClick={() => onSelect(scenario)}
           className="w-full mt-2 py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg active:scale-[0.99] transition-all cursor-pointer bg-[#0EA5E9] hover:bg-[#38BDF8] text-slate-950 shadow-sky-950/30"
         >
-          <Phone className="w-3.5 h-3.5 text-slate-950" />
-          <span>{t('card.startRoleplay')}</span>
+          <Phone className="w-3.5 h-3.5 text-slate-950 shrink-0" />
+          <span className="truncate">{t('card.startRoleplay')}</span>
         </button>
       )}
     </div>

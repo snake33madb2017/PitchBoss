@@ -38,15 +38,15 @@ export const LevelPromotionModal: React.FC<LevelPromotionModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-[#0B0F17]/85 backdrop-blur-md overflow-hidden animate-in fade-in">
-      <div className="relative w-full max-w-lg rounded-3xl border border-[#2A344A] bg-[#1C2331] text-[#E2E8F0] shadow-2xl p-6 sm:p-8 space-y-6 animate-in zoom-in-95">
+      <div className="relative w-full max-w-lg rounded-3xl border border-[#2A344A] bg-[#1C2331] text-[#E2E8F0] shadow-2xl p-4 sm:p-8 space-y-4 sm:space-y-6 animate-in zoom-in-95">
         {/* Glow ambient background */}
         <div className="absolute top-0 right-1/2 translate-x-1/2 -mt-16 w-60 h-60 rounded-full bg-sky-500/10 blur-3xl pointer-events-none" />
 
         {/* Header icon */}
         <div className="text-center space-y-2 relative z-10">
-          <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-sky-500 to-sky-300 p-0.5 mx-auto shadow-xl shadow-sky-500/20 flex items-center justify-center">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-3xl bg-gradient-to-tr from-sky-500 to-sky-300 p-0.5 mx-auto shadow-xl shadow-sky-500/20 flex items-center justify-center">
             <div className="w-full h-full bg-[#12161F] rounded-[22px] flex items-center justify-center">
-              <Trophy className="w-8 h-8 text-amber-400" />
+              <Trophy className="w-7 h-7 sm:w-8 sm:h-8 text-amber-400" />
             </div>
           </div>
 
@@ -54,7 +54,7 @@ export const LevelPromotionModal: React.FC<LevelPromotionModalProps> = ({
             <Sparkles className="w-3.5 h-3.5" /> ¡Evaluación Superada!
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+          <h2 className="text-xl sm:text-3xl font-black text-white tracking-tight">
             Has Ascendido a <span className="text-[#38BDF8]">{LevelEvaluationService.getPitchTier(event.toLevel)}</span>
           </h2>
           <p className="text-xs sm:text-sm text-[#94A3B8]">
@@ -63,35 +63,35 @@ export const LevelPromotionModal: React.FC<LevelPromotionModalProps> = ({
         </div>
 
         {/* Level Progression Visual Pill */}
-        <div className="p-4 rounded-2xl bg-[#12161F] border border-[#2A344A] flex items-center justify-between relative z-10">
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-[#12161F] border border-[#2A344A] flex items-center justify-between relative z-10">
           <div className="text-center">
             <span className="text-[10px] text-[#94A3B8] font-bold uppercase block">Nivel Anterior</span>
-            <span className="text-sm sm:text-base font-black text-[#94A3B8] mt-0.5 block">{LevelEvaluationService.getPitchTier(event.fromLevel)}</span>
+            <span className="text-xs sm:text-base font-black text-[#94A3B8] mt-0.5 block">{LevelEvaluationService.getPitchTier(event.fromLevel)}</span>
           </div>
 
           <div className="flex flex-col items-center">
-            <ArrowRight className="w-6 h-6 text-[#38BDF8] animate-pulse" />
-            <span className="text-[9px] text-[#38BDF8] font-bold uppercase tracking-widest mt-0.5">Ascenso</span>
+            <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 text-[#38BDF8] animate-pulse" />
+            <span className="text-[8px] sm:text-[9px] text-[#38BDF8] font-bold uppercase tracking-widest mt-0.5">Ascenso</span>
           </div>
 
           <div className="text-center">
             <span className="text-[10px] text-sky-400 font-bold uppercase block">Nuevo Nivel</span>
-            <span className="text-base sm:text-lg font-black text-[#38BDF8] mt-0.5 block">
+            <span className="text-sm sm:text-lg font-black text-[#38BDF8] mt-0.5 block">
               {LevelEvaluationService.getPitchTier(event.toLevel)}
             </span>
           </div>
         </div>
 
         {/* What changes in the simulation */}
-        <div className="space-y-3 p-4 rounded-2xl bg-[#12161F] border border-[#2A344A] relative z-10">
+        <div className="space-y-2.5 p-3.5 sm:p-4 rounded-2xl bg-[#12161F] border border-[#2A344A] relative z-10">
           <span className="text-xs font-bold text-[#E2E8F0] flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
             ¿Qué cambia a partir de ahora en tus simulaciones?
           </span>
           <p className="text-xs text-[#94A3B8] leading-relaxed">
             {toDesc.aiBehavior}
           </p>
-          <div className="pt-2 border-t border-[#2A344A] flex items-center justify-between text-[11px] text-[#94A3B8]">
+          <div className="pt-2 border-t border-[#2A344A] flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-[#94A3B8]">
             <span>Nota en última práctica:</span>
             <span className="text-emerald-400 font-bold">Fluidez {event.englishScore}% | Negocio {event.businessScore}%</span>
           </div>

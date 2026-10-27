@@ -91,26 +91,26 @@ export const EmployeeSelectorModal: React.FC<EmployeeSelectorModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
       <div className="relative w-full max-w-xl rounded-3xl bg-[#161D2B] border border-stone-700/80 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-[#2A344A] bg-[#12161F]">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-sky-500/20 border border-sky-500/40 flex items-center justify-center text-sky-400">
+        <div className="flex items-center justify-between p-3.5 sm:p-5 border-b border-[#2A344A] bg-[#12161F]">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 mr-2">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-sky-500/20 border border-sky-500/40 flex items-center justify-center text-sky-400 shrink-0">
               <User className="w-5 h-5" />
             </div>
-            <div>
-              <h3 className="text-base font-black text-white flex items-center gap-2">
-                <span>Perfil de Alumno (Empleado)</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-bold">
+            <div className="min-w-0">
+              <h3 className="text-sm sm:text-base font-black text-white flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                <span className="truncate">Perfil de Alumno</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-bold shrink-0">
                   {currentCount}/{maxSeats} Cupos
                 </span>
               </h3>
-              <p className="text-xs text-stone-400">
-                Selecciona tu perfil en <strong className="text-stone-200">{workspaceName}</strong> para reportar tu progreso a gerencia.
+              <p className="text-[11px] sm:text-xs text-stone-400 truncate">
+                {workspaceName} • Reportar progreso
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-stone-400 hover:text-white hover:bg-stone-800 transition cursor-pointer"
+            className="p-1.5 rounded-xl text-stone-400 hover:text-white hover:bg-stone-800 transition cursor-pointer shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
@@ -220,17 +220,17 @@ export const EmployeeSelectorModal: React.FC<EmployeeSelectorModalProps> = ({
               <button
                 onClick={() => setIsRegistering(true)}
                 disabled={seatsAvailable <= 0}
-                className={`w-full py-2.5 px-4 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer ${
+                className={`w-full py-2.5 px-3 sm:px-4 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer text-center leading-snug ${
                   seatsAvailable > 0
                     ? 'border-sky-500/40 bg-sky-500/10 hover:bg-sky-500/20 text-sky-300'
                     : 'border-stone-800 bg-stone-900 text-stone-600 cursor-not-allowed'
                 }`}
               >
-                <Sparkles className="w-4 h-4 text-sky-400" />
+                <Sparkles className="w-4 h-4 text-sky-400 shrink-0" />
                 <span>
                   {seatsAvailable > 0
-                    ? `➕ ¿No estás en la lista? Ingresar como nuevo colaborador (${seatsAvailable} cupos disponibles)`
-                    : 'Plan completo (15/15 cupos). Contacta a gerencia para liberar un cupo.'}
+                    ? `➕ Registrarme como nuevo colaborador (${seatsAvailable} cupos)`
+                    : `Plan completo (${maxSeats}/${maxSeats} cupos). Contacta a gerencia.`}
                 </span>
               </button>
             </div>

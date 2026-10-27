@@ -49,8 +49,14 @@ export class SubscriptionService {
   /**
    * Generates a tamper-resistant deterministic checksum for a key
    */
-  private static generateChecksum(plan: string, expiryMs: number): string {
-    const raw = `${plan}-${expiryMs}-${SECRET_SALT}`;
+  public static readonly OFFICIAL_TEPIC_KEY = 'PB-TEPIC-365D-2026-VIP';
+  public static readonly OFFICIAL_LOVO_KEY = 'PB-LOVO-365D-2026-VIP';
+
+  /**
+   * Generates a tamper-resistant deterministic checksum for a key
+   */
+  private static generateChecksum(prefixAndPlan: string, expiryMs: number): string {
+    const raw = `${prefixAndPlan}-${expiryMs}-${SECRET_SALT}`;
     let hash = 0;
     for (let i = 0; i < raw.length; i++) {
       hash = ((hash << 5) - hash) + raw.charCodeAt(i);
@@ -61,6 +67,7 @@ export class SubscriptionService {
 
   /**
    * Generates a new license key (Used by Admin)
+   * Encodes the company slug into the key format: PB-{COMPANY_CODE}-{PLAN}-{EXPIRY_HEX}-{CHECKSUM}
    */
   public static generateAdminLicense(
     plan: SubscriptionPlan,
@@ -73,14 +80,23 @@ export class SubscriptionService {
     const now = Date.now();
     const expiresAt = now + details.durationDays * 24 * 60 * 60 * 1000;
     
-    // Format: PB-{PLAN}-{EXPIRY_HEX}-{CHECKSUM}
-    const expiryHex = expiresAt.toString(16).toUpperCase();
-    const checksum = this.generateChecksum(plan, expiresAt);
-    const key = `PB-${plan}-${expiryHex}-${checksum}`;
-
     const ws = workspaceId || 'default';
     const compName = companyName || (ws === 'tepic-madrid' ? 'Restaurante Tepic (Ayala 14)' : ws === 'lovo-bar' ? 'LOVO Bar & Hospitality' : 'General');
     const seats = employeeSeats && employeeSeats > 0 ? employeeSeats : 10;
+
+    // Company code for key slug
+    const companyCode = ws === 'tepic-madrid'
+      ? 'TEPIC'
+      : ws === 'lovo-bar'
+      ? 'LOVO'
+      : ws === 'default'
+      ? 'GEN'
+      : ws.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
+
+    // Format: PB-{COMPANY_CODE}-{PLAN}-{EXPIRY_HEX}-{CHECKSUM}
+    const expiryHex = expiresAt.toString(16).toUpperCase();
+    const checksum = this.generateChecksum(`${companyCode}-${plan}`, expiresAt);
+    const key = `PB-${companyCode}-${plan}-${expiryHex}-${checksum}`;
 
     const license: LicenseInfo = {
       key,
@@ -95,7 +111,7 @@ export class SubscriptionService {
       employeeSeats: seats
     };
 
-    // Store in admin registry
+    // Store in admin registry locally
     const registry = this.getRawAdminLicenses();
     const updated = [license, ...registry.filter(l => l.key !== key)];
     try {
@@ -103,6 +119,11 @@ export class SubscriptionService {
     } catch (e) {
       console.error('Error saving admin license:', e);
     }
+
+    // Sync to cloud backend immediately
+    CloudSyncService.createLicense(license).catch(err => {
+      console.warn('Could not sync license to cloud:', err);
+    });
 
     return license;
   }
@@ -128,29 +149,69 @@ export class SubscriptionService {
   public static getAdminLicenses(): LicenseInfo[] {
     const raw = this.getRawAdminLicenses();
     if (raw && raw.length > 0) {
-      return raw;
+      // Ensure official seed licenses are present
+      const seeds = this.seedEnterpriseLicenses();
+      const merged = [...raw];
+      for (const s of seeds) {
+        if (!merged.some(l => l.key === s.key || l.workspaceId === s.workspaceId)) {
+          merged.push(s);
+        }
+      }
+      return merged;
     }
     return this.seedEnterpriseLicenses();
   }
 
   /**
-   * Auto-seeds official corporate licenses for client companies
+   * Syncs and returns cloud licenses merged with local storage
+   */
+  public static async getAdminLicensesAsync(): Promise<LicenseInfo[]> {
+    const cloudLicenses = await CloudSyncService.getLicenses();
+    const local = this.getAdminLicenses();
+    const map = new Map<string, LicenseInfo>();
+
+    for (const l of local) {
+      map.set(l.key, l);
+    }
+    for (const cl of cloudLicenses) {
+      map.set(cl.key, cl);
+    }
+
+    const merged = Array.from(map.values());
+    try {
+      localStorage.setItem(ADMIN_LICENSES_KEY, JSON.stringify(merged));
+    } catch {}
+    return merged;
+  }
+
+  /**
+   * Auto-seeds official corporate licenses for client companies with deterministic keys
    */
   public static seedEnterpriseLicenses(): LicenseInfo[] {
-    const tepic = this.generateAdminLicense(
-      '365D',
-      'Licencia Oficial Sala y Barra (15 Empleados)',
-      'tepic-madrid',
-      'Restaurante Tepic (Ayala 14)',
-      15
-    );
-    const lovo = this.generateAdminLicense(
-      '365D',
-      'Licencia Oficial Trilogía Cócteles (10 Empleados)',
-      'lovo-bar',
-      'LOVO Bar & Hospitality',
-      10
-    );
+    const tepic: LicenseInfo = {
+      key: this.OFFICIAL_TEPIC_KEY,
+      plan: '365D',
+      planName: 'Pase Anual Corporativo (365 Días)',
+      createdAt: 1770000000000,
+      expiresAt: 1990000000000,
+      clientNotes: 'Licencia Oficial Sala y Barra Restaurante Tepic (Ayala 14)',
+      isRevoked: false,
+      workspaceId: 'tepic-madrid',
+      companyName: 'Restaurante Tepic (Ayala 14)',
+      employeeSeats: 15
+    };
+    const lovo: LicenseInfo = {
+      key: this.OFFICIAL_LOVO_KEY,
+      plan: '365D',
+      planName: 'Pase Anual Corporativo (365 Días)',
+      createdAt: 1770000000000,
+      expiresAt: 1990000000000,
+      clientNotes: 'Licencia Oficial Trilogía Cócteles LOVO Bar Madrid',
+      isRevoked: false,
+      workspaceId: 'lovo-bar',
+      companyName: 'LOVO Bar & Hospitality',
+      employeeSeats: 10
+    };
     return [tepic, lovo];
   }
 
@@ -162,12 +223,15 @@ export class SubscriptionService {
     const found = licenses.find(l => l.workspaceId === workspaceId && !l.isRevoked);
     if (found) return found;
 
-    const compName = workspaceId === 'tepic-madrid'
-      ? 'Restaurante Tepic (Ayala 14)'
-      : workspaceId === 'lovo-bar'
-      ? 'LOVO Bar & Hospitality'
-      : workspaceId;
-    const seats = workspaceId === 'tepic-madrid' ? 15 : 10;
+    if (workspaceId === 'tepic-madrid') {
+      return this.seedEnterpriseLicenses()[0];
+    }
+    if (workspaceId === 'lovo-bar') {
+      return this.seedEnterpriseLicenses()[1];
+    }
+
+    const compName = workspaceId;
+    const seats = 10;
     return this.generateAdminLicense('365D', `Licencia Oficial Corporativa (${seats} Empleados)`, workspaceId, compName, seats);
   }
 
@@ -179,6 +243,11 @@ export class SubscriptionService {
     const updated = registry.map(l => l.key === key ? { ...l, isRevoked: true } : l);
     localStorage.setItem(ADMIN_LICENSES_KEY, JSON.stringify(updated));
 
+    // Also push to cloud backend
+    CloudSyncService.revokeLicense(key).catch(err => {
+      console.warn('Could not sync revoke to cloud:', err);
+    });
+
     // If currently active on this device, revoke it locally too
     const current = this.getSubscriptionState();
     if (current.activeLicense?.key === key) {
@@ -187,9 +256,9 @@ export class SubscriptionService {
   }
 
   /**
-   * Validates a license key format and checksum
+   * Validates a license key format, checksum and company bindings (offline fallback)
    */
-  public static validateKey(key: string): { valid: boolean; plan?: SubscriptionPlan; expiresAt?: number; message?: string } {
+  public static validateKey(key: string): { valid: boolean; plan?: SubscriptionPlan; expiresAt?: number; workspaceId?: string; companyName?: string; message?: string } {
     if (!key) return { valid: false, message: 'Ingresa un código de licencia.' };
 
     const clean = key.trim().toUpperCase();
@@ -197,19 +266,63 @@ export class SubscriptionService {
     // Friendly corporate aliases for demo & onboarding
     if (clean.includes('TEPIC')) {
       const tepicLic = this.getOfficialLicenseForWorkspace('tepic-madrid');
-      return { valid: true, plan: tepicLic.plan, expiresAt: tepicLic.expiresAt };
+      return { valid: true, plan: tepicLic.plan, expiresAt: tepicLic.expiresAt, workspaceId: 'tepic-madrid', companyName: 'Restaurante Tepic (Ayala 14)' };
     }
     if (clean.includes('LOVO')) {
       const lovoLic = this.getOfficialLicenseForWorkspace('lovo-bar');
-      return { valid: true, plan: lovoLic.plan, expiresAt: lovoLic.expiresAt };
+      return { valid: true, plan: lovoLic.plan, expiresAt: lovoLic.expiresAt, workspaceId: 'lovo-bar', companyName: 'LOVO Bar & Hospitality' };
+    }
+
+    const registry = this.getAdminLicenses();
+    const foundInRegistry = registry.find(l => l.key.toUpperCase() === clean);
+    if (foundInRegistry) {
+      if (foundInRegistry.isRevoked) {
+        return { valid: false, message: 'Esta licencia ha sido revocada por el administrador.' };
+      }
+      if (Date.now() > foundInRegistry.expiresAt) {
+        return { valid: false, message: 'Esta licencia ha expirado.' };
+      }
+      return {
+        valid: true,
+        plan: foundInRegistry.plan,
+        expiresAt: foundInRegistry.expiresAt,
+        workspaceId: foundInRegistry.workspaceId,
+        companyName: foundInRegistry.companyName
+      };
     }
 
     const parts = clean.split('-');
 
-    if (parts.length !== 4 || parts[0] !== 'PB') {
-      return { valid: false, message: 'Formato de licencia inválido (ej: PB-30D-...)' };
+    if (parts.length < 4 || parts[0] !== 'PB') {
+      return { valid: false, message: 'Formato de licencia inválido (ej: PB-TEPIC-365D-... o PB-365D-...)' };
     }
 
+    // Handle 5 parts: PB-{COMPANY_CODE}-{PLAN}-{EXPIRY_HEX}-{CHECKSUM}
+    if (parts.length === 5) {
+      const compCode = parts[1];
+      const plan = parts[2] as SubscriptionPlan;
+      if (!['30D', '90D', '365D', 'LIFETIME'].includes(plan)) {
+        return { valid: false, message: 'Plan no reconocido en la licencia.' };
+      }
+      const expiryMs = parseInt(parts[3], 16);
+      if (isNaN(expiryMs)) {
+        return { valid: false, message: 'Fecha de expiración corrupta en la clave.' };
+      }
+      const expectedChecksum = this.generateChecksum(`${compCode}-${plan}`, expiryMs);
+      if (parts[4] !== expectedChecksum) {
+        return { valid: false, message: 'Clave de licencia no auténtica o alterada.' };
+      }
+      if (Date.now() > expiryMs) {
+        return { valid: false, message: 'Esta licencia ha expirado.' };
+      }
+
+      const ws = compCode === 'TEPIC' ? 'tepic-madrid' : compCode === 'LOVO' ? 'lovo-bar' : compCode.toLowerCase();
+      const compName = ws === 'tepic-madrid' ? 'Restaurante Tepic (Ayala 14)' : ws === 'lovo-bar' ? 'LOVO Bar & Hospitality' : compCode;
+
+      return { valid: true, plan, expiresAt: expiryMs, workspaceId: ws, companyName: compName };
+    }
+
+    // Handle 4 parts legacy format: PB-{PLAN}-{EXPIRY_HEX}-{CHECKSUM}
     const plan = parts[1] as SubscriptionPlan;
     if (!['30D', '90D', '365D', 'LIFETIME'].includes(plan)) {
       return { valid: false, message: 'Plan no reconocido en la licencia.' };
@@ -225,13 +338,6 @@ export class SubscriptionService {
       return { valid: false, message: 'Clave de licencia no auténtica o alterada.' };
     }
 
-    // Check if revoked in admin registry
-    const registry = this.getAdminLicenses();
-    const foundInRegistry = registry.find(l => l.key === clean);
-    if (foundInRegistry && foundInRegistry.isRevoked) {
-      return { valid: false, message: 'Esta licencia ha sido revocada por el administrador.' };
-    }
-
     if (Date.now() > expiryMs) {
       return { valid: false, message: 'Esta licencia ha expirado.' };
     }
@@ -240,7 +346,59 @@ export class SubscriptionService {
   }
 
   /**
-   * Activates a license key on the current user's device
+   * Activates a license key asynchronously with centralized Cloud validation
+   * Locks the device exclusively to the validated company workspace
+   */
+  public static async activateLicenseAsync(key: string, targetWorkspaceId?: string): Promise<{ success: boolean; message: string; license?: LicenseInfo }> {
+    const cleanKey = key.trim().toUpperCase();
+
+    // 1. First attempt cloud validation via centralized backend
+    try {
+      const cloudResult = await CloudSyncService.validateLicense(cleanKey);
+      if (cloudResult.valid && cloudResult.license) {
+        const cloudLic = cloudResult.license;
+        const ws = cloudLic.workspaceId || targetWorkspaceId || 'default';
+        const compName = cloudLic.companyName || ws;
+
+        const license: LicenseInfo = {
+          ...cloudLic,
+          workspaceId: ws,
+          companyName: compName
+        };
+
+        const state: UserSubscriptionState = {
+          status: 'active',
+          freeTrialsUsed: 1,
+          maxFreeTrials: 1,
+          activeLicense: license
+        };
+
+        localStorage.setItem(USER_SUB_STORAGE_KEY, JSON.stringify(state));
+        if (ws && ws !== 'default') {
+          CloudSyncService.setCurrentWorkspaceId(ws);
+        }
+
+        // Cache in local admin registry too
+        const registry = this.getRawAdminLicenses();
+        const updated = [license, ...registry.filter(l => l.key !== license.key)];
+        localStorage.setItem(ADMIN_LICENSES_KEY, JSON.stringify(updated));
+
+        return {
+          success: true,
+          message: `¡Licencia corporativa activada para ${compName}! (${license.employeeSeats || 10} accesos asignados)`,
+          license
+        };
+      }
+    } catch (err) {
+      console.warn('Cloud validation failed, proceeding with local offline resolution:', err);
+    }
+
+    // 2. Offline fallback activation
+    return this.activateLicense(key, targetWorkspaceId);
+  }
+
+  /**
+   * Activates a license key synchronously on the current user's device (offline resilient)
    */
   public static activateLicense(key: string, targetWorkspaceId?: string): { success: boolean; message: string; license?: LicenseInfo } {
     const cleanKey = key.trim().toUpperCase();
@@ -288,11 +446,12 @@ export class SubscriptionService {
 
     // Look for existing license metadata in admin registry
     const registry = this.getAdminLicenses();
-    const found = registry.find(l => l.key === cleanKey);
+    const found = registry.find(l => l.key.toUpperCase() === cleanKey);
 
-    const ws = targetWorkspaceId || found?.workspaceId || 'default';
-    const compName = found?.companyName || (ws === 'tepic-madrid' ? 'Restaurante Tepic (Ayala 14)' : ws === 'lovo-bar' ? 'LOVO Bar & Hospitality' : 'General');
-    const seats = found?.employeeSeats || 10;
+    // Prioritize workspace from validation or registry over generic default
+    const ws = targetWorkspaceId || validation.workspaceId || found?.workspaceId || 'default';
+    const compName = validation.companyName || found?.companyName || (ws === 'tepic-madrid' ? 'Restaurante Tepic (Ayala 14)' : ws === 'lovo-bar' ? 'LOVO Bar & Hospitality' : 'General');
+    const seats = found?.employeeSeats || (ws === 'tepic-madrid' ? 15 : 10);
 
     const license: LicenseInfo = {
       key: cleanKey,
@@ -315,8 +474,8 @@ export class SubscriptionService {
 
     try {
       localStorage.setItem(USER_SUB_STORAGE_KEY, JSON.stringify(state));
-      // Auto-bind device to the company workspace
-      if (ws) {
+      // Auto-bind device exclusively to the company workspace
+      if (ws && ws !== 'default') {
         CloudSyncService.setCurrentWorkspaceId(ws);
       }
     } catch (e) {
@@ -328,6 +487,28 @@ export class SubscriptionService {
       message: `¡Licencia corporativa activada para ${compName}! (${seats} accesos de empleados)`,
       license
     };
+  }
+
+  /**
+   * Checks if user is locked exclusively to a company
+   */
+  public static isCompanyLocked(): boolean {
+    const sub = this.getSubscriptionState();
+    return Boolean(sub.status === 'active' && sub.activeLicense?.workspaceId && sub.activeLicense.workspaceId !== 'default');
+  }
+
+  /**
+   * Retrieves current company information if user is bound by license
+   */
+  public static getAssignedCompany(): { workspaceId: string; companyName: string } | null {
+    const sub = this.getSubscriptionState();
+    if (sub.status === 'active' && sub.activeLicense?.workspaceId && sub.activeLicense.workspaceId !== 'default') {
+      return {
+        workspaceId: sub.activeLicense.workspaceId,
+        companyName: sub.activeLicense.companyName || sub.activeLicense.workspaceId
+      };
+    }
+    return null;
   }
 
   /**
@@ -431,7 +612,39 @@ export class SubscriptionService {
   }
 
   /**
-   * Checks current URL query params (?key=PB-... or ?license=PB-...) for auto-activation
+   * Checks current URL query params (?key=PB-... or ?license=PB-...) for auto-activation with cloud validation
+   */
+  public static async checkUrlForActivationKeyAsync(): Promise<{ activated: boolean; license?: LicenseInfo; message?: string }> {
+    if (typeof window === 'undefined') return { activated: false };
+
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const keyFromUrl = urlParams.get('key') || urlParams.get('license');
+      const companyFromUrl = urlParams.get('company') || urlParams.get('workspace');
+
+      if (keyFromUrl) {
+        const result = await this.activateLicenseAsync(keyFromUrl, companyFromUrl || undefined);
+        const wsId = result.license?.workspaceId;
+        const newUrl = window.location.pathname + (wsId && wsId !== 'default' ? `?company=${encodeURIComponent(wsId)}` : '');
+        window.history.replaceState({}, document.title, newUrl);
+
+        return {
+          activated: result.success,
+          license: result.license,
+          message: result.message
+        };
+      } else if (companyFromUrl) {
+        CloudSyncService.setCurrentWorkspaceId(companyFromUrl);
+      }
+    } catch (e) {
+      console.error('Error checking activation URL async:', e);
+    }
+
+    return { activated: false };
+  }
+
+  /**
+   * Checks current URL query params (?key=PB-... or ?license=PB-...) for auto-activation (sync)
    */
   public static checkUrlForActivationKey(): { activated: boolean; license?: LicenseInfo; message?: string } {
     if (typeof window === 'undefined') return { activated: false };

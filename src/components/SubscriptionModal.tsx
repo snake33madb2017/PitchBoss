@@ -33,25 +33,29 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleActivateKey = (e: React.FormEvent) => {
+  const handleActivateKey = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!licenseInput.trim()) return;
 
     setIsActivating(true);
     setActivationMsg(null);
 
-    const result = SubscriptionService.activateLicense(licenseInput.trim());
-    setIsActivating(false);
-
-    if (result.success) {
-      setActivationMsg({ type: 'success', text: result.message });
-      setLicenseInput('');
-      onSubscriptionUpdated();
-      setTimeout(() => {
-        onClose();
-      }, 1800);
-    } else {
-      setActivationMsg({ type: 'error', text: result.message });
+    try {
+      const result = await SubscriptionService.activateLicenseAsync(licenseInput.trim());
+      if (result.success) {
+        setActivationMsg({ type: 'success', text: result.message });
+        setLicenseInput('');
+        onSubscriptionUpdated();
+        setTimeout(() => {
+          onClose();
+        }, 1800);
+      } else {
+        setActivationMsg({ type: 'error', text: result.message });
+      }
+    } catch (err: any) {
+      setActivationMsg({ type: 'error', text: err.message || 'Error al validar la licencia.' });
+    } finally {
+      setIsActivating(false);
     }
   };
 
@@ -67,27 +71,27 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
       <div className="bg-[#1C2331] border border-[#2A344A] rounded-3xl max-w-lg w-full p-5 sm:p-7 shadow-2xl shadow-black/80 space-y-5 my-auto">
         {/* Header */}
         <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-[#38BDF8] shrink-0 shadow-lg shadow-sky-500/10">
-              <Crown className="w-6 h-6" />
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 mr-2">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-[#38BDF8] shrink-0 shadow-lg shadow-sky-500/10">
+              <Crown className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg sm:text-xl font-black text-[#E2E8F0]">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                <h2 className="text-base sm:text-xl font-black text-[#E2E8F0] truncate">
                   Pitch<span className="text-[#38BDF8]">Boss Pro</span>
                 </h2>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-sky-500/15 border border-sky-500/30 text-[#38BDF8] font-bold uppercase tracking-wider">
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-sky-500/15 border border-sky-500/30 text-[#38BDF8] font-bold uppercase tracking-wider shrink-0">
                   Acceso Total
                 </span>
               </div>
-              <p className="text-xs text-[#94A3B8]">
-                Domina las conversaciones en inglés para tu profesión
+              <p className="text-[11px] sm:text-xs text-[#94A3B8] truncate">
+                Domina conversaciones en inglés para tu profesión
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl bg-[#12161F] hover:bg-[#202838] text-[#94A3B8] hover:text-[#E2E8F0] border border-[#2A344A] transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl bg-[#12161F] hover:bg-[#202838] text-[#94A3B8] hover:text-[#E2E8F0] border border-[#2A344A] transition-colors cursor-pointer shrink-0"
           >
             <X className="w-4 h-4" />
           </button>

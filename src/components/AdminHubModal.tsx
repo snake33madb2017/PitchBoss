@@ -133,6 +133,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
+      SubscriptionService.getAdminLicensesAsync().then(setAdminLicenses);
       CloudSyncService.getWorkspaces().then(setWorkspaces);
       setIsLoadingReports(true);
       CloudSyncService.getTeamReports(activeWorkspaceId).then((reps) => {
@@ -347,7 +348,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
     setTimeout(() => setApiKeySaved(false), 2000);
   };
 
-  const handleGenerateLicense = (e: React.FormEvent) => {
+  const handleGenerateLicense = async (e: React.FormEvent) => {
     e.preventDefault();
     const targetWsObj = workspaces.find((w) => w.id === targetWorkspaceForLicense);
     const companyName = targetWsObj?.name || (targetWorkspaceForLicense === 'tepic-madrid' ? 'Restaurante Tepic (Ayala 14)' : targetWorkspaceForLicense === 'lovo-bar' ? 'LOVO Bar & Hospitality' : 'General');
@@ -359,7 +360,8 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
       employeeSeatsInput
     );
     setLastGeneratedLicense(license);
-    setAdminLicenses(SubscriptionService.getAdminLicenses());
+    const updated = await SubscriptionService.getAdminLicensesAsync();
+    setAdminLicenses(updated);
     setClientNotesInput('');
   };
 
@@ -376,10 +378,11 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
     setTimeout(() => setCopiedLink(null), 2000);
   };
 
-  const handleRevokeLicense = (key: string) => {
+  const handleRevokeLicense = async (key: string) => {
     if (window.confirm('¿Seguro que deseas revocar esta licencia? El cliente perderá el acceso de inmediato.')) {
       SubscriptionService.revokeAdminLicense(key);
-      setAdminLicenses(SubscriptionService.getAdminLicenses());
+      const updated = await SubscriptionService.getAdminLicensesAsync();
+      setAdminLicenses(updated);
     }
   };
 
@@ -446,7 +449,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                 <select
                   value={activeWorkspaceId}
                   onChange={(e) => handleSwitchWorkspace(e.target.value)}
-                  className="bg-transparent text-xs font-bold text-sky-300 focus:outline-none cursor-pointer"
+                  className="bg-transparent text-xs font-bold text-sky-300 focus:outline-none cursor-pointer max-w-[110px] sm:max-w-none truncate"
                 >
                   <option value="all" className="bg-[#12161F] text-white">
                     Todas las Empresas (Global)
@@ -467,9 +470,9 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#18202F] border border-[#2A344A] text-xs font-bold text-sky-300">
-                <Building2 className="w-3.5 h-3.5" />
-                <span>{activeWorkspaceNameProp || 'Empresa'}</span>
+              <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-xl bg-[#18202F] border border-[#2A344A] text-xs font-bold text-sky-300 truncate max-w-[120px] sm:max-w-none">
+                <Building2 className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">{activeWorkspaceNameProp || 'Empresa'}</span>
               </div>
             )}
 
@@ -479,7 +482,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                   onLogoutAdmin();
                   onClose();
                 }}
-                className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-500/10 border border-rose-500/20 transition-colors cursor-pointer"
+                className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-500/10 border border-rose-500/20 transition-colors cursor-pointer shrink-0"
                 title="Cerrar sesión de Administrador"
               >
                 Salir
@@ -487,7 +490,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
             )}
             <button
               onClick={onClose}
-              className="p-1.5 rounded-xl text-[#94A3B8] hover:text-[#E2E8F0] hover:bg-[#12161F] transition-colors cursor-pointer"
+              className="p-1.5 rounded-xl text-[#94A3B8] hover:text-[#E2E8F0] hover:bg-[#12161F] transition-colors cursor-pointer shrink-0"
             >
               <X className="w-5 h-5" />
             </button>
@@ -495,27 +498,27 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center border-b border-[#2A344A] bg-[#12161F]/60 px-4 sm:px-6 shrink-0 overflow-x-auto scrollbar-none">
+        <div className="flex items-center border-b border-[#2A344A] bg-[#12161F]/60 px-2.5 sm:px-6 shrink-0 overflow-x-auto scrollbar-none">
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`flex items-center gap-2 py-3 px-3.5 text-sm font-bold border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
+            className={`flex items-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-2.5 sm:px-3.5 text-xs sm:text-sm font-bold border-b-2 transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
               activeTab === 'analytics'
                 ? 'border-[#38BDF8] text-[#38BDF8]'
                 : 'border-transparent text-[#94A3B8] hover:text-[#E2E8F0]'
             }`}
           >
-            <BarChart3 className="w-4 h-4 text-emerald-400" />
-            <span>📊 {isSuperAdmin ? 'Analítica de Dirección' : 'Reportes & Cupos'} ({teamMembers.length}/{maxSeats})</span>
+            <BarChart3 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>📊 {isSuperAdmin ? 'Analítica Dirección' : 'Reportes & Cupos'} ({teamMembers.length}/{maxSeats})</span>
           </button>
           <button
             onClick={() => setActiveTab('scenarios')}
-            className={`flex items-center gap-2 py-3 px-3.5 text-sm font-bold border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
+            className={`flex items-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-2.5 sm:px-3.5 text-xs sm:text-sm font-bold border-b-2 transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
               activeTab === 'scenarios'
                 ? 'border-[#38BDF8] text-[#38BDF8]'
                 : 'border-transparent text-[#94A3B8] hover:text-[#E2E8F0]'
             }`}
           >
-            <Layers className="w-4 h-4" />
+            <Layers className="w-4 h-4 shrink-0" />
             <span>{isSuperAdmin ? 'Escenarios Globales' : 'Editar Escenarios'} ({filtered.length})</span>
           </button>
 

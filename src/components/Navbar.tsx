@@ -192,11 +192,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          {/* Company Switcher Pill (Desktop & Tablet) - Only visible for Admin or scoped company portal */}
-          {(isAdmin || (activeWorkspaceId && activeWorkspaceId !== 'default' && activeWorkspaceId !== 'all')) && (
+          {/* Company Identity: Admin has interactive switcher; Licensed employee is locked exclusively to their company */}
+          {isAdmin ? (
             <>
               <span className="hidden sm:inline-block text-[#2A344A]">/</span>
-              <div className="relative shrink-0" ref={companyDropdownRef}>
+              <div className="relative shrink-0 hidden sm:block" ref={companyDropdownRef}>
                 <button
                   onClick={() => setIsCompanyDropdownOpen(!isCompanyDropdownOpen)}
                   className={`flex items-center gap-2 px-2.5 py-1.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer shadow-sm ${
@@ -206,7 +206,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       ? 'border-[#B39964]/50 bg-[#21201E] text-[#FAF6EE] hover:border-[#B39964]'
                       : 'border-[#2A344A] bg-[#161D2B] hover:bg-[#1C2433] text-slate-200 hover:border-sky-500/40'
                   }`}
-                  title="Cambiar de empresa o ver catálogo general"
+                  title="Cambiar de empresa o ver catálogo general (Modo Administrador)"
                 >
                   {activeWorkspaceId === 'lovo-bar' ? (
                     <>
@@ -231,124 +231,165 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${isCompanyDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
-            {/* Company Dropdown Menu */}
-            {isCompanyDropdownOpen && (
-              <div className="absolute left-0 mt-2 w-72 rounded-2xl border border-[#2A344A] bg-[#161D2B] text-[#E2E8F0] shadow-2xl py-1.5 z-50 overflow-hidden animate-in fade-in zoom-in-95 backdrop-blur-xl">
-                <div className="px-3.5 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-[#2A344A]">
-                  Seleccionar Empresa / Entorno
-                </div>
+                {/* Company Dropdown Menu for Admin */}
+                {isCompanyDropdownOpen && (
+                  <div className="absolute left-0 mt-2 w-72 rounded-2xl border border-[#2A344A] bg-[#161D2B] text-[#E2E8F0] shadow-2xl py-1.5 z-50 overflow-hidden animate-in fade-in zoom-in-95 backdrop-blur-xl">
+                    <div className="px-3.5 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-[#2A344A]">
+                      Seleccionar Empresa / Entorno (Admin)
+                    </div>
 
-                {/* Option 1: All companies */}
-                <button
-                  onClick={() => handleCompanySelect('all')}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs transition cursor-pointer text-left ${
-                    activeWorkspaceId === 'all' || activeWorkspaceId === 'default'
-                      ? 'bg-sky-500/15 text-sky-300 font-bold'
-                      : 'text-slate-200 hover:bg-[#1F2738]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-8 h-8 rounded-lg bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
-                      <Building2 className="w-4 h-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-bold truncate">Todas las Empresas</p>
-                      <p className="text-[10px] text-slate-400 truncate">Catálogo completo (Tepic, LOVO y Demo)</p>
-                    </div>
-                  </div>
-                  {(activeWorkspaceId === 'all' || activeWorkspaceId === 'default') && (
-                    <Check className="w-4 h-4 text-sky-400 shrink-0" />
-                  )}
-                </button>
-
-                {/* Option 2: Restaurante Tepic */}
-                <button
-                  onClick={() => handleCompanySelect('tepic-madrid')}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs transition cursor-pointer text-left ${
-                    activeWorkspaceId === 'tepic-madrid'
-                      ? 'bg-[#B39964]/20 text-[#F5DEB3] font-bold'
-                      : 'text-slate-200 hover:bg-[#1F2738]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-8 h-8 rounded-lg bg-[#FAF7F2] border border-[#B39964]/60 p-0.5 flex items-center justify-center shrink-0 shadow-sm">
-                      <img src="/images/logos/tepic-logo.png" alt="Tepic" className="h-5 w-auto object-contain" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <p className="font-serif font-bold text-white truncate">Restaurante Tepic</p>
-                        <span className="text-[9px] px-1 rounded bg-[#2E281E] text-[#E8D4A2] border border-[#B39964]/40 font-semibold">Bib Gourmand</span>
-                      </div>
-                      <p className="text-[10px] text-stone-400 truncate">Calle de Ayala, 14 · Salamanca, Madrid</p>
-                    </div>
-                  </div>
-                  {activeWorkspaceId === 'tepic-madrid' && (
-                    <Check className="w-4 h-4 text-[#B39964] shrink-0" />
-                  )}
-                </button>
-
-                {/* Option 3: LOVO Bar */}
-                <button
-                  onClick={() => handleCompanySelect('lovo-bar')}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs transition cursor-pointer text-left ${
-                    activeWorkspaceId === 'lovo-bar'
-                      ? 'bg-[#D3A548]/20 text-[#D3A548] font-bold'
-                      : 'text-slate-200 hover:bg-[#1F2738]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-8 h-8 rounded-lg bg-black border border-[#D3A548]/50 p-1 flex items-center justify-center shrink-0 shadow-sm">
-                      <img src="/images/logos/lovo-logo.webp" alt="LOVO" className="h-full w-full object-contain" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <p className="font-serif font-bold text-[#D3A548] truncate">LOVO Bar Madrid</p>
-                        <span className="text-[9px] px-1 rounded bg-[#D3A548]/20 text-[#D3A548] border border-[#D3A548]/30 font-semibold">71 Cócteles</span>
-                      </div>
-                      <p className="text-[10px] text-zinc-400 truncate">Calle Echegaray 20 · Barrio de las Letras</p>
-                    </div>
-                  </div>
-                  {activeWorkspaceId === 'lovo-bar' && (
-                    <Check className="w-4 h-4 text-[#D3A548] shrink-0" />
-                  )}
-                </button>
-
-                {/* Option 4: Register new enterprise */}
-                <div className="p-2 border-t border-[#2A344A] bg-[#12161F]/60">
-                  <button
-                    onClick={() => {
-                      setIsCompanyDropdownOpen(false);
-                      if (onOpenNewCompany) onOpenNewCompany();
-                      else if (onOpenAdmin) onOpenAdmin();
-                    }}
-                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 text-sky-300 text-xs font-bold transition cursor-pointer"
-                  >
-                    <Plus className="w-3.5 h-3.5 text-sky-400 shrink-0" />
-                    <span>Registrar Nueva Empresa</span>
-                  </button>
-                </div>
-
-                {/* Option 5: Acceso Empresas / Validar Licencia */}
-                {onOpenCompanyAccess && (
-                  <div className="p-2 border-t border-[#2A344A]/60 bg-[#12161F]/40">
+                    {/* Option 1: All companies */}
                     <button
-                      onClick={() => {
-                        setIsCompanyDropdownOpen(false);
-                        onOpenCompanyAccess();
-                      }}
-                      className="w-full flex items-center gap-2 px-3 py-1.5 rounded-xl text-sky-400 hover:bg-sky-500/10 text-xs font-semibold transition cursor-pointer"
+                      onClick={() => handleCompanySelect('all')}
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs transition cursor-pointer text-left ${
+                        activeWorkspaceId === 'all' || activeWorkspaceId === 'default'
+                          ? 'bg-sky-500/15 text-sky-300 font-bold'
+                          : 'text-slate-200 hover:bg-[#1F2738]'
+                      }`}
                     >
-                      <Key className="w-3.5 h-3.5" />
-                      <span>Ingresar con Licencia Corporativa</span>
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-8 h-8 rounded-lg bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
+                          <Building2 className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-bold truncate">Todas las Empresas</p>
+                          <p className="text-[10px] text-slate-400 truncate">Catálogo completo (Tepic, LOVO y Demo)</p>
+                        </div>
+                      </div>
+                      {(activeWorkspaceId === 'all' || activeWorkspaceId === 'default') && (
+                        <Check className="w-4 h-4 text-sky-400 shrink-0" />
+                      )}
                     </button>
+
+                    {/* Option 2: Restaurante Tepic */}
+                    <button
+                      onClick={() => handleCompanySelect('tepic-madrid')}
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs transition cursor-pointer text-left ${
+                        activeWorkspaceId === 'tepic-madrid'
+                          ? 'bg-[#B39964]/20 text-[#F5DEB3] font-bold'
+                          : 'text-slate-200 hover:bg-[#1F2738]'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-8 h-8 rounded-lg bg-[#FAF7F2] border border-[#B39964]/60 p-0.5 flex items-center justify-center shrink-0 shadow-sm">
+                          <img src="/images/logos/tepic-logo.png" alt="Tepic" className="h-5 w-auto object-contain" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <p className="font-serif font-bold text-white truncate">Restaurante Tepic</p>
+                            <span className="text-[9px] px-1 rounded bg-[#2E281E] text-[#E8D4A2] border border-[#B39964]/40 font-semibold">Bib Gourmand</span>
+                          </div>
+                          <p className="text-[10px] text-stone-400 truncate">Calle de Ayala, 14 · Salamanca, Madrid</p>
+                        </div>
+                      </div>
+                      {activeWorkspaceId === 'tepic-madrid' && (
+                        <Check className="w-4 h-4 text-[#B39964] shrink-0" />
+                      )}
+                    </button>
+
+                    {/* Option 3: LOVO Bar */}
+                    <button
+                      onClick={() => handleCompanySelect('lovo-bar')}
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs transition cursor-pointer text-left ${
+                        activeWorkspaceId === 'lovo-bar'
+                          ? 'bg-[#D3A548]/20 text-[#D3A548] font-bold'
+                          : 'text-slate-200 hover:bg-[#1F2738]'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-8 h-8 rounded-lg bg-black border border-[#D3A548]/50 p-1 flex items-center justify-center shrink-0 shadow-sm">
+                          <img src="/images/logos/lovo-logo.webp" alt="LOVO" className="h-full w-full object-contain" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <p className="font-serif font-bold text-[#D3A548] truncate">LOVO Bar Madrid</p>
+                            <span className="text-[9px] px-1 rounded bg-[#D3A548]/20 text-[#D3A548] border border-[#D3A548]/30 font-semibold">71 Cócteles</span>
+                          </div>
+                          <p className="text-[10px] text-zinc-400 truncate">Calle Echegaray 20 · Barrio de las Letras</p>
+                        </div>
+                      </div>
+                      {activeWorkspaceId === 'lovo-bar' && (
+                        <Check className="w-4 h-4 text-[#D3A548] shrink-0" />
+                      )}
+                    </button>
+
+                    {/* Option 4: Register new enterprise */}
+                    <div className="p-2 border-t border-[#2A344A] bg-[#12161F]/60">
+                      <button
+                        onClick={() => {
+                          setIsCompanyDropdownOpen(false);
+                          if (onOpenNewCompany) onOpenNewCompany();
+                          else if (onOpenAdmin) onOpenAdmin();
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 text-sky-300 text-xs font-bold transition cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                        <span>Registrar Nueva Empresa</span>
+                      </button>
+                    </div>
+
+                    {/* Option 5: Acceso Empresas / Validar Licencia */}
+                    {onOpenCompanyAccess && (
+                      <div className="p-2 border-t border-[#2A344A]/60 bg-[#12161F]/40">
+                        <button
+                          onClick={() => {
+                            setIsCompanyDropdownOpen(false);
+                            onOpenCompanyAccess();
+                          }}
+                          className="w-full flex items-center gap-2 px-3 py-1.5 rounded-xl text-sky-400 hover:bg-sky-500/10 text-xs font-semibold transition cursor-pointer"
+                        >
+                          <Key className="w-3.5 h-3.5" />
+                          <span>Ingresar con Licencia Corporativa</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
-            )}
-          </div>
-        </>
-      )}
-    </div>
+            </>
+          ) : hasCompanyLicense ? (
+            /* Licensed Employee: Locked Exclusively to their Company */
+            <>
+              <span className="hidden sm:inline-block text-[#2A344A]">/</span>
+              <div
+                className={`hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-xl border text-xs font-semibold select-none shadow-sm ${
+                  activeWorkspaceId === 'lovo-bar'
+                    ? 'border-[#D3A548]/50 bg-black/60 text-[#D3A548]'
+                    : activeWorkspaceId === 'tepic-madrid'
+                    ? 'border-[#B39964]/50 bg-[#21201E] text-[#FAF6EE]'
+                    : 'border-emerald-500/40 bg-emerald-950/40 text-emerald-300'
+                }`}
+                title={`Acceso Exclusivo Autorizado: ${activeWorkspaceName}`}
+              >
+                {activeWorkspaceId === 'lovo-bar' ? (
+                  <>
+                    <img src="/images/logos/lovo-logo.webp" alt="LOVO" className="w-4 h-4 object-contain" />
+                    <span className="font-serif font-black text-[#D3A548] truncate max-w-[120px] sm:max-w-[160px]">LOVO Bar</span>
+                  </>
+                ) : activeWorkspaceId === 'tepic-madrid' ? (
+                  <>
+                    <div className="h-4 w-7 bg-[#FAF7F2] rounded px-0.5 flex items-center justify-center border border-[#B39964]/40">
+                      <img src="/images/logos/tepic-logo.png" alt="Tepic" className="h-3 w-auto object-contain" />
+                    </div>
+                    <span className="font-serif font-bold text-[#FAF6EE] truncate max-w-[120px] sm:max-w-[160px]">Rest. Tepic</span>
+                  </>
+                ) : (
+                  <>
+                    <Building2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span className="font-semibold text-white truncate max-w-[120px] sm:max-w-[160px]">
+                      {activeWorkspaceName}
+                    </span>
+                  </>
+                )}
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-md text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  <ShieldCheck className="w-2.5 h-2.5 text-emerald-400" />
+                  <span className="hidden sm:inline">Exclusivo</span>
+                </span>
+              </div>
+            </>
+          ) : null}
+
+        </div>
 
         {/* ========================================================= */}
         {/* MOBILE HEADER BAR (< 768px): Clean, No Overlap, No Clipping */}
@@ -358,11 +399,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           {onOpenLevelModal && (
             <button
               onClick={onOpenLevelModal}
-              className="flex items-center gap-1 px-2 py-1.5 rounded-xl border border-[#2A344A] bg-[#1C2331] active:bg-[#242D3E] text-[#E2E8F0] text-xs font-bold transition cursor-pointer shadow-sm"
+              className="flex items-center gap-1 px-2 py-1.5 rounded-xl border border-[#2A344A] bg-[#1C2331] active:bg-[#242D3E] text-[#E2E8F0] text-xs font-bold transition cursor-pointer shadow-sm shrink-0"
               title="Tu nivel actual de Pitch"
             >
               <Award className="w-3.5 h-3.5 text-[#38BDF8] shrink-0" />
-              <span className="text-[11px] font-black text-[#38BDF8] truncate max-w-[70px]">
+              <span className="text-[11px] font-black text-[#38BDF8] truncate max-w-[65px] sm:max-w-[80px]">
                 {currentPitchTierName}
               </span>
             </button>
@@ -372,7 +413,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {activeWorkspaceId === 'lovo-bar' && onOpenLovoMenu ? (
             <button
               onClick={onOpenLovoMenu}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-[#D3A548]/50 bg-black/70 active:bg-black text-[#D3A548] text-xs font-bold transition cursor-pointer shadow-sm"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-[#D3A548]/50 bg-black/70 active:bg-black text-[#D3A548] text-xs font-bold transition cursor-pointer shadow-sm shrink-0"
               title="Carta Trilogía LOVO Bar (71 cócteles)"
             >
               <img src="/images/logos/lovo-logo.webp" alt="LOVO" className="w-3.5 h-3.5 object-contain" />
@@ -381,7 +422,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           ) : activeWorkspaceId === 'tepic-madrid' && onOpenTepicMenu ? (
             <button
               onClick={onOpenTepicMenu}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-[#B39964]/50 bg-[#21201E] active:bg-[#282622] text-[#FAF6EE] text-xs font-bold transition cursor-pointer shadow-sm"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-[#B39964]/50 bg-[#21201E] active:bg-[#282622] text-[#FAF6EE] text-xs font-bold transition cursor-pointer shadow-sm shrink-0"
               title="Carta Oficial Restaurante Tepic (Michelin Bib Gourmand)"
             >
               <div className="h-3.5 w-6 bg-[#FAF7F2] rounded px-0.5 flex items-center justify-center border border-[#B39964]/40">
@@ -394,7 +435,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Mobile Hamburger Toggle Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className={`p-2 rounded-xl border transition-all cursor-pointer ${
+            className={`p-2 rounded-xl border transition-all cursor-pointer shrink-0 ${
               isMobileMenuOpen
                 ? 'border-[#38BDF8] bg-sky-500/15 text-[#38BDF8]'
                 : 'border-[#2A344A] bg-[#1C2331] active:bg-[#242D3E] text-[#E2E8F0]'
@@ -716,100 +757,137 @@ export const Navbar: React.FC<NavbarProps> = ({
             ref={mobileMenuRef}
             className="bg-[#12161F] border-b border-[#2A344A] shadow-2xl max-h-[calc(100vh-55px)] overflow-y-auto overflow-x-hidden p-4 space-y-4 animate-in slide-in-from-top-3 duration-200"
           >
-            {/* SECTIONS 1 & 2: Company Switcher & Menus (Only visible for Admin or scoped company portal) */}
+            {/* SECTIONS 1 & 2: Company Switcher & Menus */}
             {(isAdmin || (activeWorkspaceId && activeWorkspaceId !== 'default' && activeWorkspaceId !== 'all')) && (
               <>
-                {/* SECTION 1: Company Switcher Tabs */}
-                <div className="space-y-1.5">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1">
-                    Empresa / Entorno Activo
-                  </p>
-                  <div className="grid grid-cols-3 gap-1.5 bg-[#161D2B] p-1 rounded-2xl border border-[#2A344A]">
-                    <button
-                      onClick={() => handleCompanySelect('all')}
-                      className={`py-2 px-1 text-center rounded-xl text-xs font-bold transition cursor-pointer ${
-                        activeWorkspaceId === 'all' || activeWorkspaceId === 'default'
-                          ? 'bg-sky-500 text-slate-950 shadow-md'
-                          : 'text-slate-300 hover:text-white'
-                      }`}
-                    >
-                      Todas
-                    </button>
-                    <button
-                      onClick={() => handleCompanySelect('tepic-madrid')}
-                      className={`py-2 px-1 text-center rounded-xl text-xs font-bold transition cursor-pointer ${
-                        activeWorkspaceId === 'tepic-madrid'
-                          ? 'bg-amber-400 text-slate-950 shadow-md'
-                          : 'text-slate-300 hover:text-white'
-                      }`}
-                    >
-                      🌮 Tepic
-                    </button>
-                    <button
-                      onClick={() => handleCompanySelect('lovo-bar')}
-                      className={`py-2 px-1 text-center rounded-xl text-xs font-bold transition cursor-pointer ${
-                        activeWorkspaceId === 'lovo-bar'
-                          ? 'bg-amber-400 text-slate-950 shadow-md'
-                          : 'text-slate-300 hover:text-white'
-                      }`}
-                    >
-                      🍸 LOVO
-                    </button>
+                {/* SECTION 1: Company Switcher (Admin only) or Locked Identity (Employee) */}
+                {isAdmin ? (
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1">
+                      Empresa / Entorno Activo (Modo Admin)
+                    </p>
+                    <div className="grid grid-cols-3 gap-1.5 bg-[#161D2B] p-1 rounded-2xl border border-[#2A344A]">
+                      <button
+                        onClick={() => handleCompanySelect('all')}
+                        className={`py-2 px-1 text-center rounded-xl text-xs font-bold transition cursor-pointer ${
+                          activeWorkspaceId === 'all' || activeWorkspaceId === 'default'
+                            ? 'bg-sky-500 text-slate-950 shadow-md'
+                            : 'text-slate-300 hover:text-white'
+                        }`}
+                      >
+                        Todas
+                      </button>
+                      <button
+                        onClick={() => handleCompanySelect('tepic-madrid')}
+                        className={`py-2 px-1 text-center rounded-xl text-xs font-bold transition cursor-pointer ${
+                          activeWorkspaceId === 'tepic-madrid'
+                            ? 'bg-amber-400 text-slate-950 shadow-md'
+                            : 'text-slate-300 hover:text-white'
+                        }`}
+                      >
+                        🌮 Tepic
+                      </button>
+                      <button
+                        onClick={() => handleCompanySelect('lovo-bar')}
+                        className={`py-2 px-1 text-center rounded-xl text-xs font-bold transition cursor-pointer ${
+                          activeWorkspaceId === 'lovo-bar'
+                            ? 'bg-amber-400 text-slate-950 shadow-md'
+                            : 'text-slate-300 hover:text-white'
+                        }`}
+                      >
+                        🍸 LOVO
+                      </button>
+                    </div>
                   </div>
-                </div>
-
-                {/* SECTION 2: Official Gastronomy Menus */}
-                <div className="space-y-2">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1">
-                    Cartas Oficiales
-                  </p>
-
-                  {/* Carta LOVO Button */}
-                  {onOpenLovoMenu && (
-                    <button
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        onOpenLovoMenu();
-                      }}
-                      className="w-full flex items-center gap-3 p-3 rounded-2xl border border-[#D3A548]/40 bg-gradient-to-r from-black via-[#0B0E14] to-[#12161F] text-left transition cursor-pointer shadow-md"
-                    >
-                      <div className="w-10 h-10 rounded-xl bg-black border border-[#D3A548]/50 p-1 flex items-center justify-center shrink-0 shadow-md">
-                        <img src="/images/logos/lovo-logo.webp" alt="LOVO" className="h-full w-full object-contain" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <p className="text-xs font-serif font-black text-[#D3A548]">Carta Trilogía LOVO Bar</p>
-                          <span className="text-[10px] bg-[#D3A548] text-black font-black px-1.5 py-0.2 rounded">71 Cócteles</span>
+                ) : hasCompanyLicense ? (
+                  /* Licensed Employee: Locked Company Status Pill */
+                  <div className="p-3 rounded-2xl border border-emerald-500/30 bg-[#161D2B] flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      {activeWorkspaceId === 'lovo-bar' ? (
+                        <img src="/images/logos/lovo-logo.webp" alt="LOVO" className="w-6 h-6 object-contain" />
+                      ) : activeWorkspaceId === 'tepic-madrid' ? (
+                        <div className="h-5 w-8 bg-[#FAF7F2] rounded px-0.5 flex items-center justify-center border border-[#B39964]/40">
+                          <img src="/images/logos/tepic-logo.png" alt="Tepic" className="h-3.5 w-auto object-contain" />
                         </div>
-                        <p className="text-[11px] text-zinc-400 truncate mt-0.5">La Musa, Taxonomía & La Tribu</p>
+                      ) : (
+                        <Building2 className="w-5 h-5 text-emerald-400" />
+                      )}
+                      <div>
+                        <p className="text-xs font-bold text-white">{activeWorkspaceName}</p>
+                        <p className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+                          <ShieldCheck className="w-3 h-3" />
+                          <span>Entorno Corporativo Exclusivo</span>
+                        </p>
                       </div>
-                    </button>
-                  )}
+                    </div>
+                    {onExitCompanyWorkspace && (
+                      <button
+                        onClick={() => {
+                          setIsMobileMenuOpen(false);
+                          onExitCompanyWorkspace();
+                        }}
+                        className="px-2.5 py-1 rounded-lg border border-rose-500/30 text-rose-300 text-[10px] font-bold hover:bg-rose-500/10 transition cursor-pointer"
+                      >
+                        Salir
+                      </button>
+                    )}
+                  </div>
+                ) : null}
 
-                  {/* Carta Tepic Button */}
-                  {onOpenTepicMenu && (
-                    <button
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        onOpenTepicMenu();
-                      }}
-                      className="w-full flex items-center gap-3 p-3 rounded-2xl border border-[#B39964]/50 bg-gradient-to-r from-[#21201E] via-[#1A1917] to-[#12161F] text-left transition cursor-pointer shadow-md hover:border-[#B39964]"
-                    >
-                      <div className="w-10 h-10 rounded-xl bg-[#FAF7F2] border border-[#B39964]/60 p-1 flex items-center justify-center shrink-0 shadow-md">
-                        <img src="/images/logos/tepic-logo.png" alt="Tepic" className="h-5 w-auto object-contain" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <p className="text-xs font-serif font-bold text-white">Carta Restaurante Tepic</p>
-                          <span className="text-[10px] bg-[#2E281E] text-[#E8D4A2] font-bold px-1.5 py-0.2 rounded border border-[#B39964]/40">
-                            Bib Gourmand
-                          </span>
+                {/* SECTION 2: Official Gastronomy Menus (Scoped to this company) */}
+                {(isAdmin || activeWorkspaceId === 'lovo-bar' || activeWorkspaceId === 'tepic-madrid') && (
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1">
+                      Cartas Oficiales
+                    </p>
+
+                    {/* Carta LOVO Button */}
+                    {(isAdmin || activeWorkspaceId === 'lovo-bar') && onOpenLovoMenu && (
+                      <button
+                        onClick={() => {
+                          setIsMobileMenuOpen(false);
+                          onOpenLovoMenu();
+                        }}
+                        className="w-full flex items-center gap-3 p-3 rounded-2xl border border-[#D3A548]/40 bg-gradient-to-r from-black via-[#0B0E14] to-[#12161F] text-left transition cursor-pointer shadow-md"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-black border border-[#D3A548]/50 p-1 flex items-center justify-center shrink-0 shadow-md">
+                          <img src="/images/logos/lovo-logo.webp" alt="LOVO" className="h-full w-full object-contain" />
                         </div>
-                        <p className="text-[11px] text-stone-300 truncate mt-0.5">Tacos nixtamalizados, mezcales y vinos (Ayala 14)</p>
-                      </div>
-                    </button>
-                  )}
-                </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <p className="text-xs font-serif font-black text-[#D3A548]">Carta Trilogía LOVO Bar</p>
+                            <span className="text-[10px] bg-[#D3A548] text-black font-black px-1.5 py-0.2 rounded">71 Cócteles</span>
+                          </div>
+                          <p className="text-[11px] text-zinc-400 truncate mt-0.5">La Musa, Taxonomía & La Tribu</p>
+                        </div>
+                      </button>
+                    )}
+
+                    {/* Carta Tepic Button */}
+                    {(isAdmin || activeWorkspaceId === 'tepic-madrid') && onOpenTepicMenu && (
+                      <button
+                        onClick={() => {
+                          setIsMobileMenuOpen(false);
+                          onOpenTepicMenu();
+                        }}
+                        className="w-full flex items-center gap-3 p-3 rounded-2xl border border-[#B39964]/50 bg-gradient-to-r from-[#21201E] via-[#1A1917] to-[#12161F] text-left transition cursor-pointer shadow-md hover:border-[#B39964]"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-[#FAF7F2] border border-[#B39964]/60 p-1 flex items-center justify-center shrink-0 shadow-md">
+                          <img src="/images/logos/tepic-logo.png" alt="Tepic" className="h-5 w-auto object-contain" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <p className="text-xs font-serif font-bold text-white">Carta Restaurante Tepic</p>
+                            <span className="text-[10px] bg-[#2E281E] text-[#E8D4A2] font-bold px-1.5 py-0.2 rounded border border-[#B39964]/40">
+                              Bib Gourmand
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-stone-300 truncate mt-0.5">Tacos nixtamalizados, mezcales y vinos (Ayala 14)</p>
+                        </div>
+                      </button>
+                    )}
+                  </div>
+                )}
               </>
             )}
 

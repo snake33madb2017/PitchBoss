@@ -496,36 +496,36 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-[#12161F] text-[#E2E8F0] overflow-hidden">
       {/* Top Bar Header - Clean, non-wrapping single line */}
-      <div className="flex items-center justify-between px-4 sm:px-6 py-2.5 sm:py-3 border-b border-[#2A344A] bg-[#12161F]/95 backdrop-blur-md shrink-0 z-20">
+      <div className="flex items-center justify-between px-3 sm:px-6 py-2 sm:py-3 border-b border-[#2A344A] bg-[#12161F]/95 backdrop-blur-md shrink-0 z-20">
         {/* Left: Avatar + Character Name */}
-        <div className="flex items-center gap-2.5 min-w-0">
+        <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
           <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#1C2331] border border-[#2A344A] flex items-center justify-center shrink-0">
             <span className="text-base sm:text-lg" role="img">
               {scenario.aiCharacter.avatar}
             </span>
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5">
-              <h2 className="text-xs sm:text-sm font-bold text-[#E2E8F0] truncate max-w-[130px] sm:max-w-[220px]">
+              <h2 className="text-xs sm:text-sm font-bold text-[#E2E8F0] truncate max-w-[100px] xs:max-w-[140px] sm:max-w-[220px]">
                 {scenario.aiCharacter.name}
               </h2>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
             </div>
-            <p className="text-[10px] text-[#94A3B8] truncate max-w-[140px] sm:max-w-none">
+            <p className="text-[10px] text-[#94A3B8] truncate max-w-[100px] xs:max-w-[140px] sm:max-w-none">
               {scenario.userRole}
             </p>
           </div>
         </div>
 
         {/* Right: Controls & Timer */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           {/* Mute speaker button */}
           <button
             onClick={() => {
               if (!isMuted) SpeechService.cancelSpeech();
               setIsMuted(!isMuted);
             }}
-            className={`p-1.5 rounded-xl border transition-colors cursor-pointer ${
+            className={`p-1.5 rounded-xl border transition-colors cursor-pointer shrink-0 ${
               isMuted
                 ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
                 : 'bg-[#1C2331] border-[#2A344A] text-[#94A3B8] hover:text-[#E2E8F0]'
@@ -536,7 +536,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
           </button>
 
           {/* Timer pill */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#1C2331] border border-[#2A344A] text-xs font-mono font-medium text-[#FBBF24]">
+          <div className="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-xl bg-[#1C2331] border border-[#2A344A] text-[11px] sm:text-xs font-mono font-medium text-[#FBBF24] shrink-0">
             <span className="w-1.5 h-1.5 rounded-full bg-[#FBBF24] animate-pulse" />
             <span>{formatDuration(durationSeconds)}</span>
           </div>
@@ -544,7 +544,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
           {/* Objectives Toggle */}
           <button
             onClick={() => setShowObjectives(!showObjectives)}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#1C2331] hover:bg-[#202838] border border-[#2A344A] text-xs font-medium text-[#E2E8F0] transition-colors cursor-pointer"
+            className="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-xl bg-[#1C2331] hover:bg-[#202838] border border-[#2A344A] text-[11px] sm:text-xs font-medium text-[#E2E8F0] transition-colors cursor-pointer shrink-0"
             title="Ver objetivos"
           >
             <span>
@@ -556,7 +556,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
           {/* Exit without report */}
           <button
             onClick={handleExitWithAutoSave}
-            className="p-1.5 rounded-xl bg-[#1C2331] hover:bg-[#202838] border border-[#2A344A] text-[#94A3B8] hover:text-[#E2E8F0] transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl bg-[#1C2331] hover:bg-[#202838] border border-[#2A344A] text-[#94A3B8] hover:text-[#E2E8F0] transition-colors cursor-pointer shrink-0"
             title="Guardar y Salir"
           >
             <X className="w-3.5 h-3.5" />
@@ -960,68 +960,71 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
       )}
 
       {/* Bottom Floating Call Dock (Apple / ChatGPT style) */}
-      <div className="px-4 sm:px-6 py-3 bg-[#12161F]/95 border-t border-[#2A344A] backdrop-blur-md flex items-center justify-between max-w-md mx-auto w-full shrink-0 z-20">
+      <div
+        className="px-2 xs:px-4 sm:px-6 py-2 sm:py-3 bg-[#12161F]/95 border-t border-[#2A344A] backdrop-blur-md flex items-center justify-around sm:justify-between max-w-md mx-auto w-full shrink-0 z-20"
+        style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
+      >
         {/* Lifeline / Hint button */}
         <button
           onClick={fetchLiveHints}
-          className="flex flex-col items-center gap-1 text-[#94A3B8] hover:text-[#38BDF8] transition-colors cursor-pointer"
+          className="flex flex-col items-center gap-1 text-[#94A3B8] hover:text-[#38BDF8] transition-colors cursor-pointer shrink-0"
           title="Pedir ideas de respuesta"
         >
-          <div className="w-10 h-10 rounded-full bg-[#1C2331] border border-[#2A344A] hover:border-[#38BDF8]/40 flex items-center justify-center transition-all">
-            <Lightbulb className="w-4 h-4" />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#1C2331] border border-[#2A344A] hover:border-[#38BDF8]/40 flex items-center justify-center transition-all">
+            <Lightbulb className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
-          <span className="text-[10px] font-medium">Pista</span>
+          <span className="text-[9px] sm:text-[10px] font-medium">Pista</span>
         </button>
 
         {/* Repeat audio button */}
         <button
           onClick={repeatLastAiStatement}
-          className={`flex flex-col items-center gap-1 transition-colors cursor-pointer ${
+          className={`flex flex-col items-center gap-1 transition-colors cursor-pointer shrink-0 ${
             callState === 'ai_speaking' ? 'text-[#38BDF8]' : 'text-[#94A3B8] hover:text-[#E2E8F0]'
           }`}
           title={callState === 'ai_speaking' ? 'Detener audio' : 'Escuchar de nuevo'}
         >
           <div
-            className={`w-10 h-10 rounded-full bg-[#1C2331] border flex items-center justify-center transition-all ${
+            className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#1C2331] border flex items-center justify-center transition-all ${
               callState === 'ai_speaking'
                 ? 'border-[#38BDF8] shadow-sm shadow-sky-500/20'
                 : 'border-[#2A344A] hover:border-[#3D4A66]'
             }`}
           >
             {callState === 'ai_speaking' ? (
-              <VolumeX className="w-4 h-4 text-[#38BDF8] animate-pulse" />
+              <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#38BDF8] animate-pulse" />
             ) : (
-              <RotateCcw className="w-4 h-4" />
+              <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             )}
           </div>
-          <span className="text-[10px] font-medium">
+          <span className="text-[9px] sm:text-[10px] font-medium">
             {callState === 'ai_speaking' ? 'Detener' : 'Repetir'}
           </span>
         </button>
 
         {/* Central Prominent Walkie-Talkie Button */}
-        <div className="flex flex-col items-center gap-1 -mt-2 select-none">
+        <div className="flex flex-col items-center gap-1 -mt-1 select-none shrink-0">
           <button
             type="button"
             onPointerDown={handleWalkieTalkieStart}
             onPointerUp={handleWalkieTalkieEnd}
             onPointerCancel={handleWalkieTalkieEnd}
             onContextMenu={(e) => e.preventDefault()}
-            className={`w-15 h-15 rounded-full flex items-center justify-center transition-all duration-150 cursor-pointer touch-none select-none relative ${
+            className={`w-13 h-13 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-all duration-150 cursor-pointer touch-none select-none relative ${
               isHoldingMic
-                ? 'bg-rose-600 text-white ring-8 ring-rose-500/30 scale-110 shadow-2xl shadow-rose-600/50'
+                ? 'bg-rose-600 text-white ring-6 sm:ring-8 ring-rose-500/30 scale-105 sm:scale-110 shadow-2xl shadow-rose-600/50'
                 : 'bg-[#0EA5E9] hover:bg-[#38BDF8] text-slate-950 shadow-lg shadow-sky-950/40 active:scale-95'
             }`}
             title="Mantén presionado para hablar, suelta para enviar"
           >
             {isHoldingMic ? (
-              <Mic className="w-7 h-7 text-white animate-pulse" />
+              <Mic className="w-6 h-6 sm:w-7 sm:h-7 text-white animate-pulse" />
             ) : (
-              <Mic className="w-6 h-6 text-slate-950" />
+              <Mic className="w-5 h-5 sm:w-6 sm:h-6 text-slate-950" />
             )}
           </button>
           <span
-            className={`text-[10px] font-semibold tracking-tight transition-colors ${
+            className={`text-[9px] sm:text-[10px] font-semibold tracking-tight transition-colors ${
               isHoldingMic ? 'text-rose-400 font-bold animate-pulse' : 'text-[#94A3B8]'
             }`}
           >
@@ -1032,27 +1035,27 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
         {/* Keyboard Toggle */}
         <button
           onClick={() => setShowTextInput(!showTextInput)}
-          className={`flex flex-col items-center gap-1 transition-colors cursor-pointer ${
+          className={`flex flex-col items-center gap-1 transition-colors cursor-pointer shrink-0 ${
             showTextInput ? 'text-[#38BDF8]' : 'text-[#94A3B8] hover:text-[#E2E8F0]'
           }`}
           title="Escribir texto"
         >
-          <div className="w-10 h-10 rounded-full bg-[#1C2331] border border-[#2A344A] flex items-center justify-center transition-all">
-            <Keyboard className="w-4 h-4" />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#1C2331] border border-[#2A344A] flex items-center justify-center transition-all">
+            <Keyboard className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
-          <span className="text-[10px] font-medium">Teclado</span>
+          <span className="text-[9px] sm:text-[10px] font-medium">Teclado</span>
         </button>
 
         {/* End Call Button */}
         <button
           onClick={handleHangUp}
-          className="flex flex-col items-center gap-1 text-[#94A3B8] hover:text-rose-400 transition-colors cursor-pointer"
+          className="flex flex-col items-center gap-1 text-[#94A3B8] hover:text-rose-400 transition-colors cursor-pointer shrink-0"
           title="Colgar y ver reporte"
         >
-          <div className="w-10 h-10 rounded-full bg-[#1C2331] border border-[#2A344A] hover:bg-rose-600 hover:border-rose-600 flex items-center justify-center text-rose-400 hover:text-white transition-all">
-            <PhoneOff className="w-4 h-4" />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#1C2331] border border-[#2A344A] hover:bg-rose-600 hover:border-rose-600 flex items-center justify-center text-rose-400 hover:text-white transition-all">
+            <PhoneOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </div>
-          <span className="text-[10px] font-medium text-rose-400">Colgar</span>
+          <span className="text-[9px] sm:text-[10px] font-medium text-rose-400">Colgar</span>
         </button>
       </div>
 

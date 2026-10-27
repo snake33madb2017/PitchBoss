@@ -81,47 +81,47 @@ export const TepicMenuModal: React.FC<TepicMenuModalProps> = ({
       >
         {/* TOP HEADER: Tepic Authentic Cantera Slate & Ochre Gold */}
         <header 
-          className="relative px-5 sm:px-7 py-4 sm:py-5 border-b border-[#38342D] flex flex-col md:flex-row md:items-center justify-between gap-4"
+          className="relative px-3.5 sm:px-7 py-3 sm:py-5 border-b border-[#38342D] flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 shrink-0"
           style={{ backgroundColor: '#21201E' }}
         >
           {/* Brand Info with Official Tepic Logo */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0 mr-2">
             <div 
-              className="px-2.5 py-1.5 rounded-2xl flex items-center justify-center shadow-lg bg-[#FAF7F2] border border-[#B39964]/60 shrink-0"
+              className="px-2 py-1 rounded-2xl flex items-center justify-center shadow-lg bg-[#FAF7F2] border border-[#B39964]/60 shrink-0"
               title="Restaurante Tepic · Madrid"
             >
               <img 
                 src="/images/logos/tepic-logo.png" 
                 alt="Logo Oficial Restaurante Tepic" 
-                className="h-9 w-auto object-contain"
+                className="h-7 sm:h-9 w-auto object-contain"
               />
             </div>
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-xl sm:text-2xl font-serif font-black tracking-wide text-white">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                <h1 className="text-base sm:text-2xl font-serif font-black tracking-wide text-white truncate">
                   RESTAURANTE TEPIC
                 </h1>
                 <span 
-                  className="px-2.5 py-0.5 text-xs font-bold rounded-full flex items-center gap-1 border shadow-sm"
+                  className="px-2 py-0.5 text-[10px] sm:text-xs font-bold rounded-full flex items-center gap-1 border shadow-sm shrink-0"
                   style={{ backgroundColor: '#2E281E', color: '#E8D4A2', borderColor: '#B39964' }}
                 >
-                  <Award className="w-3.5 h-3.5 text-[#B39964]" /> Michelin Bib Gourmand
+                  <Award className="w-3 h-3 text-[#B39964]" /> Bib Gourmand
                 </span>
                 <span 
-                  className="px-2.5 py-0.5 text-[11px] font-semibold rounded-full border"
+                  className="px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold rounded-full border shrink-0 hidden xs:inline-flex"
                   style={{ backgroundColor: '#1E3327', color: '#A7F3D0', borderColor: '#2D7D52' }}
                 >
-                  Oasis Mexicano · Ayala 14
+                  Ayala 14
                 </span>
               </div>
-              <p className="text-xs sm:text-sm mt-0.5 font-normal text-stone-300">
-                Carta Oficial & Protocolo de Pitch en Inglés · Barrio de Salamanca, Madrid
+              <p className="text-[11px] sm:text-xs mt-0.5 font-normal text-stone-300 truncate hidden xs:block">
+                Carta Oficial & Protocolo de Pitch en Inglés · Madrid
               </p>
             </div>
           </div>
 
           {/* Quick Actions & Close */}
-          <div className="flex items-center gap-2.5 self-end md:self-auto">
+          <div className="flex items-center gap-2 self-end md:self-auto shrink-0">
             {/* External Official Link */}
             <a
               href="https://www.tepic.es/carta/"

@@ -1,4 +1,5 @@
 import type { Scenario, SessionReport, Workspace } from '../types';
+import type { LicenseInfo } from './subscriptionService';
 
 const WORKSPACE_STORAGE_KEY = 'pitchboss_current_workspace_id';
 const ADMIN_TOKEN_KEY = 'pitchboss_admin_token';
@@ -248,5 +249,80 @@ export class CloudSyncService {
       console.warn('Could not fetch team reports:', err);
     }
     return [];
+  }
+
+  /**
+   * Fetch all cloud licenses
+   */
+  public static async getLicenses(workspaceId?: string): Promise<LicenseInfo[]> {
+    const ws = workspaceId || this.getCurrentWorkspaceId();
+    try {
+      const url = ws && ws !== 'all' ? `/api/licenses?workspaceId=${encodeURIComponent(ws)}` : '/api/licenses';
+      const res = await fetch(url, {
+        headers: { 'X-PitchBoss-Workspace': ws }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return data.licenses || [];
+      }
+    } catch (err) {
+      console.warn('Could not fetch cloud licenses:', err);
+    }
+    return [];
+  }
+
+  /**
+   * Save a new license to cloud backend
+   */
+  public static async createLicense(license: LicenseInfo): Promise<LicenseInfo | null> {
+    try {
+      const res = await fetch('/api/licenses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(license)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return data.license;
+      }
+    } catch (err) {
+      console.error('Error saving license to cloud:', err);
+    }
+    return null;
+  }
+
+  /**
+   * Validates a license key with cloud backend
+   */
+  public static async validateLicense(key: string): Promise<{ valid: boolean; license?: LicenseInfo; message?: string }> {
+    try {
+      const res = await fetch(`/api/licenses/validate?key=${encodeURIComponent(key.trim())}`);
+      const data = await res.json();
+      return {
+        valid: Boolean(data.valid),
+        license: data.license,
+        message: data.message || data.error
+      };
+    } catch (err: any) {
+      console.warn('Error validating license with cloud, fallback to offline:', err);
+      return { valid: false, message: 'No se pudo conectar con el servidor de validación.' };
+    }
+  }
+
+  /**
+   * Revoke a license on the cloud
+   */
+  public static async revokeLicense(key: string): Promise<boolean> {
+    try {
+      const res = await fetch('/api/licenses/revoke', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: key.trim() })
+      });
+      return res.ok;
+    } catch (err) {
+      console.error('Error revoking license on cloud:', err);
+      return false;
+    }
   }
 }

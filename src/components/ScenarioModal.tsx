@@ -258,16 +258,16 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-[#0B0F17]/85 backdrop-blur-md overflow-hidden">
       <div className="relative w-full max-w-3xl rounded-3xl border border-[#2A344A] bg-[#1C2331] text-[#E2E8F0] shadow-2xl flex flex-col h-[94vh] sm:h-auto sm:max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95">
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-[#2A344A] bg-[#12161F] shrink-0 z-10">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0">
+        <div className="flex items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 border-b border-[#2A344A] bg-[#12161F] shrink-0 z-10">
+          <div className="flex items-center gap-2.5 min-w-0 mr-2">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0">
               {isEditMode ? <Edit3 className="w-4 h-4 text-sky-400" /> : <Sparkles className="w-4 h-4 text-sky-400" />}
             </div>
             <div className="min-w-0">
-              <h2 className="text-base sm:text-lg font-bold text-[#E2E8F0] truncate">
-                {isEditMode ? 'Editar Escenario' : 'Crear Escenario de Entrenamiento'}
+              <h2 className="text-sm sm:text-lg font-bold text-[#E2E8F0] truncate">
+                {isEditMode ? 'Editar Escenario' : 'Crear Escenario'}
               </h2>
-              <p className="text-xs text-[#94A3B8] truncate">
+              <p className="text-[11px] sm:text-xs text-[#94A3B8] truncate hidden xs:block">
                 {isEditMode
                   ? 'Modifica los diálogos, fonética, objetivos y vocabulario'
                   : 'Diseña una nueva simulación con IA o de forma manual'}
@@ -276,7 +276,7 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-[#94A3B8] hover:text-white hover:bg-[#222B3D] transition-colors cursor-pointer shrink-0"
+            className="p-1.5 sm:p-2 rounded-xl text-[#94A3B8] hover:text-white hover:bg-[#222B3D] transition-colors cursor-pointer shrink-0"
             title="Cerrar"
           >
             <X className="w-5 h-5" />
@@ -284,27 +284,28 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
         </div>
 
         {/* Tab Buttons */}
-        <div className="flex border-b border-[#2A344A] px-4 sm:px-6 pt-1 bg-[#12161F] shrink-0">
+        <div className="flex border-b border-[#2A344A] px-3 sm:px-6 pt-1 bg-[#12161F] shrink-0 overflow-x-auto scrollbar-none">
           <button
             onClick={() => setActiveTab('ai')}
-            className={`flex items-center gap-2 px-4 py-3 text-sm font-bold border-b-2 transition-colors cursor-pointer ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-bold border-b-2 transition-colors cursor-pointer shrink-0 ${
               activeTab === 'ai'
                 ? 'border-sky-400 text-sky-400'
                 : 'border-transparent text-[#94A3B8] hover:text-[#E2E8F0]'
             }`}
           >
-            <Wand2 className="w-4 h-4" />
-            <span>✨ Inyector Maestro de Carta / IA</span>
+            <Wand2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">✨ Inyector Maestro de Carta / IA</span>
+            <span className="sm:hidden">✨ Inyector Carta / IA</span>
           </button>
           <button
             onClick={() => setActiveTab('manual')}
-            className={`flex items-center gap-2 px-4 py-3 text-sm font-bold border-b-2 transition-colors cursor-pointer ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-bold border-b-2 transition-colors cursor-pointer shrink-0 ${
               activeTab === 'manual'
                 ? 'border-sky-400 text-sky-400'
                 : 'border-transparent text-[#94A3B8] hover:text-[#E2E8F0]'
             }`}
           >
-            <Edit3 className="w-4 h-4" />
+            <Edit3 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span>{isEditMode ? 'Datos del Escenario' : 'Campos Detallados'}</span>
           </button>
         </div>
@@ -874,20 +875,20 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
         </div>
 
         {/* Modal Footer: Fixed & fully visible on mobile */}
-        <div className="flex items-center justify-end gap-3 px-4 sm:px-6 py-3.5 border-t border-[#2A344A] bg-[#12161F] shrink-0 z-10">
+        <div className="flex items-center justify-end gap-2.5 px-3.5 sm:px-6 py-3 sm:py-3.5 border-t border-[#2A344A] bg-[#12161F] shrink-0 z-10">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2.5 rounded-xl text-sm font-semibold text-[#94A3B8] hover:text-[#E2E8F0] hover:bg-[#222B3D] transition-colors cursor-pointer"
+            className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-[#94A3B8] hover:text-[#E2E8F0] hover:bg-[#222B3D] transition-colors cursor-pointer text-center"
           >
             {t('modal.cancel')}
           </button>
           <button
             type="button"
             onClick={handleSave}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-sky-500 hover:bg-sky-400 shadow-lg shadow-sky-500/25 active:scale-95 transition-all cursor-pointer"
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-sky-500 hover:bg-sky-400 shadow-lg shadow-sky-500/25 active:scale-95 transition-all cursor-pointer text-center"
           >
-            <Check className="w-4 h-4" />
+            <Check className="w-4 h-4 shrink-0" />
             <span>{isEditMode ? 'Guardar Cambios' : 'Guardar y Practicar'}</span>
           </button>
         </div>

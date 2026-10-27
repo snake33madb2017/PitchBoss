@@ -80,28 +80,28 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-black/80 backdrop-blur-md overflow-hidden">
       <div className="relative w-full max-w-4xl rounded-3xl border border-[#2A344A] bg-[#1C2331] text-[#E2E8F0] shadow-2xl flex flex-col h-[94vh] sm:h-auto sm:max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 sm:px-7 py-4 border-b border-[#2A344A] bg-[#12161F] shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-[#38BDF8] shrink-0">
+        <div className="flex items-center justify-between px-3.5 sm:px-7 py-3 sm:py-4 border-b border-[#2A344A] bg-[#12161F] shrink-0">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 mr-2">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-[#38BDF8] shrink-0">
               <History className="w-5 h-5" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-black text-[#E2E8F0]">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <h2 className="text-sm sm:text-lg font-black text-[#E2E8F0] truncate">
                   Historial de <span className="text-[#38BDF8]">Conversaciones</span>
                 </h2>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#1C2331] text-[#94A3B8] border border-[#2A344A] font-mono">
-                  {sessions.length} registradas
+                <span className="text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-[#1C2331] text-[#94A3B8] border border-[#2A344A] font-mono shrink-0">
+                  {sessions.length}
                 </span>
               </div>
-              <p className="text-xs text-[#94A3B8]">
-                Retoma charlas previas y audita las transcripciones de cada práctica
+              <p className="text-[11px] sm:text-xs text-[#94A3B8] truncate hidden xs:block">
+                Retoma charlas previas y audita transcripciones
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl bg-[#1C2331] hover:bg-[#202838] text-[#94A3B8] hover:text-[#E2E8F0] border border-[#2A344A] transition-colors cursor-pointer"
+            className="p-1.5 sm:p-2 rounded-xl bg-[#1C2331] hover:bg-[#202838] text-[#94A3B8] hover:text-[#E2E8F0] border border-[#2A344A] transition-colors cursor-pointer shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
@@ -185,14 +185,14 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
           {selectedSessionForTranscript ? (
             /* Transcript Detail View */
             <div className="space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-[#2A344A]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-[#2A344A]">
                 <button
                   onClick={() => setSelectedSessionForTranscript(null)}
-                  className="flex items-center gap-1 text-xs text-[#38BDF8] hover:underline cursor-pointer font-bold"
+                  className="flex items-center gap-1 text-xs text-[#38BDF8] hover:underline cursor-pointer font-bold self-start"
                 >
                   ← Volver al listado de sesiones
                 </button>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
                   {selectedSessionForTranscript.status === 'in_progress' && (
                     <button
                       onClick={() => {
@@ -211,7 +211,7 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#12161F] hover:bg-[#202838] text-[#E2E8F0] text-xs font-semibold border border-[#2A344A] transition-colors cursor-pointer"
                     >
                       <FileText className="w-3.5 h-3.5 text-[#38BDF8]" />
-                      Ver Informe de Evaluación
+                      Ver Informe
                     </button>
                   )}
                 </div>
