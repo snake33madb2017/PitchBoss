@@ -3,6 +3,8 @@ import { X, Sparkles, ArrowRight, ArrowLeft, Check, Copy, Share2, ShieldCheck, F
 import confetti from 'canvas-confetti';
 import type { Scenario, EnglishLevel, DifficultyLevel } from '../types';
 import { AdminStorageService } from '../services/adminStorageService';
+import { CloudSyncService } from '../services/cloudSyncService';
+import { TeamAnalyticsService } from '../services/teamAnalyticsService';
 import { LOVO_BAR_MASTER_KNOWLEDGE } from '../data/lovoBarKnowledge';
 
 interface BusinessOnboardingModalProps {
@@ -43,9 +45,11 @@ export const BusinessOnboardingModal: React.FC<BusinessOnboardingModalProps> = (
   };
 
   const handleCreateAndGenerateLink = () => {
+    const wsId = businessName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'default';
     const scenarioId = `biz-${Date.now()}`;
     const newScenario: Scenario = {
       id: scenarioId,
+      workspaceId: wsId,
       title: `${businessName}: Atención a Clientes Internacionales (Carta Oficial)`,
       niche: `${nicheCategory} - ${businessName}`,
       businessKnowledge: menuDocument.trim(),
@@ -85,10 +89,31 @@ export const BusinessOnboardingModal: React.FC<BusinessOnboardingModalProps> = (
       updatedAt: Date.now()
     };
 
-    // Save scenario to storage
-    const existing = AdminStorageService.getScenarios();
-    const updated = [newScenario, ...existing];
-    AdminStorageService.saveScenarios(updated);
+    // Save scenario to storage and sync to cloud
+    AdminStorageService.upsertScenario(newScenario);
+    CloudSyncService.createWorkspace(businessName.trim());
+
+    // Auto-seed initial member for this company in TeamAnalytics
+    TeamAnalyticsService.addMember(
+      {
+        name: 'Empleado Piloto',
+        role: employeeRole,
+        workspaceId: wsId,
+        scenarioId: newScenario.id,
+        scenarioTitle: newScenario.title,
+        totalSessions: 0,
+        menuFluencyScore: 50,
+        pronunciationScore: 50,
+        upSellingScore: 50,
+        objectionsMastered: 0,
+        totalObjections: 4,
+        totalSpokenMinutes: 0,
+        lastActiveDate: Date.now(),
+        status: 'needs_practice',
+        executiveFeedback: `Colaborador habilitado en ${businessName}. Pendiente de iniciar su entrenamiento.`
+      },
+      wsId
+    );
 
     setCreatedScenario(newScenario);
     onScenarioCreated(newScenario);
@@ -283,17 +308,18 @@ export const BusinessOnboardingModal: React.FC<BusinessOnboardingModalProps> = (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
-                    Nivel de Inglés del Equipo
+                    Nivel Pitch del Equipo
                   </label>
                   <select
                     value={targetLevel}
                     onChange={(e) => setTargetLevel(e.target.value as EnglishLevel)}
                     className="w-full bg-[#18202F] border border-[#2A344A] rounded-xl px-3.5 py-2.5 text-sm text-[#E2E8F0] focus:outline-none focus:border-sky-400 cursor-pointer font-medium"
                   >
-                    <option value="A1">A1 - Principiante (Frases muy cortas y apoyo fonético)</option>
-                    <option value="A2">A2 - Básico (Atención fluida y vocabulario de carta)</option>
-                    <option value="B1">B1 - Intermedio (Preguntas de clientes y alternativas)</option>
-                    <option value="B2">B2 - Avanzado (Clientes exigentes y modismos)</option>
+                    <option value="A1">Pitch One (Iniciación y apoyo guiado)</option>
+                    <option value="A2">Pitch One (Atención fluida y protocolo)</option>
+                    <option value="B1">Pitch Two (Fluidez y alternativas)</option>
+                    <option value="B2">Pitch Two (Argumentación y Up-Selling)</option>
+                    <option value="C1">Pitch Three (Alta Dirección y Negociación VIP)</option>
                   </select>
                 </div>
 

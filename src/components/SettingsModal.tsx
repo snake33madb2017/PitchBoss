@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import type { AppSettings } from '../types';
 import { SpeechService } from '../services/speechService';
+import { CloudSyncService } from '../services/cloudSyncService';
+import { NotificationService } from '../services/notificationService';
 import { useTranslation } from '../i18n/LanguageContext';
-import { Settings, Volume2, Mic, Check, X, Download } from 'lucide-react';
+import { Settings, Volume2, Mic, Check, X, Download, User, Bell } from 'lucide-react';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -29,6 +31,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [autoListen, setAutoListen] = useState(settings.autoListen);
   const [preferredVoice, setPreferredVoice] = useState(settings.preferredVoice);
   const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [employeeName, setEmployeeName] = useState(() => CloudSyncService.getEmployeeName());
+  const [remindersEnabled, setRemindersEnabled] = useState(() => NotificationService.isEnabled());
 
   useEffect(() => {
     SpeechService.getEnglishVoices().then((voices) => {
@@ -38,12 +42,24 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   if (!isOpen) return null;
 
+  const handleToggleReminders = async () => {
+    if (remindersEnabled) {
+      NotificationService.disable();
+      setRemindersEnabled(false);
+    } else {
+      const granted = await NotificationService.requestPermission();
+      setRemindersEnabled(granted);
+    }
+  };
+
   const handleSave = () => {
+    CloudSyncService.setEmployeeName(employeeName);
     onSaveSettings({
       ...settings,
       speechRate,
       autoListen,
-      preferredVoice
+      preferredVoice,
+      employeeName
     });
     onClose();
   };
@@ -67,6 +83,50 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
         {/* Form Body */}
         <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
+          {/* Employee Name (For Live Audit Reports) */}
+          <div className="space-y-2 p-3.5 rounded-2xl border border-sky-500/20 bg-[#12161F]">
+            <label className="text-xs font-semibold flex items-center gap-1.5 text-white">
+              <User className="w-3.5 h-3.5 text-[#38BDF8]" />
+              Tu Nombre / Colaborador
+            </label>
+            <p className="text-[11px] text-[#94A3B8]">
+              Tus reportes y notas de simulación se etiquetarán con este nombre en el panel del encargado.
+            </p>
+            <input
+              type="text"
+              value={employeeName}
+              onChange={(e) => setEmployeeName(e.target.value)}
+              placeholder="Ej. Carlos Méndez"
+              className="w-full border rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:border-[#38BDF8] bg-[#18202F] border-[#2A344A] text-[#E2E8F0]"
+            />
+          </div>
+
+          {/* Daily Retention Reminders (PWA Notifications) */}
+          <div className="flex items-center justify-between p-3.5 rounded-2xl border bg-[#12161F] border-[#2A344A]">
+            <div className="space-y-0.5 max-w-[75%]">
+              <span className="text-xs font-semibold flex items-center gap-1.5 text-[#E2E8F0]">
+                <Bell className="w-3.5 h-3.5 text-[#FBBF24]" />
+                Recordatorio Diario de Práctica (PWA)
+              </span>
+              <p className="text-[11px] text-[#94A3B8]">
+                Recibe un aviso diario para hacer 3 minutos de roleplay antes de tu turno.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleToggleReminders}
+              className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors cursor-pointer ${
+                remindersEnabled ? 'bg-[#0EA5E9]' : 'bg-[#1C2331] border border-[#2A344A]'
+              }`}
+            >
+              <div
+                className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${
+                  remindersEnabled ? 'translate-x-5' : 'translate-x-0'
+                }`}
+              />
+            </button>
+          </div>
+
           {/* Voice Selector */}
           <div className="space-y-2">
             <label className="text-xs font-semibold flex items-center gap-1.5 text-[#E2E8F0]">
@@ -208,9 +268,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </button>
           <button
             onClick={handleSave}
-            className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold shadow-lg transition-all cursor-pointer bg-[#0EA5E9] hover:bg-[#38BDF8] text-white shadow-sky-950/40"
+            className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold shadow-lg transition-all cursor-pointer bg-[#0EA5E9] hover:bg-[#38BDF8] text-slate-950 shadow-sky-950/40"
           >
-            <Check className="w-3.5 h-3.5 text-white" />
+            <Check className="w-3.5 h-3.5" />
             {t('settings.save')}
           </button>
         </div>

@@ -2,6 +2,7 @@ import React from 'react';
 import type { Scenario, SavedSession } from '../types';
 import { Phone, Target, Trash2, Building2, User, Edit3, Copy, Eye, EyeOff, Play, RotateCcw } from 'lucide-react';
 import { SessionHistoryService } from '../services/sessionHistoryService';
+import { LevelEvaluationService } from '../services/levelEvaluationService';
 import { useTranslation } from '../i18n/LanguageContext';
 
 interface ScenarioCardProps {
@@ -64,6 +65,10 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
       className={`group relative rounded-3xl p-6 flex flex-col justify-between transition-all duration-300 border ${
         scenario.isHidden
           ? 'bg-[#1C2331]/60 border-[#2A344A]/60 opacity-80'
+          : scenario.workspaceId === 'lovo-bar'
+          ? 'bg-[#1C2331] border-[#2A344A] hover:border-[#D3A548]/70 hover:bg-[#1f2638] hover:shadow-[#D3A548]/10'
+          : scenario.workspaceId === 'tepic-madrid'
+          ? 'bg-[#1C2331] border-[#2A344A] hover:border-[#B39964]/70 hover:bg-[#1f2638] hover:shadow-[#B39964]/10'
           : 'bg-[#1C2331] border-[#2A344A] hover:border-[#38BDF8]/60 hover:bg-[#202838]'
       } shadow-2xl shadow-black/40 hover:-translate-y-1`}
     >
@@ -150,23 +155,34 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
               <Building2 className="w-3 h-3 text-[#38BDF8]" />
               {scenario.niche}
             </span>
+            {scenario.workspaceId === 'lovo-bar' && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-serif font-black border bg-black/80 text-[#D3A548] border-[#D3A548]/50 shadow-sm">
+                <img src="/images/logos/lovo-logo.webp" alt="LOVO" className="w-3.5 h-3.5 object-contain" />
+                <span>LOVO Bar</span>
+              </span>
+            )}
+            {scenario.workspaceId === 'tepic-madrid' && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-serif font-bold border bg-[#21201E] text-[#FAF6EE] border-[#B39964]/50 shadow-sm">
+                <div className="h-3.5 w-6 bg-[#FAF7F2] rounded px-0.5 flex items-center justify-center border border-[#B39964]/40">
+                  <img src="/images/logos/tepic-logo.png" alt="Tepic" className="h-2.5 w-auto object-contain" />
+                </div>
+                <span>Tepic Madrid</span>
+              </span>
+            )}
             {getDifficultyBadge(scenario.difficulty)}
-            <span className="px-2 py-0.5 rounded-full text-xs font-mono font-bold border bg-[#12161F] text-[#38BDF8] border-[#2A344A]">
-              {scenario.targetEnglishLevel}
-            </span>
-            {scenario.title.includes('Pitch One') && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-sky-500/20 text-sky-300 border border-sky-500/40">
-                Pitch One (A1-A2)
+            {LevelEvaluationService.getPitchTier(scenario.targetEnglishLevel || scenario.title) === 'Pitch One' && (
+              <span className="px-2 py-0.5 rounded-full text-xs font-semibold tracking-wide border bg-sky-500/10 text-sky-400 border-sky-500/30">
+                Pitch One
               </span>
             )}
-            {scenario.title.includes('Pitch Two') && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                Pitch Two (B1-B2)
+            {LevelEvaluationService.getPitchTier(scenario.targetEnglishLevel || scenario.title) === 'Pitch Two' && (
+              <span className="px-2 py-0.5 rounded-full text-xs font-semibold tracking-wide border bg-amber-500/10 text-amber-400 border-amber-500/30">
+                Pitch Two
               </span>
             )}
-            {scenario.title.includes('Pitch Three') && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-purple-500/20 text-purple-300 border border-purple-500/40">
-                Pitch Three (C1-C2)
+            {LevelEvaluationService.getPitchTier(scenario.targetEnglishLevel || scenario.title) === 'Pitch Three' && (
+              <span className="px-2 py-0.5 rounded-full text-xs font-semibold tracking-wide border bg-purple-500/10 text-purple-400 border-purple-500/30">
+                Pitch Three
               </span>
             )}
           </div>
@@ -187,7 +203,7 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
 
         {/* Title */}
         <h3 className="text-lg font-bold transition-colors line-clamp-2 mb-3 text-[#E2E8F0] group-hover:text-[#38BDF8]">
-          {scenario.title}
+          {LevelEvaluationService.cleanTitle(scenario.title)}
         </h3>
 
         {/* AI Character & User Role */}

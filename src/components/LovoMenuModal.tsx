@@ -78,19 +78,19 @@ export const LovoMenuModal: React.FC<LovoMenuModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md overflow-hidden animate-fade-in">
-      <div className="relative w-full max-w-7xl h-[92vh] bg-[#12161F] border border-[#2A344A] rounded-2xl flex flex-col shadow-2xl overflow-hidden text-[#E2E8F0]">
+      <div className="relative w-full max-w-7xl h-[92vh] max-h-[920px] bg-[#0A0D14] border border-[#D3A548]/40 rounded-2xl flex flex-col shadow-2xl shadow-black/90 overflow-hidden text-[#E2E8F0]">
         {/* Header Bar */}
-        <div className="px-4 sm:px-6 py-4 border-b border-[#2A344A] bg-[#171D2A] flex flex-wrap items-center justify-between gap-3 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-lg">
-              🍸
+        <div className="px-4 sm:px-6 py-4 border-b border-[#2A344A] bg-[#000000] flex flex-wrap items-center justify-between gap-3 shrink-0">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-xl bg-black border border-[#D3A548]/50 p-1 flex items-center justify-center shrink-0 shadow-lg shadow-black">
+              <img src="/images/logos/lovo-logo.webp" alt="LOVO Bar Logo" className="w-full h-full object-contain" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-lg sm:text-xl font-black text-white uppercase tracking-tight">
+                <h2 className="text-lg sm:text-xl font-serif font-black text-[#D3A548] uppercase tracking-wider">
                   Carta Trilogía LOVO Bar
                 </h2>
-                <span className="text-[11px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full">
+                <span className="text-[11px] font-bold uppercase tracking-wider bg-[#D3A548]/20 text-[#D3A548] border border-[#D3A548]/40 px-2 py-0.5 rounded-full shrink-0">
                   71 Signature Cocktails
                 </span>
               </div>
@@ -108,7 +108,7 @@ export const LovoMenuModal: React.FC<LovoMenuModalProps> = ({
                 type="button"
                 onClick={() => setViewMode('cards')}
                 className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 ${
-                  viewMode === 'cards' ? 'bg-amber-400 text-zinc-950 shadow-md' : 'text-zinc-400 hover:text-white'
+                  viewMode === 'cards' ? 'bg-[#D3A548] text-black shadow-md font-black' : 'text-zinc-400 hover:text-white'
                 }`}
               >
                 <span>🍸</span>
@@ -118,7 +118,7 @@ export const LovoMenuModal: React.FC<LovoMenuModalProps> = ({
                 type="button"
                 onClick={() => setViewMode('book')}
                 className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 ${
-                  viewMode === 'book' ? 'bg-amber-400 text-zinc-950 shadow-md' : 'text-zinc-400 hover:text-white'
+                  viewMode === 'book' ? 'bg-[#D3A548] text-black shadow-md font-black' : 'text-zinc-400 hover:text-white'
                 }`}
               >
                 <span>📖</span>
@@ -263,8 +263,8 @@ export const LovoMenuModal: React.FC<LovoMenuModalProps> = ({
           </div>
         </div>
 
-        {/* Content Body: Scrollable */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#0E121B]">
+        {/* Content Body: Scrollable with reliable flex shrinking */}
+        <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6 bg-[#0E121B] overscroll-contain">
           {viewMode === 'cards' ? (
             /* Cards View */
             <div>
@@ -447,48 +447,52 @@ export const LovoMenuModal: React.FC<LovoMenuModalProps> = ({
           onClick={() => setSelectedCocktail(null)}
         >
           <div
-            className="relative w-full max-w-3xl bg-[#171D2A] border border-[#2A344A] rounded-2xl overflow-hidden shadow-2xl grid grid-cols-1 md:grid-cols-2 max-h-[90vh]"
+            className="relative w-full max-w-4xl bg-[#171D2A] border border-[#2A344A] rounded-2xl shadow-2xl flex flex-col md:flex-row max-h-[90vh] overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close */}
             <button
               type="button"
               onClick={() => setSelectedCocktail(null)}
-              className="absolute top-3 right-3 z-20 w-8 h-8 rounded-lg bg-black/70 hover:bg-black text-zinc-400 hover:text-white flex items-center justify-center border border-zinc-700 transition-colors"
+              className="absolute top-3 right-3 z-30 w-8 h-8 rounded-lg bg-black/80 hover:bg-black text-zinc-300 hover:text-white flex items-center justify-center border border-zinc-700 transition-colors shadow-lg cursor-pointer"
+              title="Cerrar detalle"
             >
               <X className="w-4 h-4" />
             </button>
 
-            {/* Left: Image */}
-            <div className="relative min-h-[260px] md:min-h-full bg-zinc-950">
+            {/* Left: Image (Responsive height on mobile, full height on desktop) */}
+            <div className="relative w-full md:w-5/12 h-52 sm:h-64 md:h-auto min-h-0 shrink-0 bg-zinc-950 overflow-hidden">
               <img
                 src={selectedCocktail.cocktail_image}
                 alt={selectedCocktail.name}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#171D2A] via-transparent to-black/30"></div>
-              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-wider bg-black/80 text-amber-400 px-2 py-1 rounded border border-amber-500/30">
+              <div className="absolute inset-0 bg-gradient-to-t from-[#171D2A] via-transparent to-black/40"></div>
+              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider bg-black/85 text-amber-400 px-2.5 py-1 rounded-md border border-amber-500/30 truncate">
                   {selectedCocktail.volume_title}
                 </span>
-                <span className="text-base font-black bg-amber-400 text-zinc-950 px-3 py-1 rounded">
+                <span className="text-sm sm:text-base font-black bg-amber-400 text-zinc-950 px-3 py-1 rounded-md shadow-md shrink-0">
                   {selectedCocktail.price}
                 </span>
               </div>
             </div>
 
-            {/* Right: Story & Mixology */}
-            <div className="p-6 flex flex-col justify-between overflow-y-auto max-h-[85vh]">
-              <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400 block mb-1">
-                  {lang === 'es' ? selectedCocktail.stage : selectedCocktail.stage_en}
-                </span>
-                <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-3">
-                  {selectedCocktail.name}
-                </h2>
+            {/* Right: Story, Mixology & Pinned Actions */}
+            <div className="w-full md:w-7/12 min-h-0 flex-1 flex flex-col justify-between overflow-hidden bg-[#171D2A]">
+              {/* Scrollable Details Area */}
+              <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6 overscroll-contain space-y-4">
+                <div>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400 block mb-1">
+                    {lang === 'es' ? selectedCocktail.stage : selectedCocktail.stage_en}
+                  </span>
+                  <h2 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight">
+                    {selectedCocktail.name}
+                  </h2>
+                </div>
 
                 {/* Story */}
-                <div className="bg-[#0E121B] border border-[#2A344A] p-3.5 rounded-xl mb-4">
+                <div className="bg-[#0E121B] border border-[#2A344A] p-3.5 rounded-xl">
                   <h4 className="text-[11px] font-bold uppercase text-amber-400 mb-1.5 flex items-center gap-1.5">
                     <span>📜</span> <span>{lang === 'es' ? 'Relato & Simbolismo' : 'Story & Lore'}</span>
                   </h4>
@@ -498,11 +502,11 @@ export const LovoMenuModal: React.FC<LovoMenuModalProps> = ({
                 </div>
 
                 {/* Ingredients */}
-                <div className="mb-4">
+                <div>
                   <h4 className="text-[11px] font-bold uppercase text-zinc-400 mb-2 flex items-center gap-1.5">
                     <span>🧪</span> <span>{lang === 'es' ? 'Ingredientes & Alquimia' : 'Ingredients & Recipe'}</span>
                   </h4>
-                  <ul className="space-y-1 text-xs text-zinc-200">
+                  <ul className="space-y-1.5 text-xs text-zinc-200">
                     {(lang === 'es' ? selectedCocktail.ingredients_es : selectedCocktail.ingredients_en).map(
                       (ingr, idx) => (
                         <li key={idx} className="flex items-center gap-2">
@@ -515,9 +519,9 @@ export const LovoMenuModal: React.FC<LovoMenuModalProps> = ({
                 </div>
 
                 {/* Tasting Notes */}
-                <div className="mb-4">
+                <div>
                   <h4 className="text-[11px] font-bold uppercase text-zinc-400 mb-1.5">Notas de Cata</h4>
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-wrap gap-1.5">
                     {selectedCocktail.tasting_notes.map((note, idx) => (
                       <span
                         key={idx}
@@ -530,12 +534,12 @@ export const LovoMenuModal: React.FC<LovoMenuModalProps> = ({
                 </div>
               </div>
 
-              {/* Actions */}
-              <div className="pt-3 border-t border-[#2A344A] space-y-2">
+              {/* Pinned Bottom Action Footer: Always visible, never cut off */}
+              <div className="shrink-0 p-4 border-t border-[#2A344A] bg-[#12161F]/95 backdrop-blur-md space-y-2">
                 <button
                   type="button"
                   onClick={() => handleCopyPitchPhrase(selectedCocktail)}
-                  className="w-full py-2.5 bg-amber-400 hover:bg-amber-300 text-zinc-950 font-bold text-xs uppercase tracking-wider rounded-xl transition-colors flex items-center justify-center gap-2 shadow-lg"
+                  className="w-full py-2.5 bg-amber-400 hover:bg-amber-300 text-zinc-950 font-bold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg active:scale-98 cursor-pointer"
                 >
                   {copiedId === selectedCocktail.id ? (
                     <>
@@ -555,7 +559,7 @@ export const LovoMenuModal: React.FC<LovoMenuModalProps> = ({
                   onClick={() => {
                     setSelectedSpreadImg(selectedCocktail.spread_image);
                   }}
-                  className="w-full py-2 bg-[#0E121B] hover:bg-zinc-800 text-zinc-300 hover:text-white font-semibold text-xs rounded-xl border border-[#2A344A] transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-2 bg-[#0E121B] hover:bg-zinc-800 text-zinc-300 hover:text-white font-semibold text-xs rounded-xl border border-[#2A344A] transition-colors flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <BookOpen className="w-4 h-4 text-amber-400" />
                   <span>Ver página original en el libro impreso</span>

@@ -1,11 +1,12 @@
 import type { Scenario } from '../types';
 import { PRESET_SCENARIOS } from '../data/presetScenarios';
+import { CloudSyncService } from './cloudSyncService';
 
 const STORAGE_KEY = 'persona_managed_scenarios_v2';
 const LEGACY_STORAGE_KEY = 'persona_custom_scenarios';
 const PIN_STORAGE_KEY = 'persona_admin_pin';
 const ADMIN_SESSION_KEY = 'persona_admin_session_active';
-const DEFAULT_PIN = '1234';
+const DEFAULT_PIN = '3319';
 const DELETED_IDS_KEY = 'pitchboss_deleted_scenarios_v1';
 
 export class AdminStorageService {
@@ -22,22 +23,25 @@ export class AdminStorageService {
           let hasSynced = false;
           const syncedScenarios = parsed.map((s: Scenario) => {
             const presetMatch = PRESET_SCENARIOS.find((p) => p.id === s.id);
-            // If it's a default preset and missing the full master business knowledge, auto-upgrade it
-            if (presetMatch && (!s.businessKnowledge || !s.businessKnowledge.includes("TOMO I: LA MUSA"))) {
+            const ws = s.workspaceId || presetMatch?.workspaceId || (s.id.startsWith('tepic-') ? 'tepic-madrid' : s.id.startsWith('lovo-') ? 'lovo-bar' : undefined);
+            
+            // Clean any parenthetical CEFR levels like (A1-A2), (B1-B2), (C1-C2) from stored titles
+            const cleanedTitle = s.title ? s.title.replace(/\s*\((?:A1-A2|B1-B2|C1-C2|A1|A2|B1|B2|C1|C2)\)/gi, '') : s.title;
+            const titleChanged = cleanedTitle !== s.title;
+
+            // Auto-upgrade business knowledge only if missing or if legacy LOVO tomo 1 without full master text
+            const needsKnowledgeUpgrade = presetMatch && (
+              (s.id.startsWith('lovo-tomo1') && (!s.businessKnowledge || !s.businessKnowledge.includes("TOMO I: LA MUSA"))) ||
+              (!s.businessKnowledge && Boolean(presetMatch.businessKnowledge))
+            );
+
+            if (needsKnowledgeUpgrade || (!s.workspaceId && ws) || titleChanged) {
               hasSynced = true;
               return {
                 ...s,
-                title: presetMatch.title,
-                niche: presetMatch.niche,
-                businessKnowledge: presetMatch.businessKnowledge,
-                context: presetMatch.context,
-                aiCharacter: presetMatch.aiCharacter,
-                objectives: presetMatch.objectives,
-                commonObjections: presetMatch.commonObjections,
-                nicheVocabulary: presetMatch.nicheVocabulary,
-                initialGreeting: presetMatch.initialGreeting,
-                initialTranslation: presetMatch.initialTranslation,
-                initialTip: presetMatch.initialTip
+                title: cleanedTitle,
+                workspaceId: s.workspaceId || ws,
+                businessKnowledge: needsKnowledgeUpgrade && presetMatch ? presetMatch.businessKnowledge : s.businessKnowledge
               };
             }
             return s;
@@ -133,7 +137,34 @@ export class AdminStorageService {
     }
 
     this.saveScenarios(updated);
+    CloudSyncService.syncScenarioToCloud(index >= 0 ? updated[index] : updated[0]);
     return updated;
+  }
+
+  /**
+   * Synchronizes local scenarios with centralized backend
+   */
+  public static async syncWithCloud(workspaceId?: string): Promise<Scenario[]> {
+    try {
+      const cloudScenarios = await CloudSyncService.fetchCloudScenarios(workspaceId);
+      if (cloudScenarios && cloudScenarios.length > 0) {
+        const current = this.getScenarios();
+        const deletedIds = this.getDeletedScenarioIds();
+        const map = new Map<string, Scenario>();
+        current.forEach(s => map.set(s.id, s));
+        cloudScenarios.forEach(cs => {
+          if (!deletedIds.includes(cs.id)) {
+            map.set(cs.id, cs);
+          }
+        });
+        const merged = Array.from(map.values());
+        this.saveScenarios(merged);
+        return merged;
+      }
+    } catch (err) {
+      console.warn('Sync with cloud failed, using local scenarios:', err);
+    }
+    return this.getScenarios();
   }
 
   /**
@@ -155,6 +186,7 @@ export class AdminStorageService {
 
     const updated = [duplicated, ...current];
     this.saveScenarios(updated);
+    CloudSyncService.syncScenarioToCloud(duplicated);
     return { scenarios: updated, newScenario: duplicated };
   }
 
@@ -188,6 +220,7 @@ export class AdminStorageService {
     const current = this.getScenarios();
     const updated = current.filter(s => s.id !== id);
     this.saveScenarios(updated);
+    CloudSyncService.deleteCloudScenario(id);
     return updated;
   }
 
@@ -279,12 +312,18 @@ export class AdminStorageService {
    * Admin Authentication & PIN
    */
   public static getAdminPin(): string {
-    return localStorage.getItem(PIN_STORAGE_KEY) || DEFAULT_PIN;
+    const saved = localStorage.getItem(PIN_STORAGE_KEY);
+    if (!saved || saved === '1234') {
+      localStorage.setItem(PIN_STORAGE_KEY, DEFAULT_PIN);
+      return DEFAULT_PIN;
+    }
+    return saved;
   }
 
   public static setAdminPin(newPin: string): boolean {
     if (!newPin || newPin.trim().length < 4) return false;
     localStorage.setItem(PIN_STORAGE_KEY, newPin.trim());
+    CloudSyncService.changeAdminPin(newPin.trim());
     return true;
   }
 

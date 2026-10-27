@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Scenario, DifficultyLevel, EnglishLevel, Objective } from '../types';
 import { GeminiService } from '../services/geminiService';
+import { CloudSyncService } from '../services/cloudSyncService';
 import { X, Sparkles, Plus, Trash2, Loader2, Wand2, Edit3, BookOpen, MessageSquare, Check, FileText, Zap } from 'lucide-react';
 import { useTranslation } from '../i18n/LanguageContext';
 import { LOVO_BAR_MASTER_KNOWLEDGE } from '../data/lovoBarKnowledge';
@@ -244,6 +245,7 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
       businessKnowledge: businessKnowledge.trim() || undefined,
       isCustom: true,
       isHidden: scenarioToEdit?.isHidden || false,
+      workspaceId: scenarioToEdit?.workspaceId || CloudSyncService.getCurrentWorkspaceId(),
       createdAt: scenarioToEdit?.createdAt || Date.now(),
       updatedAt: Date.now()
     };
@@ -330,18 +332,18 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-2xl bg-[#12161F] border border-[#2A344A]">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-sky-400 mb-1.5">
-                    Nivel de Inglés Objetivo
+                    Nivel Pitch Objetivo
                   </label>
                   <select
                     value={targetEnglishLevel}
                     onChange={(e) => setTargetEnglishLevel(e.target.value as EnglishLevel)}
                     className="w-full bg-[#18202F] border border-[#2A344A] rounded-xl px-3 py-2 text-xs font-semibold text-[#E2E8F0] focus:outline-none focus:border-sky-400 cursor-pointer"
                   >
-                    <option value="A1">A1 - Principiante (Frases muy cortas y apoyo fonético)</option>
-                    <option value="A2">A2 - Básico (Atención fluida y vocabulario de carta)</option>
-                    <option value="B1">B1 - Intermedio (Preguntas de clientes y alternativas)</option>
-                    <option value="B2">B2 - Avanzado (Clientes exigentes y modismos)</option>
-                    <option value="C1">C1 - Ejecutivo / Experto</option>
+                    <option value="A1">Pitch One (Iniciación y apoyo guiado)</option>
+                    <option value="A2">Pitch One (Atención fluida y carta)</option>
+                    <option value="B1">Pitch Two (Fluidez y alternativas)</option>
+                    <option value="B2">Pitch Two (Argumentación y objeciones)</option>
+                    <option value="C1">Pitch Three (Alta Dirección y Negociación)</option>
                   </select>
                 </div>
 
@@ -725,19 +727,19 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
                 </div>
                 <div>
                   <label className="block text-sm font-semibold mb-1.5 text-slate-200">
-                    Nivel de Inglés Objetivo
+                    Nivel Pitch Objetivo
                   </label>
                   <select
                     value={targetEnglishLevel}
                     onChange={(e) => setTargetEnglishLevel(e.target.value as EnglishLevel)}
                     className="w-full border rounded-xl px-3.5 py-2.5 text-sm cursor-pointer focus:outline-none focus:border-sky-500 bg-[#18202F] border-[#2A344A] text-[#E2E8F0]"
                   >
-                    <option value="A1">Nivel A1 (Principiante / Frases cortas y guiadas)</option>
-                    <option value="A2">Nivel A2 (Básico conversacional)</option>
-                    <option value="B1">Nivel B1 (Intermedio)</option>
-                    <option value="B2">Nivel B2 (Intermedio alto)</option>
-                    <option value="C1">Nivel C1 (Avanzado profesional)</option>
-                    <option value="C2">Nivel C2 (Nativo / Alta dirección)</option>
+                    <option value="A1">Pitch One (Iniciación / Frases cortas y guiadas)</option>
+                    <option value="A2">Pitch One (Atención operativa y carta)</option>
+                    <option value="B1">Pitch Two (Intermedio comercial)</option>
+                    <option value="B2">Pitch Two (Argumentación y Up-Selling)</option>
+                    <option value="C1">Pitch Three (Alta Dirección y Negociación)</option>
+                    <option value="C2">Pitch Three (Maestría y Diplomacia VIP)</option>
                   </select>
                 </div>
               </div>

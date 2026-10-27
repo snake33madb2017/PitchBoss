@@ -3,6 +3,7 @@ import type { Scenario, Message, SessionReport, SavedSession } from '../types';
 import { GeminiService } from '../services/geminiService';
 import { SpeechService } from '../services/speechService';
 import { SessionHistoryService } from '../services/sessionHistoryService';
+import { AudioRecordingService } from '../services/audioRecordingService';
 import { AudioVisualizer } from './AudioVisualizer';
 import { useTranslation } from '../i18n/LanguageContext';
 import {
@@ -214,6 +215,9 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
     setWalkieTalkieTip(null);
     setCallState('user_listening');
 
+    // Start recording audio for review playback
+    AudioRecordingService.startRecording();
+
     SpeechService.startListening({
       lang: 'en-US',
       enableAutoSilence: false, // Walkie-Talkie mode stays open until button release!
@@ -257,25 +261,28 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
       transcriptRef.current = immediateText;
     }
 
-    // Allow 180ms grace period for browser speech buffer to flush last syllables
-    walkieTimeoutRef.current = setTimeout(() => {
-      const raw = (transcriptRef.current || SpeechService.getLatestTranscript()).trim();
-      const cleaned = SpeechService.cleanDuplicatePhrases(raw);
+    // Stop audio recording and capture URL
+    AudioRecordingService.stopRecording().then((audioUrl) => {
+      // Allow 180ms grace period for browser speech buffer to flush last syllables
+      walkieTimeoutRef.current = setTimeout(() => {
+        const raw = (transcriptRef.current || SpeechService.getLatestTranscript()).trim();
+        const cleaned = SpeechService.cleanDuplicatePhrases(raw);
 
-      if (cleaned && cleaned.length >= 2) {
-        handleUserSubmission(cleaned);
-      } else {
-        setCallState('idle');
-        if (holdDuration < 320) {
-          setWalkieTalkieTip('💡 Mantén presionado mientras hablas y suelta al terminar');
-          setTimeout(() => setWalkieTalkieTip(null), 3500);
+        if (cleaned && cleaned.length >= 2) {
+          handleUserSubmission(cleaned, audioUrl || undefined);
+        } else {
+          setCallState('idle');
+          if (holdDuration < 320) {
+            setWalkieTalkieTip('💡 Mantén presionado mientras hablas y suelta al terminar');
+            setTimeout(() => setWalkieTalkieTip(null), 3500);
+          }
         }
-      }
-    }, 180);
+      }, 180);
+    });
   };
 
   // Process user speech or typed text
-  const handleUserSubmission = async (text: string) => {
+  const handleUserSubmission = async (text: string, audioUrl?: string) => {
     if (isSubmittingRef.current || callState === 'processing') return;
     isSubmittingRef.current = true;
 
@@ -305,6 +312,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
         id: 'msg-' + Date.now(),
         sender: 'user',
         text: cleaned,
+        audioUrl,
         timestamp: Date.now()
       };
 
@@ -357,11 +365,12 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
         objectives: currentObjectives
       });
 
-      // Speak response out loud
+      // Speak response out loud using Neural TTS or browser fallback
       if (!isMuted) {
         setCallState('ai_speaking');
-        SpeechService.speakText({
+        SpeechService.speakTextNeuralOrFallback({
           text: response.reply,
+          voiceGender: scenario.aiCharacter?.voiceGender || 'female',
           onStart: () => setCallState('ai_speaking'),
           onEnd: () => {
             setCallState('idle');
@@ -442,6 +451,12 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
       durationSeconds
     });
 
+    const userAudioUrl = [...messages].reverse().find((m) => m.audioUrl)?.audioUrl;
+    if (userAudioUrl) {
+      report.audioRecordingUrl = userAudioUrl;
+    }
+    AudioRecordingService.cleanup();
+
     // Mark session as completed in storage
     SessionHistoryService.completeSession({
       sessionId: sessionIdRef.current,
@@ -457,6 +472,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
   const handleExitWithAutoSave = () => {
     SpeechService.cancelSpeech();
     SpeechService.stopListening();
+    AudioRecordingService.cleanup();
     SessionHistoryService.upsertSession({
       id: sessionIdRef.current,
       scenarioId: scenario.id,

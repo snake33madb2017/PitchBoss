@@ -249,6 +249,79 @@ export class SpeechService {
     return isSpanish ? 'es-ES' : 'en-US';
   }
 
+  private static activeAudioElement: HTMLAudioElement | null = null;
+
+  /**
+   * Attempts to play high-fidelity Neural TTS from backend proxy (/api/tts/speak).
+   * Gracefully falls back to browser SpeechSynthesis if unavailable or offline.
+   */
+  public static async speakTextNeuralOrFallback({
+    text,
+    voiceGender = 'female',
+    lang = 'auto',
+    voiceName,
+    rate = 1.0,
+    pitch = 1.0,
+    onStart,
+    onEnd,
+    onError
+  }: {
+    text: string;
+    voiceGender?: 'male' | 'female';
+    lang?: 'es-ES' | 'en-US' | 'auto';
+    voiceName?: string;
+    rate?: number;
+    pitch?: number;
+    onStart?: () => void;
+    onEnd?: () => void;
+    onError?: (err: any) => void;
+  }): Promise<void> {
+    // 1. If audio element is currently playing, pause it
+    if (this.activeAudioElement) {
+      try {
+        this.activeAudioElement.pause();
+        this.activeAudioElement = null;
+      } catch {}
+    }
+
+    try {
+      const res = await fetch('/api/tts/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text,
+          voiceGender,
+          lang: lang === 'auto' ? this.detectLang(text) : lang
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.audioBase64) {
+          const audio = new Audio(`data:audio/mp3;base64,${data.audioBase64}`);
+          this.activeAudioElement = audio;
+          if (onStart) onStart();
+          audio.onended = () => {
+            this.activeAudioElement = null;
+            if (onEnd) onEnd();
+          };
+          audio.onerror = () => {
+            this.activeAudioElement = null;
+            // Fallback to browser
+            this.speakText({ text, lang, voiceName, rate, pitch, onStart, onEnd, onError });
+          };
+          await audio.play();
+          return;
+        }
+      }
+    } catch {
+      // Fallback silently
+    }
+
+    // Fallback to browser speech synthesis
+    this.speakText({ text, lang, voiceName, rate, pitch, onStart, onEnd, onError });
+  }
+
   /**
    * Speaks text chunk by chunk sequentially.
    * Completely immune to duplicate loops and race conditions via speechSessionId token gating.

@@ -55,7 +55,7 @@ export const LevelPromotionModal: React.FC<LevelPromotionModalProps> = ({
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            Has Ascendido a <span className="text-[#38BDF8]">Nivel {event.toLevel}</span>
+            Has Ascendido a <span className="text-[#38BDF8]">{LevelEvaluationService.getPitchTier(event.toLevel)}</span>
           </h2>
           <p className="text-xs sm:text-sm text-[#94A3B8]">
             Tu solvencia comunicativa y puntuación de negocio han alcanzado el estándar directivo exigido.
@@ -66,7 +66,7 @@ export const LevelPromotionModal: React.FC<LevelPromotionModalProps> = ({
         <div className="p-4 rounded-2xl bg-[#12161F] border border-[#2A344A] flex items-center justify-between relative z-10">
           <div className="text-center">
             <span className="text-[10px] text-[#94A3B8] font-bold uppercase block">Nivel Anterior</span>
-            <span className="text-xl font-black text-[#94A3B8] mt-0.5 block">{event.fromLevel}</span>
+            <span className="text-sm sm:text-base font-black text-[#94A3B8] mt-0.5 block">{LevelEvaluationService.getPitchTier(event.fromLevel)}</span>
           </div>
 
           <div className="flex flex-col items-center">
@@ -76,8 +76,8 @@ export const LevelPromotionModal: React.FC<LevelPromotionModalProps> = ({
 
           <div className="text-center">
             <span className="text-[10px] text-sky-400 font-bold uppercase block">Nuevo Nivel</span>
-            <span className="text-2xl font-black text-[#38BDF8] mt-0.5 block">
-              {event.toLevel}
+            <span className="text-base sm:text-lg font-black text-[#38BDF8] mt-0.5 block">
+              {LevelEvaluationService.getPitchTier(event.toLevel)}
             </span>
           </div>
         </div>

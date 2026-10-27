@@ -47,7 +47,7 @@ export const LevelAssessmentModal: React.FC<LevelAssessmentModalProps> = ({
                   Evaluación y <span className="text-[#38BDF8]">Nivel de Inglés</span>
                 </h2>
                 <span className="text-xs px-2.5 py-0.5 rounded-full bg-sky-500/15 border border-sky-500/30 text-[#38BDF8] font-bold uppercase tracking-wider">
-                  CEFR {progress.currentLevel}
+                  {LevelEvaluationService.getPitchTier(progress.currentLevel)}
                 </span>
               </div>
               <p className="text-xs text-[#94A3B8]">
@@ -112,8 +112,8 @@ export const LevelAssessmentModal: React.FC<LevelAssessmentModalProps> = ({
                       {currentDesc.title}
                     </h3>
                   </div>
-                  <div className="w-12 h-12 rounded-2xl bg-sky-500/15 border border-sky-500/40 flex items-center justify-center text-xl font-black text-[#38BDF8]">
-                    {progress.currentLevel}
+                  <div className="px-3.5 py-2 rounded-2xl bg-sky-500/15 border border-sky-500/40 flex items-center justify-center text-sm font-black text-[#38BDF8]">
+                    {LevelEvaluationService.getPitchTier(progress.currentLevel)}
                   </div>
                 </div>
 
@@ -126,7 +126,7 @@ export const LevelAssessmentModal: React.FC<LevelAssessmentModalProps> = ({
                   <div className="space-y-2 pt-2 border-t border-[#2A344A]">
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-[#E2E8F0] font-medium">
-                        Progreso hacia el <strong className="text-[#38BDF8]">Nivel {nextLevel}</strong>:
+                        Progreso hacia el <strong className="text-[#38BDF8]">{LevelEvaluationService.getPitchTier(nextLevel)}</strong>:
                       </span>
                       <span className="font-mono font-bold text-[#38BDF8]">{progress.masteryScore}%</span>
                     </div>
@@ -179,18 +179,22 @@ export const LevelAssessmentModal: React.FC<LevelAssessmentModalProps> = ({
                   <span className="text-xs font-bold text-[#38BDF8] block">
                     🛡️ Ajuste Rápido de Nivel (Modo Administrador)
                   </span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {(['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] as EnglishLevel[]).map((lvl) => (
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { label: 'Pitch One', lvl: 'A1' as EnglishLevel },
+                      { label: 'Pitch Two', lvl: 'B1' as EnglishLevel },
+                      { label: 'Pitch Three', lvl: 'C1' as EnglishLevel }
+                    ].map((item) => (
                       <button
-                        key={lvl}
-                        onClick={() => handleManualLevelChange(lvl)}
-                        className={`px-3 py-1 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
-                          progress.currentLevel === lvl
-                            ? 'bg-[#0EA5E9] text-slate-950'
-                            : 'bg-[#1C2331] text-[#E2E8F0] hover:bg-[#202838]'
+                        key={item.label}
+                        onClick={() => handleManualLevelChange(item.lvl)}
+                        className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
+                          LevelEvaluationService.getPitchTier(progress.currentLevel) === item.label
+                            ? 'bg-[#0EA5E9] text-slate-950 font-black shadow-md'
+                            : 'bg-[#1C2331] text-[#E2E8F0] hover:bg-[#202838] border border-[#2A344A]'
                         }`}
                       >
-                        Nivel {lvl}
+                        {item.label}
                       </button>
                     ))}
                   </div>
@@ -201,12 +205,33 @@ export const LevelAssessmentModal: React.FC<LevelAssessmentModalProps> = ({
 
           {selectedTab === 'levels' && (
             <div className="space-y-3">
-              {(['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] as EnglishLevel[]).map((lvl) => {
-                const desc = LevelEvaluationService.getLevelDescription(lvl);
-                const isCurrent = progress.currentLevel === lvl;
+              {[
+                {
+                  tier: 'Pitch One',
+                  level: 'A1' as EnglishLevel,
+                  title: 'Pitch One (Iniciación y Saludos)',
+                  profile: 'Frases de bienvenida, saludos amables, pedidos básicos y protocolo operativo de atención.',
+                  aiBehavior: 'El interlocutor habla pausado y claro. Te ofrece tips fonéticos y guía en español cuando dudas.'
+                },
+                {
+                  tier: 'Pitch Two',
+                  level: 'B1' as EnglishLevel,
+                  title: 'Pitch Two (Fluidez y Argumentación)',
+                  profile: 'Storytelling de productos, explicación de carta, venta sugestiva premium y resolución de objeciones comerciales.',
+                  aiBehavior: 'El cliente pide recomendaciones de autor, pregunta por alérgenos y exige justificación de valor.'
+                },
+                {
+                  tier: 'Pitch Three',
+                  level: 'C1' as EnglishLevel,
+                  title: 'Pitch Three (Alta Dirección y Negociación)',
+                  profile: 'Negociaciones complejas a nivel C-Suite, auditorías críticas, persuasión estratégica y diplomacia ejecutiva.',
+                  aiBehavior: 'Inglés con modismos sofisticados, ritmo corporativo rápido y máxima exigencia de resultados.'
+                }
+              ].map((item) => {
+                const isCurrent = LevelEvaluationService.getPitchTier(progress.currentLevel) === item.tier;
                 return (
                   <div
-                    key={lvl}
+                    key={item.tier}
                     className={`p-4 rounded-2xl border transition-all ${
                       isCurrent
                         ? 'bg-sky-500/10 border-sky-500/40 shadow-lg shadow-sky-950/20'
@@ -214,11 +239,11 @@ export const LevelAssessmentModal: React.FC<LevelAssessmentModalProps> = ({
                     }`}
                   >
                     <div className="flex items-center justify-between pb-1">
-                      <div className="flex items-center gap-2">
-                        <span className="w-8 h-8 rounded-xl bg-[#1C2331] border border-[#2A344A] font-black text-[#38BDF8] text-xs flex items-center justify-center">
-                          {lvl}
+                      <div className="flex items-center gap-2.5">
+                        <span className="px-2.5 py-1 rounded-xl bg-[#1C2331] border border-[#2A344A] font-black text-[#38BDF8] text-xs flex items-center justify-center">
+                          {item.tier}
                         </span>
-                        <h4 className="text-xs font-bold text-[#E2E8F0]">{desc.title}</h4>
+                        <h4 className="text-xs font-bold text-[#E2E8F0]">{item.title}</h4>
                       </div>
                       {isCurrent && (
                         <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#0EA5E9] text-slate-950 font-bold uppercase">
@@ -226,8 +251,8 @@ export const LevelAssessmentModal: React.FC<LevelAssessmentModalProps> = ({
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-[#E2E8F0] mt-2 leading-relaxed">{desc.profile}</p>
-                    <p className="text-[11px] text-[#94A3B8] mt-1 italic">IA: {desc.aiBehavior}</p>
+                    <p className="text-xs text-[#E2E8F0] mt-2 leading-relaxed">{item.profile}</p>
+                    <p className="text-[11px] text-[#94A3B8] mt-1 italic">IA: {item.aiBehavior}</p>
                   </div>
                 );
               })}
@@ -249,7 +274,7 @@ export const LevelAssessmentModal: React.FC<LevelAssessmentModalProps> = ({
                   <div key={i} className="p-4 rounded-2xl bg-[#12161F] border border-[#2A344A] space-y-1.5 text-xs">
                     <div className="flex items-center justify-between font-bold">
                       <span className="text-[#38BDF8]">
-                        Ascenso: Nivel {ev.fromLevel} → Nivel {ev.toLevel}
+                        Ascenso: {LevelEvaluationService.getPitchTier(ev.fromLevel)} → {LevelEvaluationService.getPitchTier(ev.toLevel)}
                       </span>
                       <span className="text-[#94A3B8] text-[11px] font-mono">
                         {new Date(ev.date).toLocaleDateString('es-ES')}
@@ -257,7 +282,7 @@ export const LevelAssessmentModal: React.FC<LevelAssessmentModalProps> = ({
                     </div>
                     <p className="text-[#E2E8F0] text-[11px]">{ev.reason}</p>
                     <div className="text-[10px] text-emerald-400 font-semibold pt-1">
-                      Escenario: {ev.scenarioTitle} | Fluidez: {ev.englishScore}% | Negocio: {ev.businessScore}%
+                      Escenario: {LevelEvaluationService.cleanTitle(ev.scenarioTitle)} | Fluidez: {ev.englishScore}% | Negocio: {ev.businessScore}%
                     </div>
                   </div>
                 ))

@@ -1,0 +1,386 @@
+{
+  "workspaces": [
+    {
+      "id": "default",
+      "name": "General / Matriz",
+      "createdAt": 1793036970835
+    },
+    {
+      "id": "lovo-bar",
+      "name": "LOVO Bar & Hospitality",
+      "createdAt": 1793036970835
+    },
+    {
+      "id": "tepic-madrid",
+      "name": "Restaurante Tepic (Ayala 14)",
+      "createdAt": 1793036970835
+    },
+    {
+      "id": "hotel-ritz-madrid",
+      "name": "Hotel Ritz Madrid",
+      "createdAt": 1793109298063
+    },
+    {
+      "id": "hotel-ritz-1793109383773",
+      "name": "Hotel Ritz 1793109383773",
+      "createdAt": 1793109383773
+    },
+    {
+      "id": "hotel-ritz-1793109485909",
+      "name": "Hotel Ritz 1793109485909",
+      "createdAt": 1793109485909
+    }
+  ],
+  "scenarios": {
+    "hotel-ritz-madrid": [
+      {
+        "id": "test-scenario-ritz-1",
+        "title": "Concierge VIP Check-in",
+        "workspaceId": "hotel-ritz-madrid",
+        "initialGreeting": "Good morning! Welcome to The Ritz.",
+        "updatedAt": 1793109485910
+      }
+    ]
+  },
+  "reports": [
+    {
+      "id": "rep_1793037565966_vxke",
+      "workspaceId": "default",
+      "employeeName": "Colaborador",
+      "scenarioId": "lovo-tomo2-pitch2",
+      "scenarioTitle": "LOVO Tomo II · Pitch Two (B1-B2): Taxonomía (Coctelería Culinaria & Fábulas)",
+      "durationSeconds": 22,
+      "totalMessages": 1,
+      "businessScore": 75,
+      "englishScore": 88,
+      "completedObjectives": [],
+      "pendingObjectives": [
+        "Describir los ingredientes salinos y técnicas de Festín Marino (12€) y Festín Oriental (13€)",
+        "Recomendar opciones ahumadas como Festín Maya (13€) con mezcal o Mindfulness (13€)",
+        "Sugerir maridaje con raciones de jamón ibérico de bellota o quesos artesanos de la carta",
+        "Explicar las opciones sin gluten o con alérgenos presentes en el menú gastronómico"
+      ],
+      "executiveSummary": "Excelente práctica de servicio y hospitalidad en LOVO Bar. Lograste atender a clientes angloparlantes usando frases claras de nivel A1 para ubicar clientes, sugerir cócteles y gestionar el cobro.",
+      "keyStrengths": [
+        "Atención al cliente amable, rápida y directa",
+        "Buena recomendación de la carta de cócteles (Bubi, Manabi, opciones 0,0)",
+        "Dominio de frases clave de supervivencia para sala, barra y cobro"
+      ],
+      "areasForImprovement": [
+        "Recordar ofrecer la carta de placeres (Iberian Ham & Cheese Board) para aumentar el ticket medio",
+        "Pronunciar con naturalidad \"Table or bar?\" [Téibol or bar?]",
+        "Despedir siempre con una sonrisa diciendo \"Have a great night!\""
+      ],
+      "suggestedPhrases": [
+        {
+          "original": "Mesa o barra",
+          "better": "Table or bar, please? [Téibol or bar, plis?]",
+          "reason": "Frase corta y educada para recepcionistas y camareros de LOVO Bar."
+        },
+        {
+          "original": "El baño está abajo",
+          "better": "Restrooms are downstairs [Rest-rums ar daun-stérs]",
+          "reason": "Instrucción universal y fácil de pronunciar para sala y barra."
+        }
+      ],
+      "createdAt": 1793037565966
+    },
+    {
+      "id": "rep_1793038174806_20ni",
+      "workspaceId": "default",
+      "employeeName": "Colaborador",
+      "scenarioId": "lovo-tomo1-pitch1",
+      "scenarioTitle": "LOVO Tomo I · Pitch One (A1-A2): La Musa (Saludos, Sabores & Cócteles Básicos)",
+      "durationSeconds": 14,
+      "totalMessages": 1,
+      "businessScore": 75,
+      "englishScore": 88,
+      "completedObjectives": [],
+      "pendingObjectives": [
+        "Saludar en inglés, dar la bienvenida y ofrecer agua de cortesía (\"Welcome to LOVO! Here is some water\")",
+        "Preguntar preferencias básicas de sabor (\"Do you prefer sweet, sour, or bitter drinks?\")",
+        "Recomendar Jupe Banane (12€) o Red Moon (12€) indicando sus ingredientes principales",
+        "Indicar el precio con claridad y desearle que disfrute su copa (\"It is 12 euros. Enjoy your cocktail!\")"
+      ],
+      "executiveSummary": "Excelente práctica de servicio y hospitalidad en LOVO Bar. Lograste atender a clientes angloparlantes usando frases claras de nivel A1 para ubicar clientes, sugerir cócteles y gestionar el cobro.",
+      "keyStrengths": [
+        "Atención al cliente amable, rápida y directa",
+        "Buena recomendación de la carta de cócteles (Bubi, Manabi, opciones 0,0)",
+        "Dominio de frases clave de supervivencia para sala, barra y cobro"
+      ],
+      "areasForImprovement": [
+        "Recordar ofrecer la carta de placeres (Iberian Ham & Cheese Board) para aumentar el ticket medio",
+        "Pronunciar con naturalidad \"Table or bar?\" [Téibol or bar?]",
+        "Despedir siempre con una sonrisa diciendo \"Have a great night!\""
+      ],
+      "suggestedPhrases": [
+        {
+          "original": "Mesa o barra",
+          "better": "Table or bar, please? [Téibol or bar, plis?]",
+          "reason": "Frase corta y educada para recepcionistas y camareros de LOVO Bar."
+        },
+        {
+          "original": "El baño está abajo",
+          "better": "Restrooms are downstairs [Rest-rums ar daun-stérs]",
+          "reason": "Instrucción universal y fácil de pronunciar para sala y barra."
+        }
+      ],
+      "createdAt": 1793038174806
+    },
+    {
+      "id": "rep_1793042232666_oqm1",
+      "workspaceId": "tepic-madrid",
+      "employeeName": "Colaborador",
+      "scenarioId": "tepic-pitch2",
+      "scenarioTitle": "Tepic · Pitch Two (B1-B2): Especialidades del Chef, Alérgenos & Mezcal Artesanal",
+      "durationSeconds": 46,
+      "totalMessages": 1,
+      "businessScore": 70,
+      "englishScore": 82,
+      "completedObjectives": [],
+      "pendingObjectives": [
+        "Explicar con soltura la diferencia entre los Tacos Gobernador (Sinaloa) y los Tacos Baja California (pescado en tempura)",
+        "Recomendar el Aguachile verde de camarón (26,50€) aclarando el nivel de picante y frescura",
+        "Presentar la Mezcalita de Oaxaca (13€) con mezcal Espadín y sal de chiles artesanal",
+        "Verificar alérgenos (mariscos, gluten, lácteos) con protocolo impecable de sala"
+      ],
+      "executiveSummary": "Práctica sólida en el área de Restaurante Tepic · Michelin Bib Gourmand. Mantuviste la compostura profesional y avanzaste en la consecución de los objetivos planteados.",
+      "keyStrengths": [
+        "Mantuvo un tono empresarial coherente a lo largo de la simulación",
+        "Buen uso de la terminología técnica del sector",
+        "Respuestas ágiles frente a las objeciones del interlocutor"
+      ],
+      "areasForImprovement": [
+        "Incorporar cierres de conversación más asertivos",
+        "Presentar cifras y plazos concretos con mayor rapidez",
+        "Usar conectores de transición como \"Furthermore\" o \"In that regard\""
+      ],
+      "suggestedPhrases": [
+        {
+          "original": "I think we can do it faster for you.",
+          "better": "Our deployment roadmap guarantees a streamlined onboarding within 14 business days.",
+          "reason": "Demuestra rigor y compromiso con plazos medibles."
+        }
+      ],
+      "createdAt": 1793042232666
+    },
+    {
+      "id": "rep_1793047367393_6kgt",
+      "workspaceId": "tepic-madrid",
+      "employeeName": "Colaborador",
+      "scenarioId": "tepic-pitch1",
+      "scenarioTitle": "Tepic · Pitch One (A1-A2): Bienvenida, Mesa o Barra y Primeros Tacos",
+      "durationSeconds": 6,
+      "totalMessages": 1,
+      "businessScore": 70,
+      "englishScore": 82,
+      "completedObjectives": [],
+      "pendingObjectives": [
+        "Saludar con calidez en inglés mencionando Tepic y ofrecer mesa o asiento en barra",
+        "Sugerir la Margarita Tepic de autor (12€) o bebida refrescante para empezar",
+        "Up-selling: Ofrecer el Guacamole casero con totopos (16€) para compartir al centro",
+        "Recomendar los Tacos al Pastor (29€) o Cochinita Pibil (28,50€) y tomar la comanda"
+      ],
+      "executiveSummary": "Práctica sólida en el área de Restaurante Tepic · Michelin Bib Gourmand. Mantuviste la compostura profesional y avanzaste en la consecución de los objetivos planteados.",
+      "keyStrengths": [
+        "Mantuvo un tono empresarial coherente a lo largo de la simulación",
+        "Buen uso de la terminología técnica del sector",
+        "Respuestas ágiles frente a las objeciones del interlocutor"
+      ],
+      "areasForImprovement": [
+        "Incorporar cierres de conversación más asertivos",
+        "Presentar cifras y plazos concretos con mayor rapidez",
+        "Usar conectores de transición como \"Furthermore\" o \"In that regard\""
+      ],
+      "suggestedPhrases": [
+        {
+          "original": "I think we can do it faster for you.",
+          "better": "Our deployment roadmap guarantees a streamlined onboarding within 14 business days.",
+          "reason": "Demuestra rigor y compromiso con plazos medibles."
+        }
+      ],
+      "createdAt": 1793047367393
+    },
+    {
+      "id": "rep_1793051756785_mgno",
+      "workspaceId": "default",
+      "employeeName": "Colaborador",
+      "scenarioId": "lovo-tomo1-pitch1",
+      "scenarioTitle": "LOVO Tomo I · Pitch One (A1-A2): La Musa (Saludos, Sabores & Cócteles Básicos)",
+      "durationSeconds": 14,
+      "totalMessages": 1,
+      "businessScore": 75,
+      "englishScore": 88,
+      "completedObjectives": [],
+      "pendingObjectives": [
+        "Saludar en inglés, dar la bienvenida y ofrecer agua de cortesía (\"Welcome to LOVO! Here is some water\")",
+        "Preguntar preferencias básicas de sabor (\"Do you prefer sweet, sour, or bitter drinks?\")",
+        "Recomendar Jupe Banane (12€) o Red Moon (12€) indicando sus ingredientes principales",
+        "Indicar el precio con claridad y desearle que disfrute su copa (\"It is 12 euros. Enjoy your cocktail!\")"
+      ],
+      "executiveSummary": "Excelente práctica de servicio y hospitalidad en LOVO Bar. Lograste atender a clientes angloparlantes usando frases claras de nivel A1 para ubicar clientes, sugerir cócteles y gestionar el cobro.",
+      "keyStrengths": [
+        "Atención al cliente amable, rápida y directa",
+        "Buena recomendación de la carta de cócteles (Bubi, Manabi, opciones 0,0)",
+        "Dominio de frases clave de supervivencia para sala, barra y cobro"
+      ],
+      "areasForImprovement": [
+        "Recordar ofrecer la carta de placeres (Iberian Ham & Cheese Board) para aumentar el ticket medio",
+        "Pronunciar con naturalidad \"Table or bar?\" [Téibol or bar?]",
+        "Despedir siempre con una sonrisa diciendo \"Have a great night!\""
+      ],
+      "suggestedPhrases": [
+        {
+          "original": "Mesa o barra",
+          "better": "Table or bar, please? [Téibol or bar, plis?]",
+          "reason": "Frase corta y educada para recepcionistas y camareros de LOVO Bar."
+        },
+        {
+          "original": "El baño está abajo",
+          "better": "Restrooms are downstairs [Rest-rums ar daun-stérs]",
+          "reason": "Instrucción universal y fácil de pronunciar para sala y barra."
+        }
+      ],
+      "createdAt": 1793051756785
+    },
+    {
+      "id": "rep_1793109298064_lbaq",
+      "workspaceId": "hotel-ritz-madrid",
+      "employeeName": "Gonzalo Pérez",
+      "scenarioId": "test-scenario-ritz-1",
+      "scenarioTitle": "Concierge VIP Check-in",
+      "durationSeconds": 120,
+      "totalMessages": 0,
+      "businessScore": 95,
+      "englishScore": 90,
+      "completedObjectives": [],
+      "pendingObjectives": [],
+      "executiveSummary": "",
+      "keyStrengths": [],
+      "areasForImprovement": [],
+      "suggestedPhrases": [],
+      "createdAt": 1793109298064
+    },
+    {
+      "id": "rep_1793109383774_h7it",
+      "workspaceId": "hotel-ritz-madrid",
+      "employeeName": "Gonzalo Pérez",
+      "scenarioId": "test-scenario-ritz-1",
+      "scenarioTitle": "Concierge VIP Check-in",
+      "durationSeconds": 120,
+      "totalMessages": 0,
+      "businessScore": 95,
+      "englishScore": 90,
+      "completedObjectives": [],
+      "pendingObjectives": [],
+      "executiveSummary": "",
+      "keyStrengths": [],
+      "areasForImprovement": [],
+      "suggestedPhrases": [],
+      "createdAt": 1793109383774
+    },
+    {
+      "id": "rep_1793109485910_5nj8",
+      "workspaceId": "hotel-ritz-madrid",
+      "employeeName": "Gonzalo Pérez",
+      "scenarioId": "test-scenario-ritz-1",
+      "scenarioTitle": "Concierge VIP Check-in",
+      "durationSeconds": 120,
+      "totalMessages": 0,
+      "businessScore": 95,
+      "englishScore": 90,
+      "completedObjectives": [],
+      "pendingObjectives": [],
+      "executiveSummary": "",
+      "keyStrengths": [],
+      "areasForImprovement": [],
+      "suggestedPhrases": [],
+      "createdAt": 1793109485910
+    }
+  ],
+  "admin": {
+    "pin": "3319",
+    "sessions": [
+      {
+        "token": "pb_adm_1793044692366_o13b0rr",
+        "createdAt": 1793044692366
+      },
+      {
+        "token": "pb_adm_1793044819474_k0tlefe",
+        "createdAt": 1793044819474
+      },
+      {
+        "token": "pb_adm_1793046592139_i9hmstq",
+        "createdAt": 1793046592139
+      },
+      {
+        "token": "pb_adm_1793051082171_sltplpj",
+        "createdAt": 1793051082171
+      },
+      {
+        "token": "pb_adm_1793051297067_efzpl89",
+        "createdAt": 1793051297067
+      },
+      {
+        "token": "pb_adm_1793051485623_kr2l2bw",
+        "createdAt": 1793051485623
+      },
+      {
+        "token": "pb_adm_1793051735466_4gcss27",
+        "createdAt": 1793051735466
+      },
+      {
+        "token": "pb_adm_1793109298062_7x2do4h",
+        "createdAt": 1793109298062
+      },
+      {
+        "token": "pb_adm_1793109358425_yl1txln",
+        "createdAt": 1793109358425
+      },
+      {
+        "token": "pb_adm_1793109383772_7q8w8oh",
+        "createdAt": 1793109383772
+      },
+      {
+        "token": "pb_adm_1793109485908_yoi440o",
+        "createdAt": 1793109485908
+      },
+      {
+        "token": "pb_adm_1793109633516_hqezptf",
+        "createdAt": 1793109633516
+      },
+      {
+        "token": "pb_adm_1793111663030_j2lrpiy",
+        "createdAt": 1793111663030
+      },
+      {
+        "token": "pb_adm_1793115775897_vm8ct0n",
+        "createdAt": 1793115775897
+      },
+      {
+        "token": "pb_adm_1793116764940_4nt2qsg",
+        "createdAt": 1793116764940
+      },
+      {
+        "token": "pb_adm_1793117326594_v4nleui",
+        "createdAt": 1793117326594
+      },
+      {
+        "token": "pb_adm_1793117356840_xd7pm7i",
+        "createdAt": 1793117356840
+      },
+      {
+        "token": "pb_adm_1793117394877_436ze52",
+        "createdAt": 1793117394877
+      },
+      {
+        "token": "pb_adm_1793117863558_3dsbw3e",
+        "createdAt": 1793117863558
+      },
+      {
+        "token": "pb_adm_1793118768376_t8s4zpy",
+        "createdAt": 1793118768376
+      }
+    ]
+  }
+}

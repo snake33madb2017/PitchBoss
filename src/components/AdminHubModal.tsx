@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
-import type { Scenario, AppSettings } from '../types';
+import React, { useState, useEffect } from 'react';
+import type { Scenario, AppSettings, Workspace, SessionReport } from '../types';
 import { AdminStorageService } from '../services/adminStorageService';
 import { SubscriptionService, type SubscriptionPlan, type LicenseInfo } from '../services/subscriptionService';
 import { TeamAnalyticsService, type TeamMember } from '../services/teamAnalyticsService';
+import { CloudSyncService } from '../services/cloudSyncService';
 import { BusinessOnboardingModal } from './BusinessOnboardingModal';
+import { SessionReportModal } from './SessionReportModal';
+import { LevelEvaluationService } from '../services/levelEvaluationService';
 import {
   ShieldCheck,
   X,
   Layers,
   FileJson,
-  Settings,
   Plus,
   Edit3,
   Copy,
@@ -38,6 +40,7 @@ import {
   Award,
   TrendingUp,
   Clock,
+  Building2
 } from 'lucide-react';
 
 interface AdminHubModalProps {
@@ -50,6 +53,10 @@ interface AdminHubModalProps {
   settings: AppSettings;
   onSaveSettings: (settings: AppSettings) => void;
   onLogoutAdmin: () => void;
+  isSuperAdmin?: boolean;
+  companyLicense?: LicenseInfo;
+  activeWorkspaceIdProp?: string;
+  activeWorkspaceNameProp?: string;
 }
 
 export const AdminHubModal: React.FC<AdminHubModalProps> = ({
@@ -61,12 +68,28 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
   onOpenEditScenario,
   settings,
   onSaveSettings,
-  onLogoutAdmin
+  onLogoutAdmin,
+  isSuperAdmin = true,
+  companyLicense,
+  activeWorkspaceIdProp,
+  activeWorkspaceNameProp
 }) => {
   const [activeTab, setActiveTab] = useState<'scenarios' | 'analytics' | 'licenses' | 'sync' | 'pwa'>('analytics');
+  const [activeWorkspaceId, setActiveWorkspaceId] = useState<string>(() => CloudSyncService.getCurrentWorkspaceId());
+  const effectiveWs = (isSuperAdmin ? (activeWorkspaceId === 'all' ? 'default' : activeWorkspaceId) : activeWorkspaceIdProp) || CloudSyncService.getCurrentWorkspaceId();
+  const maxSeats = companyLicense?.employeeSeats || (effectiveWs === 'tepic-madrid' ? 15 : 10);
 
-  // B2B Team Analytics & Reporting state
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(() => TeamAnalyticsService.getTeamMembers());
+  // B2B Team Analytics & Reporting state (scoped to this company)
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(() =>
+    TeamAnalyticsService.getTeamMembers(effectiveWs)
+  );
+
+  useEffect(() => {
+    if (isOpen) {
+      setTeamMembers(TeamAnalyticsService.getTeamMembers(effectiveWs));
+    }
+  }, [isOpen, effectiveWs]);
+
   const [isAddingMember, setIsAddingMember] = useState(false);
   const [newMemberName, setNewMemberName] = useState('');
   const [newMemberRole, setNewMemberRole] = useState('Bartender / Sala');
@@ -84,6 +107,8 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
   const [adminLicenses, setAdminLicenses] = useState<LicenseInfo[]>(() => SubscriptionService.getAdminLicenses());
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
+  const [targetWorkspaceForLicense, setTargetWorkspaceForLicense] = useState<string>('tepic-madrid');
+  const [employeeSeatsInput, setEmployeeSeatsInput] = useState<number>(10);
 
   // PIN change state
   const [currentPinInput, setCurrentPinInput] = useState('');
@@ -98,26 +123,80 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
   // Updating PWA state
   const [isUpdatingPwa, setIsUpdatingPwa] = useState(false);
 
+  // Multi-Tenant Workspaces & Live Cloud Reports state
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const [isCreatingWorkspace, setIsCreatingWorkspace] = useState(false);
+  const [newWorkspaceName, setNewWorkspaceName] = useState('');
+  const [liveReports, setLiveReports] = useState<SessionReport[]>([]);
+  const [isLoadingReports, setIsLoadingReports] = useState(false);
+  const [selectedReportToView, setSelectedReportToView] = useState<SessionReport | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      CloudSyncService.getWorkspaces().then(setWorkspaces);
+      setIsLoadingReports(true);
+      CloudSyncService.getTeamReports(activeWorkspaceId).then((reps) => {
+        setLiveReports(reps);
+        setIsLoadingReports(false);
+      });
+    }
+  }, [isOpen, activeWorkspaceId]);
+
+  const handleSwitchWorkspace = async (wsId: string) => {
+    setActiveWorkspaceId(wsId);
+    CloudSyncService.setCurrentWorkspaceId(wsId);
+    const updated = await AdminStorageService.syncWithCloud(wsId);
+    onRefreshScenarios(updated);
+    const reps = await CloudSyncService.getTeamReports(wsId);
+    setLiveReports(reps);
+    setTeamMembers(TeamAnalyticsService.getTeamMembers(wsId === 'all' ? undefined : wsId));
+  };
+
+  const handleCreateWorkspaceSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newWorkspaceName.trim()) return;
+    const ws = await CloudSyncService.createWorkspace(newWorkspaceName.trim());
+    if (ws) {
+      setWorkspaces((prev) => [...prev, ws]);
+      handleSwitchWorkspace(ws.id);
+      setIsCreatingWorkspace(false);
+      setNewWorkspaceName('');
+    }
+  };
+
   if (!isOpen) return null;
 
-  // Filtered scenarios for Admin list
-  const filtered = scenarios.filter(
-    (s) =>
+  // Filtered scenarios for Admin list (Company managers ONLY see their own scenarios)
+  const filtered = scenarios.filter((s) => {
+    if (!isSuperAdmin) {
+      if (s.workspaceId !== effectiveWs) return false;
+    } else {
+      if (activeWorkspaceId !== 'all') {
+        const scenarioWs = s.workspaceId || 'default';
+        if (scenarioWs !== activeWorkspaceId) {
+          return false;
+        }
+      }
+    }
+    return (
       s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       s.niche.toLowerCase().includes(searchQuery.toLowerCase()) ||
       s.aiCharacter.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+    );
+  });
 
   const handleDuplicate = (id: string) => {
     const { scenarios: updated, newScenario } = AdminStorageService.duplicateScenario(id);
     onRefreshScenarios(updated);
     if (newScenario) {
+      onClose();
       onOpenEditScenario(newScenario);
     }
   };
 
   const handleExportCSV = () => {
-    const csv = TeamAnalyticsService.exportToCSV('LOVO Bar Madrid');
+    const compName = activeWorkspaceNameProp || (effectiveWs === 'tepic-madrid' ? 'Restaurante Tepic (Ayala 14)' : effectiveWs === 'lovo-bar' ? 'LOVO Bar & Hospitality' : 'Empresa');
+    const csv = TeamAnalyticsService.exportToCSV(compName, isSuperAdmin && activeWorkspaceId === 'all' ? undefined : effectiveWs);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -135,33 +214,45 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
   const handleAddTeamMember = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMemberName.trim()) return;
-    TeamAnalyticsService.addMember({
-      name: newMemberName.trim(),
-      role: newMemberRole.trim(),
-      email: newMemberEmail.trim() || undefined,
-      scenarioId: 'lovo-tomo1-pitch1',
-      scenarioTitle: 'LOVO Tomo I: La Musa',
-      totalSessions: 1,
-      menuFluencyScore: 70,
-      pronunciationScore: 75,
-      upSellingScore: 65,
-      objectionsMastered: 2,
-      totalObjections: 4,
-      totalSpokenMinutes: 6,
-      lastActiveDate: Date.now(),
-      status: 'in_progress',
-      executiveFeedback: `Nuevo colaborador registrado. En proceso de asimilación de la carta y protocolos de servicio.`
-    });
-    setTeamMembers(TeamAnalyticsService.getTeamMembers());
+
+    if (!isSuperAdmin && teamMembers.length >= maxSeats) {
+      alert(`Has alcanzado el límite de ${maxSeats} empleados de tu plan corporativo. Elimina a un colaborador para liberar su cupo y asignárselo a otra persona.`);
+      return;
+    }
+
+    const companyFirstScenario = scenarios.find((s) => s.workspaceId === effectiveWs);
+    TeamAnalyticsService.addMember(
+      {
+        name: newMemberName.trim(),
+        role: newMemberRole.trim(),
+        email: newMemberEmail.trim() || undefined,
+        workspaceId: effectiveWs,
+        scenarioId: companyFirstScenario?.id || `${effectiveWs}-pitch1`,
+        scenarioTitle: companyFirstScenario?.title || `${activeWorkspaceNameProp || 'Empresa'} Módulo Principal`,
+        totalSessions: 0,
+        menuFluencyScore: 50,
+        pronunciationScore: 50,
+        upSellingScore: 50,
+        objectionsMastered: 0,
+        totalObjections: 4,
+        totalSpokenMinutes: 0,
+        lastActiveDate: Date.now(),
+        status: 'needs_practice',
+        executiveFeedback: `Colaborador habilitado en ${activeWorkspaceNameProp || 'la empresa'}. Pendiente de iniciar su entrenamiento.`
+      },
+      effectiveWs
+    );
+
+    setTeamMembers(TeamAnalyticsService.getTeamMembers(effectiveWs));
     setNewMemberName('');
     setNewMemberEmail('');
     setIsAddingMember(false);
   };
 
   const handleRemoveMember = (id: string, name: string) => {
-    if (window.confirm(`¿Eliminar al colaborador "${name}" del seguimiento de analítica?`)) {
+    if (window.confirm(`¿Eliminar al colaborador "${name}" y liberar su cupo para reasignarlo a otra persona?`)) {
       TeamAnalyticsService.removeMember(id);
-      setTeamMembers(TeamAnalyticsService.getTeamMembers());
+      setTeamMembers(TeamAnalyticsService.getTeamMembers(effectiveWs));
     }
   };
 
@@ -258,7 +349,15 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
 
   const handleGenerateLicense = (e: React.FormEvent) => {
     e.preventDefault();
-    const license = SubscriptionService.generateAdminLicense(selectedPlan, clientNotesInput);
+    const targetWsObj = workspaces.find((w) => w.id === targetWorkspaceForLicense);
+    const companyName = targetWsObj?.name || (targetWorkspaceForLicense === 'tepic-madrid' ? 'Restaurante Tepic (Ayala 14)' : targetWorkspaceForLicense === 'lovo-bar' ? 'LOVO Bar & Hospitality' : 'General');
+    const license = SubscriptionService.generateAdminLicense(
+      selectedPlan,
+      clientNotesInput,
+      targetWorkspaceForLicense,
+      companyName,
+      employeeSeatsInput
+    );
     setLastGeneratedLicense(license);
     setAdminLicenses(SubscriptionService.getAdminLicenses());
     setClientNotesInput('');
@@ -270,8 +369,8 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
     setTimeout(() => setCopiedKey(null), 2000);
   };
 
-  const handleCopyLink = (key: string) => {
-    const link = SubscriptionService.getMagicLink(key);
+  const handleCopyLink = (key: string, workspaceId?: string) => {
+    const link = SubscriptionService.getMagicLink(key, workspaceId);
     navigator.clipboard.writeText(link);
     setCopiedLink(key);
     setTimeout(() => setCopiedLink(null), 2000);
@@ -285,9 +384,11 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
   };
 
   const handleShareWhatsApp = (license: LicenseInfo) => {
-    const magicLink = SubscriptionService.getMagicLink(license.key);
+    const magicLink = SubscriptionService.getMagicLink(license.key, license.workspaceId);
+    const compText = license.companyName ? ` para ${license.companyName}` : '';
+    const seatsText = license.employeeSeats ? ` (${license.employeeSeats} puestos de equipo)` : '';
     const text = encodeURIComponent(
-      `¡Hola! Aquí tienes tu pase de acceso a PitchBoss Pro (${license.planName}).\n\nToca este enlace directo para activarlo en tu móvil:\n${magicLink}\n\nO ingresa este código manualmente en la app: ${license.key}`
+      `¡Hola! Aquí tienes la licencia de acceso a PitchBoss${compText}${seatsText} (${license.planName}).\n\nToca este enlace directo para activarlo en tu móvil:\n${magicLink}\n\nO ingresa este código manualmente en la app: ${license.key}`
     );
     window.open(`https://wa.me/?text=${text}`, '_blank');
   };
@@ -310,32 +411,80 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
         <div className="flex items-center justify-between px-3 sm:px-6 py-2.5 sm:py-3.5 border-b border-[#2A344A] bg-[#12161F] shrink-0 z-10">
           <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
             <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0">
-              <ShieldCheck className="w-4 h-4 text-[#38BDF8]" />
+              {isSuperAdmin ? (
+                <ShieldCheck className="w-4 h-4 text-[#38BDF8]" />
+              ) : (
+                <Users className="w-4 h-4 text-[#38BDF8]" />
+              )}
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 sm:gap-2">
-                <h2 className="text-sm sm:text-lg font-bold text-[#E2E8F0] truncate">Panel Admin</h2>
-                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold uppercase tracking-wider shrink-0">
-                  ADMIN
+                <h2 className="text-sm sm:text-lg font-bold text-[#E2E8F0] truncate">
+                  {isSuperAdmin ? 'Panel Super Admin' : `Panel de Gerencia · ${activeWorkspaceNameProp || 'Empresa'}`}
+                </h2>
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider shrink-0 ${
+                  isSuperAdmin
+                    ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
+                    : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                }`}>
+                  {isSuperAdmin ? 'SUPER ADMIN' : `PLAN B2B (${teamMembers.length}/${maxSeats} CUPOS)`}
                 </span>
               </div>
               <p className="text-xs text-[#94A3B8] truncate hidden xs:block">
-                Gestiona escenarios, ventas y PWA
+                {isSuperAdmin
+                  ? 'Control maestro de todas las empresas, escenarios y licencias'
+                  : `Gestión de cupos, progreso de equipo y edición de escenarios de ${activeWorkspaceNameProp || 'tu empresa'}`}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            <button
-              onClick={() => {
-                onLogoutAdmin();
-                onClose();
-              }}
-              className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-500/10 border border-rose-500/20 transition-colors cursor-pointer"
-              title="Cerrar sesión de Administrador"
-            >
-              Salir
-            </button>
+            {/* Multi-Tenant Workspace Selector (ONLY for Super Admin) */}
+            {isSuperAdmin ? (
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#18202F] border border-[#2A344A] text-xs">
+                <span className="text-[10px] text-[#94A3B8] uppercase font-semibold hidden md:inline">Espacio:</span>
+                <select
+                  value={activeWorkspaceId}
+                  onChange={(e) => handleSwitchWorkspace(e.target.value)}
+                  className="bg-transparent text-xs font-bold text-sky-300 focus:outline-none cursor-pointer"
+                >
+                  <option value="all" className="bg-[#12161F] text-white">
+                    Todas las Empresas (Global)
+                  </option>
+                  {workspaces.map((ws) => (
+                    <option key={ws.id} value={ws.id} className="bg-[#12161F] text-white">
+                      {ws.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => setIsCreatingWorkspace(!isCreatingWorkspace)}
+                  className="p-1 hover:text-sky-300 text-[#94A3B8] cursor-pointer"
+                  title="Crear nueva empresa/sede"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#18202F] border border-[#2A344A] text-xs font-bold text-sky-300">
+                <Building2 className="w-3.5 h-3.5" />
+                <span>{activeWorkspaceNameProp || 'Empresa'}</span>
+              </div>
+            )}
+
+            {isSuperAdmin && (
+              <button
+                onClick={() => {
+                  onLogoutAdmin();
+                  onClose();
+                }}
+                className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-500/10 border border-rose-500/20 transition-colors cursor-pointer"
+                title="Cerrar sesión de Administrador"
+              >
+                Salir
+              </button>
+            )}
             <button
               onClick={onClose}
               className="p-1.5 rounded-xl text-[#94A3B8] hover:text-[#E2E8F0] hover:bg-[#12161F] transition-colors cursor-pointer"
@@ -356,7 +505,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
             }`}
           >
             <BarChart3 className="w-4 h-4 text-emerald-400" />
-            <span>📊 Analítica de Dirección ({teamMembers.length})</span>
+            <span>📊 {isSuperAdmin ? 'Analítica de Dirección' : 'Reportes & Cupos'} ({teamMembers.length}/{maxSeats})</span>
           </button>
           <button
             onClick={() => setActiveTab('scenarios')}
@@ -367,48 +516,56 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
             }`}
           >
             <Layers className="w-4 h-4" />
-            <span>Escenarios ({scenarios.length})</span>
+            <span>{isSuperAdmin ? 'Escenarios Globales' : 'Editar Escenarios'} ({filtered.length})</span>
           </button>
-          <button
-            onClick={() => setActiveTab('licenses')}
-            className={`flex items-center gap-2 py-3 px-3.5 text-sm font-bold border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
-              activeTab === 'licenses'
-                ? 'border-[#38BDF8] text-[#38BDF8]'
-                : 'border-transparent text-[#94A3B8] hover:text-[#E2E8F0]'
-            }`}
-          >
-            <Crown className="w-4 h-4 text-[#FBBF24]" />
-            <span>Licencias & Ventas ({adminLicenses.length})</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('sync')}
-            className={`flex items-center gap-2 py-3 px-3.5 text-sm font-bold border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
-              activeTab === 'sync'
-                ? 'border-[#38BDF8] text-[#38BDF8]'
-                : 'border-transparent text-[#94A3B8] hover:text-[#E2E8F0]'
-            }`}
-          >
-            <FileJson className="w-4 h-4" />
-            <span>Copia & Backup</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('pwa')}
-            className={`flex items-center gap-2 py-3 px-3.5 text-sm font-bold border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
-              activeTab === 'pwa'
-                ? 'border-[#38BDF8] text-[#38BDF8]'
-                : 'border-transparent text-[#94A3B8] hover:text-[#E2E8F0]'
-            }`}
-          >
-            <Settings className="w-4 h-4" />
-            <span>Configuración PWA & PIN</span>
-          </button>
-          <button
-            onClick={() => setIsOnboardingOpen(true)}
-            className="ml-auto hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-500/20 to-emerald-500/20 hover:from-sky-500/30 hover:to-emerald-500/30 border border-sky-400/40 text-sky-300 font-bold text-xs cursor-pointer transition-all active:scale-95 shrink-0 my-1"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-sky-400" />
-            <span>🚀 Nueva Empresa (3 Pasos)</span>
-          </button>
+
+          {isSuperAdmin && (
+            <>
+              <button
+                onClick={() => setActiveTab('licenses')}
+                className={`flex items-center gap-2 py-3 px-3.5 text-sm font-bold border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
+                  activeTab === 'licenses'
+                    ? 'border-[#38BDF8] text-[#38BDF8]'
+                    : 'border-transparent text-[#94A3B8] hover:text-[#E2E8F0]'
+                }`}
+              >
+                <Crown className="w-4 h-4 text-[#FBBF24]" />
+                <span>Licencias & Ventas ({adminLicenses.length})</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('sync')}
+                className={`flex items-center gap-2 py-3 px-3.5 text-sm font-bold border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
+                  activeTab === 'sync'
+                    ? 'border-[#38BDF8] text-[#38BDF8]'
+                    : 'border-transparent text-[#94A3B8] hover:text-[#E2E8F0]'
+                }`}
+              >
+                <FileJson className="w-4 h-4" />
+                <span>Copia & Backup</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('pwa')}
+                className={`flex items-center gap-2 py-3 px-3.5 text-sm font-bold border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
+                  activeTab === 'pwa'
+                    ? 'border-[#38BDF8] text-[#38BDF8]'
+                    : 'border-transparent text-[#94A3B8] hover:text-[#E2E8F0]'
+                }`}
+              >
+                <Download className="w-4 h-4" />
+                <span>PWA</span>
+              </button>
+            </>
+          )}
+
+          {isSuperAdmin && (
+            <button
+              onClick={() => setIsOnboardingOpen(true)}
+              className="ml-auto hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-500/20 to-emerald-500/20 hover:from-sky-500/30 hover:to-emerald-500/30 border border-sky-400/40 text-sky-300 font-bold text-xs cursor-pointer transition-all active:scale-95 shrink-0 my-1"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-sky-400" />
+              <span>🚀 Nueva Empresa (3 Pasos)</span>
+            </button>
+          )}
         </div>
 
         {/* Main Tab Content */}
@@ -429,11 +586,23 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                         Evaluación Ejecutiva para la Dirección
                       </span>
                       <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-bold border border-emerald-500/30">
-                        2 Empleados Certificados para Sala
+                        {teamMembers.filter((m) => m.status === 'ready').length} Empleados Certificados para Sala
                       </span>
                     </div>
                     <blockquote className="text-sm sm:text-base font-medium text-slate-100 leading-relaxed italic">
-                      "Tu empleado <span className="text-sky-300 font-bold">Carlos Méndez</span> ha completado 5 sesiones de LOVO Bar y tiene un <span className="text-emerald-400 font-bold">85% de fluidez en la carta</span>. Ha dominado las recomendaciones de los cócteles Bubi y Manabi y la política de cuenta no dividida. Elena Gómez (90%) y él están certificados y listos para sala."
+                      {effectiveWs === 'tepic-madrid' ? (
+                        <>
+                          "Tu colaborador <span className="text-sky-300 font-bold">{teamMembers[0]?.name || 'Mateo Salazar'}</span> ha completado {teamMembers[0]?.totalSessions || 6} sesiones en Restaurante Tepic y tiene un <span className="text-emerald-400 font-bold">{teamMembers[0]?.menuFluencyScore || 92}% de fluidez en carta mexicana</span>. Domina en inglés la explicación del nixtamalizado, maridaje de mezcales y protocolos Michelin Bib Gourmand. {teamMembers.filter((m) => m.status === 'ready').length} colaboradores están certificados para sala."
+                        </>
+                      ) : effectiveWs === 'lovo-bar' ? (
+                        <>
+                          "Tu empleado <span className="text-sky-300 font-bold">{teamMembers[0]?.name || 'Carlos Méndez'}</span> ha completado {teamMembers[0]?.totalSessions || 5} sesiones de LOVO Bar y tiene un <span className="text-emerald-400 font-bold">{teamMembers[0]?.menuFluencyScore || 85}% de fluidez en la carta</span>. Ha dominado las recomendaciones de los cócteles Bubi y Manabi y la política de cuenta no dividida. Elena Gómez ({teamMembers[1]?.menuFluencyScore || 90}%) y él están certificados y listos para sala."
+                        </>
+                      ) : (
+                        <>
+                          "El equipo de <span className="text-sky-300 font-bold">{activeWorkspaceNameProp || 'tu empresa'}</span> registra un promedio de <span className="text-emerald-400 font-bold">{Math.round(teamMembers.reduce((acc, m) => acc + m.menuFluencyScore, 0) / (teamMembers.length || 1))}% de asimilación</span> en sus argumentos de venta en inglés y {teamMembers.filter((m) => m.status === 'ready').length} colaboradores certificados."
+                        </>
+                      )}
                     </blockquote>
                   </div>
                 </div>
@@ -447,7 +616,9 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                     <span>Personal en Turno</span>
                   </div>
                   <div className="text-2xl font-black text-white">{teamMembers.length}</div>
-                  <div className="text-[11px] text-emerald-400 font-medium mt-0.5">2 Certificados</div>
+                  <div className="text-[11px] text-emerald-400 font-medium mt-0.5">
+                    {teamMembers.filter((m) => m.status === 'ready').length} Certificados
+                  </div>
                 </div>
 
                 <div className="p-4 rounded-2xl border border-[#2A344A] bg-[#12161F]">
@@ -514,13 +685,15 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                   </button>
                 </div>
 
-                <button
-                  onClick={() => setIsOnboardingOpen(true)}
-                  className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-500/20 to-sky-500/20 hover:from-emerald-500/30 hover:to-sky-500/30 border border-emerald-500/40 text-emerald-300 cursor-pointer transition-all"
-                >
-                  <Sparkles className="w-4 h-4 text-emerald-400" />
-                  <span>🚀 Asistente Nueva Empresa (3 Pasos)</span>
-                </button>
+                {isSuperAdmin && (
+                  <button
+                    onClick={() => setIsOnboardingOpen(true)}
+                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-500/20 to-sky-500/20 hover:from-emerald-500/30 hover:to-sky-500/30 border border-emerald-500/40 text-emerald-300 cursor-pointer transition-all"
+                  >
+                    <Sparkles className="w-4 h-4 text-emerald-400" />
+                    <span>🚀 Asistente Nueva Empresa (3 Pasos)</span>
+                  </button>
+                )}
               </div>
 
               {/* Add Employee Form */}
@@ -585,7 +758,14 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                     </h4>
                   </div>
                   <span className="text-[11px] text-slate-400">
-                    Carta activa: <strong>LOVO Bar Madrid</strong>
+                    Carta activa:{' '}
+                    <strong className="text-white">
+                      {effectiveWs === 'tepic-madrid'
+                        ? 'Restaurante Tepic (Ayala 14)'
+                        : effectiveWs === 'lovo-bar'
+                        ? 'LOVO Bar Madrid'
+                        : activeWorkspaceNameProp || 'Empresa'}
+                    </strong>
                   </span>
                 </div>
 
@@ -662,6 +842,76 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                   </table>
                 </div>
               </div>
+
+              {/* LIVE CLOUD TEAM AUDIT CALLS */}
+              <div className="rounded-2xl border border-sky-500/30 bg-[#12161F] p-5 space-y-3.5 shadow-xl">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+                      <span>Auditoría de Llamadas en Vivo (Nube)</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-300 border border-sky-500/30 font-medium">
+                        {liveReports.length} {liveReports.length === 1 ? 'llamada' : 'llamadas'} sincronizadas
+                      </span>
+                    </h4>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsLoadingReports(true);
+                      CloudSyncService.getTeamReports(activeWorkspaceId).then((reps) => {
+                        setLiveReports(reps);
+                        setIsLoadingReports(false);
+                      });
+                    }}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#18202F] hover:bg-[#202838] border border-[#2A344A] text-slate-300 hover:text-white text-xs cursor-pointer transition-colors"
+                    title="Actualizar llamadas"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isLoadingReports ? 'animate-spin text-sky-400' : ''}`} />
+                    <span>Actualizar</span>
+                  </button>
+                </div>
+
+                {liveReports.length === 0 ? (
+                  <div className="text-center py-8 border border-dashed border-[#2A344A] rounded-2xl p-4 text-xs text-[#94A3B8]">
+                    No hay llamadas registradas aún en este espacio de trabajo. Cuando los empleados completen llamadas desde sus teléfonos, sus notas, fluidez y grabaciones aparecerán aquí automáticamente.
+                  </div>
+                ) : (
+                  <div className="divide-y divide-[#2A344A]/60 overflow-x-auto">
+                    {liveReports.map((rep, idx) => (
+                      <div key={rep.id || idx} className="py-3 flex items-center justify-between gap-3 text-xs">
+                        <div className="min-w-0 flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-xl bg-sky-500/15 border border-sky-500/30 text-sky-300 flex items-center justify-center font-bold text-xs shrink-0">
+                            {rep.employeeName ? rep.employeeName.charAt(0).toUpperCase() : 'C'}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-bold text-white truncate">{rep.employeeName || 'Colaborador'}</p>
+                            <p className="text-[11px] text-[#94A3B8] truncate">{rep.scenarioTitle}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 shrink-0">
+                          <div className="text-center">
+                            <span className="text-[10px] text-[#94A3B8] block">Negocio</span>
+                            <span className="font-bold text-[#FBBF24]">{rep.businessScore}%</span>
+                          </div>
+                          <div className="text-center">
+                            <span className="text-[10px] text-[#94A3B8] block">Inglés</span>
+                            <span className="font-bold text-sky-400">{rep.englishScore}%</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedReportToView(rep)}
+                            className="px-2.5 py-1 rounded-lg bg-[#18202F] hover:bg-[#202838] text-[#E2E8F0] font-semibold border border-[#2A344A] transition-colors cursor-pointer text-[11px]"
+                          >
+                            Ver Informe
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -682,24 +932,28 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
-                  <button
-                    onClick={handleRestoreDefaults}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-[#E2E8F0] hover:bg-[#202838] bg-[#12161F] border border-[#2A344A] transition-colors cursor-pointer"
-                    title="Restaurar el escenario original de LOVO Bar"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5 text-[#94A3B8]" />
-                    <span>Restaurar Fábrica</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      onClose();
-                      onOpenCreateScenario();
-                    }}
-                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-950 bg-[#0EA5E9] hover:bg-[#38BDF8] transition-all shadow-md shadow-sky-500/20 cursor-pointer"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Crear Escenario</span>
-                  </button>
+                  {isSuperAdmin && (
+                    <>
+                      <button
+                        onClick={handleRestoreDefaults}
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-[#E2E8F0] hover:bg-[#202838] bg-[#12161F] border border-[#2A344A] transition-colors cursor-pointer"
+                        title="Restaurar el escenario original de LOVO Bar"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5 text-[#94A3B8]" />
+                        <span>Restaurar Fábrica</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          onClose();
+                          onOpenCreateScenario();
+                        }}
+                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-950 bg-[#0EA5E9] hover:bg-[#38BDF8] transition-all shadow-md shadow-sky-500/20 cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Crear Escenario</span>
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -722,7 +976,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                         <div className="min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
                             <h4 className="text-xs sm:text-sm font-bold text-[#E2E8F0] truncate">
-                              {scenario.title}
+                              {LevelEvaluationService.cleanTitle(scenario.title)}
                             </h4>
                             {scenario.isHidden ? (
                               <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#1C2331] text-[#94A3B8] border border-[#2A344A] font-medium">
@@ -733,8 +987,8 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                                 Visible
                               </span>
                             )}
-                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#1C2331] text-[#38BDF8] border border-[#2A344A] font-mono">
-                              {scenario.targetEnglishLevel}
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#1C2331] text-[#38BDF8] border border-[#2A344A] font-bold">
+                              {LevelEvaluationService.getPitchTier(scenario.targetEnglishLevel || scenario.title)}
                             </span>
                           </div>
                           <p className="text-[11px] text-[#94A3B8] truncate mt-0.5">
@@ -760,33 +1014,37 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                           <span>Editar</span>
                         </button>
 
-                        <button
-                          onClick={() => handleDuplicate(scenario.id)}
-                          className="p-1.5 rounded-xl text-[#94A3B8] hover:text-[#E2E8F0] bg-[#1C2331] hover:bg-[#202838] border border-[#2A344A] transition-colors cursor-pointer"
-                          title="Duplicar escenario"
-                        >
-                          <Copy className="w-3.5 h-3.5" />
-                        </button>
+                        {isSuperAdmin && (
+                          <>
+                            <button
+                              onClick={() => handleDuplicate(scenario.id)}
+                              className="p-1.5 rounded-xl text-[#94A3B8] hover:text-[#E2E8F0] bg-[#1C2331] hover:bg-[#202838] border border-[#2A344A] transition-colors cursor-pointer"
+                              title="Duplicar escenario"
+                            >
+                              <Copy className="w-3.5 h-3.5" />
+                            </button>
 
-                        <button
-                          onClick={() => handleToggleVisibility(scenario.id)}
-                          className={`p-1.5 rounded-xl border transition-colors cursor-pointer ${
-                            scenario.isHidden
-                              ? 'text-[#94A3B8] bg-[#1C2331] border-[#2A344A] hover:text-[#E2E8F0]'
-                              : 'text-[#38BDF8] bg-sky-500/10 border-sky-500/30 hover:bg-sky-500/20'
-                          }`}
-                          title={scenario.isHidden ? 'Hacer visible a los usuarios' : 'Ocultar a los usuarios'}
-                        >
-                          {scenario.isHidden ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                        </button>
+                            <button
+                              onClick={() => handleToggleVisibility(scenario.id)}
+                              className={`p-1.5 rounded-xl border transition-colors cursor-pointer ${
+                                scenario.isHidden
+                                  ? 'text-[#94A3B8] bg-[#1C2331] border-[#2A344A] hover:text-[#E2E8F0]'
+                                  : 'text-[#38BDF8] bg-sky-500/10 border-sky-500/30 hover:bg-sky-500/20'
+                              }`}
+                              title={scenario.isHidden ? 'Hacer visible a los usuarios' : 'Ocultar a los usuarios'}
+                            >
+                              {scenario.isHidden ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                            </button>
 
-                        <button
-                          onClick={() => handleDelete(scenario.id, scenario.title)}
-                          className="p-1.5 rounded-xl text-[#94A3B8] hover:text-rose-400 bg-[#1C2331] hover:bg-[#202838] border border-[#2A344A] transition-colors cursor-pointer"
-                          title="Eliminar escenario"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                            <button
+                              onClick={() => handleDelete(scenario.id, scenario.title)}
+                              className="p-1.5 rounded-xl text-[#94A3B8] hover:text-rose-400 bg-[#1C2331] hover:bg-[#202838] border border-[#2A344A] transition-colors cursor-pointer"
+                              title="Eliminar escenario"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </>
+                        )}
                       </div>
                     </div>
                   ))
@@ -811,7 +1069,43 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                 </div>
 
                 <form onSubmit={handleGenerateLicense} className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                        Empresa / Espacio de Trabajo:
+                      </label>
+                      <select
+                        value={targetWorkspaceForLicense}
+                        onChange={(e) => setTargetWorkspaceForLicense(e.target.value)}
+                        className="w-full px-3 py-2 text-xs rounded-xl border bg-[#18202F] border-[#2A344A] text-[#E2E8F0] focus:outline-none focus:border-sky-500 cursor-pointer font-medium"
+                      >
+                        {workspaces.map((ws) => (
+                          <option key={ws.id} value={ws.id}>
+                            {ws.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                        Puestos Empleados (Seats):
+                      </label>
+                      <select
+                        value={employeeSeatsInput}
+                        onChange={(e) => setEmployeeSeatsInput(Number(e.target.value))}
+                        className="w-full px-3 py-2 text-xs rounded-xl border bg-[#18202F] border-[#2A344A] text-[#E2E8F0] focus:outline-none focus:border-sky-500 cursor-pointer"
+                      >
+                        <option value={5}>5 Empleados</option>
+                        <option value={10}>10 Empleados (Estándar)</option>
+                        <option value={15}>15 Empleados</option>
+                        <option value={20}>20 Empleados</option>
+                        <option value={30}>30 Empleados</option>
+                        <option value={50}>50 Empleados (Corporativo)</option>
+                        <option value={100}>100 Empleados (Ilimitado)</option>
+                      </select>
+                    </div>
+
                     <div>
                       <label className="block text-xs font-semibold text-slate-300 mb-1.5">
                         Plan de Suscripción:
@@ -830,13 +1124,13 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
 
                     <div>
                       <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                        Cliente / Empresa / Nota:
+                        Contacto / Referencia / Nota:
                       </label>
                       <input
                         type="text"
                         value={clientNotesInput}
                         onChange={(e) => setClientNotesInput(e.target.value)}
-                        placeholder="Ej: Hotel Meliá - Recepción, o Juan Pérez"
+                        placeholder="Ej: Gerencia Restaurante Tepic"
                         className="w-full px-3 py-2 text-xs rounded-xl border bg-[#18202F] border-[#2A344A] text-[#E2E8F0] focus:outline-none focus:border-sky-500"
                       />
                     </div>
@@ -847,7 +1141,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                     className="px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs flex items-center gap-2 transition-all cursor-pointer shadow-lg shadow-sky-500/20"
                   >
                     <Sparkles className="w-4 h-4 text-white" />
-                    <span>Generar Licencia y Enlace Mágico</span>
+                    <span>Generar Licencia y Enlace Mágico Corporativo</span>
                   </button>
                 </form>
 
@@ -855,10 +1149,15 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                 {lastGeneratedLicense && (
                   <div className="p-3.5 sm:p-4 rounded-2xl bg-sky-500/10 border border-sky-500/30 space-y-3 animate-in fade-in">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                      <span className="text-xs font-bold text-sky-400 flex items-center gap-1.5">
+                      <div className="flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                        <span>¡Licencia lista para entregar!</span>
-                      </span>
+                        <span className="text-xs font-bold text-sky-400">
+                          ¡Licencia Corporativa lista para entregar!
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                          {lastGeneratedLicense.companyName || 'General'} · {lastGeneratedLicense.employeeSeats || 10} empleados
+                        </span>
+                      </div>
                       <span className="text-[11px] text-[#94A3B8]">
                         Expira el: {new Date(lastGeneratedLicense.expiresAt).toLocaleDateString()}
                       </span>
@@ -890,13 +1189,13 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                           <input
                             type="text"
                             readOnly
-                            value={SubscriptionService.getMagicLink(lastGeneratedLicense.key)}
+                            value={SubscriptionService.getMagicLink(lastGeneratedLicense.key, lastGeneratedLicense.workspaceId)}
                             className="w-full bg-[#18202F] px-3 py-2 rounded-xl font-mono text-xs text-slate-300 border border-[#2A344A] truncate"
                           />
                           <div className="flex items-center gap-2">
                             <button
                               type="button"
-                              onClick={() => handleCopyLink(lastGeneratedLicense.key)}
+                              onClick={() => handleCopyLink(lastGeneratedLicense.key, lastGeneratedLicense.workspaceId)}
                               className="flex-1 py-2 px-3 rounded-xl bg-[#222B3D] hover:bg-[#2A344A] text-xs font-semibold text-white border border-[#2A344A] transition-colors cursor-pointer flex items-center justify-center gap-1.5"
                             >
                               {copiedLink === lastGeneratedLicense.key ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <LinkIcon className="w-3.5 h-3.5" />}
@@ -961,7 +1260,10 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                             </div>
 
                             <div className="flex items-center justify-between gap-2 text-xs">
-                              <span className="text-[#94A3B8] truncate text-[11px]">{lic.clientNotes || 'Cliente Directo'}</span>
+                              <div>
+                                <span className="font-semibold text-white text-[11px] block">{lic.companyName || 'General'}</span>
+                                <span className="text-amber-400 text-[10px]">{lic.employeeSeats || 10} puestos · {lic.clientNotes || 'Directo'}</span>
+                              </div>
                               <code className="font-mono text-[11px] text-sky-300 bg-[#18202F] px-2 py-0.5 rounded-lg border border-[#2A344A] shrink-0">
                                 {lic.key}
                               </code>
@@ -970,7 +1272,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                             <div className="flex items-center gap-2 pt-1 border-t border-[#2A344A]">
                               <button
                                 type="button"
-                                onClick={() => handleCopyLink(lic.key)}
+                                onClick={() => handleCopyLink(lic.key, lic.workspaceId)}
                                 className="flex-1 py-1.5 px-2 rounded-xl bg-[#18202F] hover:bg-[#222B3D] text-xs font-semibold text-[#E2E8F0] border border-[#2A344A] flex items-center justify-center gap-1 cursor-pointer transition-colors"
                               >
                                 <LinkIcon className="w-3.5 h-3.5 text-[#94A3B8]" />
@@ -1006,6 +1308,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                         <thead className="bg-[#161D2B] border-b border-[#2A344A] text-[11px] font-bold text-[#94A3B8]">
                           <tr>
                             <th className="px-4 py-3">Código</th>
+                            <th className="px-4 py-3">Empresa / Puestos</th>
                             <th className="px-4 py-3">Cliente / Nota</th>
                             <th className="px-4 py-3">Plan</th>
                             <th className="px-4 py-3">Vence</th>
@@ -1020,6 +1323,10 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                               <tr key={lic.key} className="hover:bg-[#1C2331]/50 transition-colors">
                                 <td className="px-4 py-3 font-mono text-[11px] text-sky-300 font-semibold">
                                   {lic.key}
+                                </td>
+                                <td className="px-4 py-3">
+                                  <div className="font-semibold text-[#E2E8F0]">{lic.companyName || 'General'}</div>
+                                  <div className="text-[10px] text-amber-400 font-medium">{lic.employeeSeats || 10} empleados</div>
                                 </td>
                                 <td className="px-4 py-3 text-[#E2E8F0]">
                                   {lic.clientNotes || 'Directo'}
@@ -1048,7 +1355,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                                 <td className="px-4 py-3 text-right">
                                   <div className="flex items-center justify-end gap-1.5">
                                     <button
-                                      onClick={() => handleCopyLink(lic.key)}
+                                      onClick={() => handleCopyLink(lic.key, lic.workspaceId)}
                                       title="Copiar Enlace Mágico"
                                       className="p-1.5 rounded-lg bg-[#18202F] hover:bg-[#222B3D] text-[#94A3B8] hover:text-white border border-[#2A344A] transition-colors cursor-pointer"
                                     >
@@ -1358,6 +1665,64 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
           </button>
         </div>
       </div>
+      {/* Create New Multi-Tenant Workspace Modal */}
+      {isCreatingWorkspace && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
+          <div className="w-full max-w-sm rounded-3xl border border-[#2A344A] bg-[#1C2331] p-5 text-[#E2E8F0] shadow-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                <Plus className="w-4 h-4 text-sky-400" />
+                <span>Nueva Empresa / Sede</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsCreatingWorkspace(false)}
+                className="p-1 rounded-lg text-[#94A3B8] hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-xs text-[#94A3B8]">
+              Crea un espacio de trabajo independiente para otra empresa o sucursal (ej. "Restaurante Lovo", "Clínica Dental").
+            </p>
+            <form onSubmit={handleCreateWorkspaceSubmit} className="space-y-3">
+              <input
+                type="text"
+                required
+                value={newWorkspaceName}
+                onChange={(e) => setNewWorkspaceName(e.target.value)}
+                placeholder="Nombre de la empresa o sede"
+                className="w-full px-3 py-2 text-xs rounded-xl border bg-[#12161F] border-[#2A344A] text-white focus:outline-none focus:border-sky-400"
+              />
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsCreatingWorkspace(false)}
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#94A3B8] hover:text-white"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-1.5 rounded-lg text-xs font-bold bg-[#0EA5E9] hover:bg-[#38BDF8] text-slate-950 shadow-md cursor-pointer"
+                >
+                  Crear Espacio
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Full Debrief Modal for Audited Employee Call */}
+      {selectedReportToView && (
+        <SessionReportModal
+          report={selectedReportToView}
+          onClose={() => setSelectedReportToView(null)}
+          onRestart={() => setSelectedReportToView(null)}
+        />
+      )}
+
       {/* 3-Step Guided Business Onboarding Wizard */}
       <BusinessOnboardingModal
         isOpen={isOnboardingOpen}

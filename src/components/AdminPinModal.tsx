@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ShieldCheck, Lock, Eye, EyeOff, X, ArrowRight, AlertCircle } from 'lucide-react';
 import { AdminStorageService } from '../services/adminStorageService';
+import { CloudSyncService } from '../services/cloudSyncService';
 
 interface AdminPinModalProps {
   isOpen: boolean;
@@ -24,20 +25,21 @@ export const AdminPinModal: React.FC<AdminPinModalProps> = ({ isOpen, onClose, o
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!pin.trim()) {
       setError('Por favor, ingresa el PIN.');
       return;
     }
 
-    if (AdminStorageService.verifyAdminPin(pin)) {
+    const res = await CloudSyncService.adminLogin(pin);
+    if (res.success || AdminStorageService.verifyAdminPin(pin)) {
       AdminStorageService.setAdminSessionActive(true);
       setError(null);
       onSuccess();
       onClose();
     } else {
-      setError('PIN incorrecto. Inténtalo de nuevo.');
+      setError(res.error || 'PIN incorrecto. Inténtalo de nuevo.');
       setPin('');
       inputRef.current?.focus();
     }
@@ -70,9 +72,9 @@ export const AdminPinModal: React.FC<AdminPinModalProps> = ({ isOpen, onClose, o
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-[#E2E8F0] flex items-center justify-between">
-              <span>PIN de Seguridad</span>
-              <span className="text-[11px] text-[#FBBF24] font-normal">Por defecto: 1234</span>
+            <label className="text-xs font-semibold text-[#E2E8F0] flex items-center gap-1.5">
+              <Lock className="w-3.5 h-3.5 text-sky-400" />
+              <span>PIN de Seguridad Maestro</span>
             </label>
             <div className="relative">
               <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8]">

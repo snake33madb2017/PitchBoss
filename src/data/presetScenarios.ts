@@ -1,13 +1,14 @@
 import type { Scenario } from '../types';
 import { LOVO_BAR_MASTER_KNOWLEDGE } from './lovoBarKnowledge';
+import { TEPIC_SCENARIOS } from './tepicScenarios';
 
-export const PRESET_SCENARIOS: Scenario[] = [
+const RAW_PRESETS: Scenario[] = [
   // ==========================================
   // TOMO I: LA MUSA (JOSEPHINE BAKER)
   // ==========================================
   {
     id: 'lovo-tomo1-pitch1',
-    title: 'LOVO Tomo I · Pitch One (A1-A2): La Musa (Saludos, Sabores & Cócteles Básicos)',
+    title: 'LOVO Tomo I · Pitch One: La Musa (Saludos, Sabores & Cócteles Básicos)',
     niche: 'Tomo I: La Musa',
     businessKnowledge: LOVO_BAR_MASTER_KNOWLEDGE,
     aiCharacter: {
@@ -19,7 +20,7 @@ export const PRESET_SCENARIOS: Scenario[] = [
     },
     userRole: 'Bartender / Camarero de LOVO Bar',
     context: 'Emma entra sola a LOVO Bar por la tarde. Se sienta en la barra y mira el Tomo I. Necesita una bienvenida cálida, agua de cortesía y una recomendación inicial sencilla de la carta de Josephine Baker.',
-    initialGreeting: '¡Hola! Practicaremos el nivel Pitch One (A1-A2) para el Tomo I: La Musa. Emma se sienta en la barra y te saluda:\n\n"Hi! Good evening! The bar looks stunning. It’s my first time here. Could you recommend something sweet and fruity from this first menu?"',
+    initialGreeting: '¡Hola! Practicaremos el nivel Pitch One para el Tomo I: La Musa. Emma se sienta en la barra y te saluda:\n\n"Hi! Good evening! The bar looks stunning. It’s my first time here. Could you recommend something sweet and fruity from this first menu?"',
     initialTranslation: '¡Hola! ¡Buenas noches! El bar se ve increíble. Es mi primera vez aquí. ¿Podrías recomendarme algo dulce y afrutado de este primer menú?',
     initialTip: "Tip: Saluda cordialmente, ofrece agua y sugiere 'Jupe Banane' (12€) explicando fresa y plátano clarificados: 'Good evening! Welcome to LOVO. Here is some water. I recommend Jupe Banane—it is sweet, fruity, with strawberry and banana, inspired by Josephine Baker!' [Gud ív-ning! Uél-cam tu Ló-vo. Ai re-co-ménd Dchup Ba-nán...]",
     difficulty: 'easy',
@@ -49,7 +50,7 @@ export const PRESET_SCENARIOS: Scenario[] = [
   },
   {
     id: 'lovo-tomo1-pitch2',
-    title: 'LOVO Tomo I · Pitch Two (B1-B2): La Musa (Storytelling, 4 Estadios & Clarificados)',
+    title: 'LOVO Tomo I · Pitch Two: La Musa (Storytelling, 4 Estadios & Clarificados)',
     niche: 'Tomo I: La Musa',
     businessKnowledge: LOVO_BAR_MASTER_KNOWLEDGE,
     aiCharacter: {
@@ -61,7 +62,7 @@ export const PRESET_SCENARIOS: Scenario[] = [
     },
     userRole: 'Bartender & Storyteller en LOVO Bar',
     context: 'Dos clientes franceses apasionados por Josephine Baker se sientan en la barra. Desean degustar cócteles del Tomo I: La Musa y escuchar la historia detrás de bebidas como Red Moon, Sour Criollo, Jupe Banane, Chez Josephine y Danseur de Rue.',
-    initialGreeting: '¡Bonjour! Practicaremos el nivel Pitch Two (B1-B2) del Tomo I: La Musa. Entran dos clientes interesados en la biografía emocional de Josephine Baker:\n\n"Good evening! We saw outside that your bar is dedicated to Josephine Baker. We adore her! Could you explain how your cocktail menu is structured around her life, and what is your favorite story behind a drink?"',
+    initialGreeting: '¡Bonjour! Practicaremos el nivel Pitch Two del Tomo I: La Musa. Entran dos clientes interesados en la biografía emocional de Josephine Baker:\n\n"Good evening! We saw outside that your bar is dedicated to Josephine Baker. We adore her! Could you explain how your cocktail menu is structured around her life, and what is your favorite story behind a drink?"',
     initialTranslation: '¡Buenas noches! Vimos afuera que vuestro bar está dedicado a Josephine Baker. ¡La adoramos! ¿Podrías explicarnos cómo está estructurada la carta alrededor de su vida y cuál es tu historia favorita detrás de un cóctel?',
     initialTip: "Tip: Explica que el Tomo I divide su vida en 4 estadios emocionales: Amarga y Seca, Ácida, Dulce y Códex. Recomienda por ejemplo 'Jupe Banane' o 'Danseur de Rue': 'Our first volume follows Josephine Baker across four emotional stages: Bitter and Dry, Sour, Sweet, and Codex. I recommend Jupe Banane, celebrating her famous banana skirt in Paris!' [Au-er ferst vól-ium fó-lous Dchóu-se-fiin Béi-ker...]",
     difficulty: 'medium',
@@ -91,7 +92,7 @@ export const PRESET_SCENARIOS: Scenario[] = [
   },
   {
     id: 'lovo-tomo1-pitch3',
-    title: 'LOVO Tomo I · Pitch Three (C1-C2): La Musa (Espionaje UV, Alta Mixología & Críticos)',
+    title: 'LOVO Tomo I · Pitch Three: La Musa (Espionaje UV, Alta Mixología & Críticos)',
     niche: 'Tomo I: La Musa',
     businessKnowledge: LOVO_BAR_MASTER_KNOWLEDGE,
     aiCharacter: {
@@ -103,13 +104,13 @@ export const PRESET_SCENARIOS: Scenario[] = [
     },
     userRole: 'Head Bartender & Director de Sala en LOVO Bar',
     context: 'Julian visita LOVO Bar para escribir una reseña internacional sobre bares conceptuales en Madrid. Se enfoca en la etapa Códex y la labor de Josephine Baker como agente de contraespionaje de la Resistencia Francesa durante la Segunda Guerra Mundial.',
-    initialGreeting: '¡Hola! Practicaremos el nivel Pitch Three (C1-C2) del Tomo I: La Musa. Julian Montgomery se sienta en una esquina de la barra, examina la cristalería y te interpela con mirada inquisitiva:\n\n"Good evening. I have been analyzing how bars around Europe translate historical narratives into liquid form. In Volume I, how do you mathematically and sensorially balance Josephine\'s wartime intelligence work with the botanical formulation of Spy Códex? And what luminescence technology are you applying to the serve?"',
+    initialGreeting: '¡Hola! Practicaremos el nivel Pitch Three del Tomo I: La Musa. Julian Montgomery se sienta en una esquina de la barra, examina la cristalería y te interpela con mirada inquisitiva:\n\n"Good evening. I have been analyzing how bars around Europe translate historical narratives into liquid form. In Volume I, how do you mathematically and sensorially balance Josephine\'s wartime intelligence work with the botanical formulation of Spy Códex? And what luminescence technology are you applying to the serve?"',
     initialTranslation: 'Buenas noches. He estado analizando cómo los bares europeos traducen narrativas históricas en forma líquida. En el Tomo I, ¿cómo equilibráis matemática y sensorialmente el trabajo de inteligencia en tiempos de guerra de Josephine con la formulación botánica de Spy Códex? ¿Y qué tecnología de luminiscencia aplicáis en el servicio?',
-    initialTip: "Tip: Mantén un registro diplomático y sofisticado en inglés C1-C2. Explica la tinta botánica reactiva a luz UV (extracto de saúco y quinina natural) y cómo Josephine pasaba secretos militares en partituras con tinta invisible: 'Good evening, Julian. In Spy Códex, we honor her role in the French Resistance where she smuggled military secrets written in invisible ink across sheet music. We infuse natural botanical quinine and elderflower that react under a UV beam at the table...' [Gud ív-ning, Dchú-lian...]",
+    initialTip: "Tip: Mantén un registro diplomático y sofisticado en inglés Pitch Three. Explica la tinta botánica reactiva a luz UV (extracto de saúco y quinina natural) y cómo Josephine pasaba secretos militares en partituras con tinta invisible: 'Good evening, Julian. In Spy Códex, we honor her role in the French Resistance where she smuggled military secrets written in invisible ink across sheet music. We infuse natural botanical quinine and elderflower that react under a UV beam at the table...' [Gud ív-ning, Dchú-lian...]",
     difficulty: 'hard',
     targetEnglishLevel: 'C1',
     objectives: [
-      { id: 't1-p3-obj-1', description: 'Articular con maestría en inglés C1 la labor de espionaje de Josephine y la tecnología botánica de Spy Códex (12€)', completed: false },
+      { id: 't1-p3-obj-1', description: 'Articular con maestría en inglés de alto nivel la labor de espionaje de Josephine y la tecnología botánica de Spy Códex (12€)', completed: false },
       { id: 't1-p3-obj-2', description: 'Debatir los matices de la etapa Códex (Oriental Códex, Le Champ Códex, Mediterranean Códex)', completed: false },
       { id: 't1-p3-obj-3', description: 'Justificar el perfil organoléptico (acidez, dilución térmica, tensión alcohólica) con vocabulario de sumillería', completed: false },
       { id: 't1-p3-obj-4', description: 'Elevar la experiencia comercial ofreciendo maridaje con destilados de colección de la cava privada', completed: false }
@@ -137,7 +138,7 @@ export const PRESET_SCENARIOS: Scenario[] = [
   // ==========================================
   {
     id: 'lovo-tomo2-pitch1',
-    title: 'LOVO Tomo II · Pitch One (A1-A2): Taxonomía (La Leyenda del Lobo & Pedidos Básicos)',
+    title: 'LOVO Tomo II · Pitch One: Taxonomía (La Leyenda del Lobo & Pedidos Básicos)',
     niche: 'Tomo II: Taxonomía Animal',
     businessKnowledge: LOVO_BAR_MASTER_KNOWLEDGE,
     aiCharacter: {
@@ -149,7 +150,7 @@ export const PRESET_SCENARIOS: Scenario[] = [
     },
     userRole: 'Bartender / Camarero de LOVO Bar',
     context: 'Oliver entra a LOVO Bar tras pasear por la Calle Echegaray. Abre el Tomo II (Taxonomía Animal) y pregunta sobre la leyenda del lobo y un cóctel refrescante con ginebra.',
-    initialGreeting: '¡Hola! Practicaremos el nivel Pitch One (A1-A2) del Tomo II: Taxonomía Animal. Oliver se acerca a la barra sonriendo:\n\n"Hello! Excuse me, why is this place called LOVO with a V, and why are there wolves everywhere? Also, I would love a fresh gin drink. What do you have?"',
+    initialGreeting: '¡Hola! Practicaremos el nivel Pitch One del Tomo II: Taxonomía Animal. Oliver se acerca a la barra sonriendo:\n\n"Hello! Excuse me, why is this place called LOVO with a V, and why are there wolves everywhere? Also, I would love a fresh gin drink. What do you have?"',
     initialTranslation: '¡Hola! Disculpa, ¿por qué este lugar se llama LOVO con V y por qué hay lobos por todas partes? Además, me encantaría una copa fresca con ginebra. ¿Qué tienes?',
     initialTip: "Tip: Explica que la calle se llamaba antiguamente Calle del Lobo en el siglo XVII y recomienda 'Mowgli' (13€) con Roku Gin: 'Welcome! This street was called Wolf Street in the 17th century. For gin, I recommend Mowgli—it has Roku Gin, pandan, and cardamom. It is very fresh and herbal!' [Uél-cam! Dis striit uos cold Uulf Striit...]",
     difficulty: 'easy',
@@ -179,7 +180,7 @@ export const PRESET_SCENARIOS: Scenario[] = [
   },
   {
     id: 'lovo-tomo2-pitch2',
-    title: 'LOVO Tomo II · Pitch Two (B1-B2): Taxonomía (Coctelería Culinaria & Fábulas)',
+    title: 'LOVO Tomo II · Pitch Two: Taxonomía (Coctelería Culinaria & Fábulas)',
     niche: 'Tomo II: Taxonomía Animal',
     businessKnowledge: LOVO_BAR_MASTER_KNOWLEDGE,
     aiCharacter: {
@@ -191,7 +192,7 @@ export const PRESET_SCENARIOS: Scenario[] = [
     },
     userRole: 'Bartender Especialista en Coctelería Gastronómica',
     context: 'Dos comensales buscan experiencias culinarias líquidas. Desean conocer el capítulo El Festín del Tomo II y cócteles como Festín Marino, Festín Oriental, Festín Nórdico y Festín Maya, acompañados de raciones para picar.',
-    initialGreeting: '¡Hola! Practicaremos el nivel Pitch Two (B1-B2) del Tomo II: Taxonomía Animal. Dos comensales apasionados por la cocina se sientan en la barra:\n\n"Hello there! We heard LOVO has a complete volume called Animal Taxonomy dedicated to the wolf and culinary mixology. We love savory, umami, and smoked flavors. What are your most innovative culinary cocktails?"',
+    initialGreeting: '¡Hola! Practicaremos el nivel Pitch Two del Tomo II: Taxonomía Animal. Dos comensales apasionados por la cocina se sientan en la barra:\n\n"Hello there! We heard LOVO has a complete volume called Animal Taxonomy dedicated to the wolf and culinary mixology. We love savory, umami, and smoked flavors. What are your most innovative culinary cocktails?"',
     initialTranslation: '¡Hola! Escuchamos que LOVO tiene un volumen completo llamado Taxonomía Animal dedicado al lobo y a la coctelería culinaria. Nos encantan los sabores salinos, umami y ahumados. ¿Cuáles son vuestros cócteles culinarios más innovadores?',
     initialTip: "Tip: Recomienda los cócteles del capítulo El Festín: Festín Marino (12€, hoja de ostra y vermut encurtido) o Festín Oriental (13€, agua clarificada de tomate y huevo de codorniz): 'Welcome! In Volume II, our Gastronomic Feast chapter features Festín Marino with oyster leaf and pickled vermouth, and Festín Oriental with clarified tomato water and marinated quail egg.' [Uél-cam! In vól-ium tuu...]",
     difficulty: 'medium',
@@ -221,7 +222,7 @@ export const PRESET_SCENARIOS: Scenario[] = [
   },
   {
     id: 'lovo-tomo2-pitch3',
-    title: 'LOVO Tomo II · Pitch Three (C1-C2): Taxonomía (Soberanía del Lobo, Ahumados & Alta Cava)',
+    title: 'LOVO Tomo II · Pitch Three: Taxonomía (Soberanía del Lobo, Ahumados & Alta Cava)',
     niche: 'Tomo II: Taxonomía Animal',
     businessKnowledge: LOVO_BAR_MASTER_KNOWLEDGE,
     aiCharacter: {
@@ -233,9 +234,9 @@ export const PRESET_SCENARIOS: Scenario[] = [
     },
     userRole: 'Bar Director & Creador de Cartas de LOVO Bar',
     context: 'Lord Alistair busca una degustación de alta complejidad sensorial en LOVO Bar. Desea evaluar el uso de destilados de turba (Islay Scotch) en cócteles como Mindfulness y debatir sobre la metáfora del lobo alfa vs manada comunitaria.',
-    initialGreeting: '¡Hola! Practicaremos el nivel Pitch Three (C1-C2) del Tomo II: Taxonomía Animal. Lord Alistair se sienta erguido, ajusta sus gemelos y te habla con tono pausado y aristocrático:\n\n"Good evening. I rarely frequent cocktail establishments unless they demonstrate a genuine reverence for peated malt and artisanal distillation. How does your Totem chapter conceptually reconcile the aggressiveness of Laphroaig 10 with the botanical subtlety of turmeric honey in Mindfulness? And why should a purist like myself drink peat in a mixed cocktail?"',
+    initialGreeting: '¡Hola! Practicaremos el nivel Pitch Three del Tomo II: Taxonomía Animal. Lord Alistair se sienta erguido, ajusta sus gemelos y te habla con tono pausado y aristocrático:\n\n"Good evening. I rarely frequent cocktail establishments unless they demonstrate a genuine reverence for peated malt and artisanal distillation. How does your Totem chapter conceptually reconcile the aggressiveness of Laphroaig 10 with the botanical subtlety of turmeric honey in Mindfulness? And why should a purist like myself drink peat in a mixed cocktail?"',
     initialTranslation: 'Buenas noches. Raras veces frecuento coctelerías a menos que demuestren una auténtica reverencia por la malta turbada y la destilación artesanal. ¿Cómo concilia conceptualmente vuestro capítulo El Tótem la agresividad de Laphroaig 10 con la sutileza botánica de la miel de cúrcuma en Mindfulness? ¿Y por qué un purista como yo debería beber turba en un cóctel?',
-    initialTip: "Tip: Responde con máxima elegancia en inglés C1-C2. Defiende la combinación de Maker's Mark (bourbon de trigo dulce) con Laphroaig 10 (ahumado medicinal de Islay) y jengibre fresco como un puente entre fuerza y equilibrio: 'Good evening, my Lord. In Mindfulness, we do not mask the peat; we frame it. We pair the sweet wheat foundation of Maker\'s Mark with an aromatic wash of Laphroaig 10, softened by cold-pressed turmeric honey and ginger to create a contemplative harmony...' [Gud ív-ning, mai Lord...]",
+    initialTip: "Tip: Responde con máxima elegancia en inglés Pitch Three. Defiende la combinación de Maker's Mark (bourbon de trigo dulce) con Laphroaig 10 (ahumado medicinal de Islay) y jengibre fresco como un puente entre fuerza y equilibrio: 'Good evening, my Lord. In Mindfulness, we do not mask the peat; we frame it. We pair the sweet wheat foundation of Maker\'s Mark with an aromatic wash of Laphroaig 10, softened by cold-pressed turmeric honey and ginger to create a contemplative harmony...' [Gud ív-ning, mai Lord...]",
     difficulty: 'hard',
     targetEnglishLevel: 'C1',
     objectives: [
@@ -267,7 +268,7 @@ export const PRESET_SCENARIOS: Scenario[] = [
   // ==========================================
   {
     id: 'lovo-tomo3-pitch1',
-    title: 'LOVO Tomo III · Pitch One (A1-A2): La Tribu (Culturas del Mundo & Sabores Tropicales)',
+    title: 'LOVO Tomo III · Pitch One: La Tribu (Culturas del Mundo & Sabores Tropicales)',
     niche: 'Tomo III: La Tribu Arcoíris',
     businessKnowledge: LOVO_BAR_MASTER_KNOWLEDGE,
     aiCharacter: {
@@ -279,7 +280,7 @@ export const PRESET_SCENARIOS: Scenario[] = [
     },
     userRole: 'Bartender / Camarero de LOVO Bar',
     context: 'Chloe entra a LOVO Bar y queda fascinada por la portada del Tomo III: La Tribu Arcoíris. Quiere saber qué significa "La Tribu" y pide un cóctel tropical con ron o tequila que no sea demasiado ácido.',
-    initialGreeting: '¡Hola! Practicaremos el nivel Pitch One (A1-A2) del Tomo III: La Tribu Arcoíris. Chloe se sienta en la barra con una gran sonrisa:\n\n"Hi! Wow, this menu cover is gorgeous! What does \'The Rainbow Tribe\' mean? And could you recommend a delicious tropical cocktail with rum or tequila?"',
+    initialGreeting: '¡Hola! Practicaremos el nivel Pitch One del Tomo III: La Tribu Arcoíris. Chloe se sienta en la barra con una gran sonrisa:\n\n"Hi! Wow, this menu cover is gorgeous! What does \'The Rainbow Tribe\' mean? And could you recommend a delicious tropical cocktail with rum or tequila?"',
     initialTranslation: '¡Hola! ¡Guau, la portada de esta carta es hermosa! ¿Qué significa "La Tribu Arcoíris"? ¿Y podrías recomendarme un cóctel tropical delicioso con ron o tequila?',
     initialTip: "Tip: Saluda cordialmente, explica que Josephine Baker adoptó a 12 niños de distintos países como su 'Tribu Arcoíris' y recomienda 'Manabi' (13€) con Ron Bumbu, piña y coco: 'Welcome to LOVO! The Rainbow Tribe honors Josephine Baker\'s 12 adopted children from different cultures. For tropical rum, I recommend Manabi—it has Bumbu Rum, pineapple, and coconut. It is tropical and delicious!' [Uél-cam tu Ló-vo! De Réin-bou Traib ó-nors...]",
     difficulty: 'easy',
@@ -309,7 +310,7 @@ export const PRESET_SCENARIOS: Scenario[] = [
   },
   {
     id: 'lovo-tomo3-pitch2',
-    title: 'LOVO Tomo III · Pitch Two (B1-B2): La Tribu (The World\'s 50 Best Bars & Alérgenos)',
+    title: 'LOVO Tomo III · Pitch Two: La Tribu (The World\'s 50 Best Bars & Alérgenos)',
     niche: 'Tomo III: La Tribu Arcoíris',
     businessKnowledge: LOVO_BAR_MASTER_KNOWLEDGE,
     aiCharacter: {
@@ -321,7 +322,7 @@ export const PRESET_SCENARIOS: Scenario[] = [
     },
     userRole: 'Bartender & Embajador de Marcas Internacionales',
     context: 'Dos clientes de Nueva York reconocen en la carta colaboraciones con Handshake (México), Employees Only (NYC) y Svanen (Oslo). Además, uno de ellos tiene alergia severa al cacahuete y a las nueces. El bartender debe guiarlos con seguridad quirúrgica.',
-    initialGreeting: '¡Hola! Practicaremos el nivel Pitch Two (B1-B2) del Tomo III: La Tribu Arcoíris. Dos clientes de Nueva York se acercan con gran curiosidad:\n\n"Good evening! Wow, we see on your menu cocktails honoring Handshake in Mexico and Employees Only from our hometown NYC! How did these collaborations come together? Also, I have a severe nut and peanut allergy—could you guide us safely through the menu?"',
+    initialGreeting: '¡Hola! Practicaremos el nivel Pitch Two del Tomo III: La Tribu Arcoíris. Dos clientes de Nueva York se acercan con gran curiosidad:\n\n"Good evening! Wow, we see on your menu cocktails honoring Handshake in Mexico and Employees Only from our hometown NYC! How did these collaborations come together? Also, I have a severe nut and peanut allergy—could you guide us safely through the menu?"',
     initialTranslation: '¡Buenas noches! ¡Guau, vemos en vuestra carta cócteles en honor a Handshake en México y Employees Only de nuestra ciudad, Nueva York! ¿Cómo surgieron estas colaboraciones? Además, tengo alergia severa a los cacahuetes y a los frutos secos, ¿podrías guiarnos de forma segura por la carta?',
     initialTip: "Tip: Agradece su visita, destaca el cóctel EO-Manhattan (15€) o Sencha de Handshake (14€) y advierte de inmediato sobre Boazu (nuez) y Upina Ñawi (cacahuete): 'Welcome! In Volume III we celebrate our Bar Tribe with 7 of the world\'s best bars, including EO-Manhattan. Regarding allergies, avoid Boazu and Upina Ñawi as they contain nuts and peanuts. Sencha or Tomato & Strawberry are completely safe!' [Uél-cam! In vól-ium zrii uii cé-le-breit...]",
     difficulty: 'medium',
@@ -351,7 +352,7 @@ export const PRESET_SCENARIOS: Scenario[] = [
   },
   {
     id: 'lovo-tomo3-pitch3',
-    title: 'LOVO Tomo III · Pitch Three (C1-C2): La Tribu (Vanguardia Global & Destilados de Colección)',
+    title: 'LOVO Tomo III · Pitch Three: La Tribu (Vanguardia Global & Destilados de Colección)',
     niche: 'Tomo III: La Tribu Arcoíris',
     businessKnowledge: LOVO_BAR_MASTER_KNOWLEDGE,
     aiCharacter: {
@@ -363,9 +364,9 @@ export const PRESET_SCENARIOS: Scenario[] = [
     },
     userRole: 'Bar Manager & Embajador Global de LOVO Bar',
     context: 'Elena visita LOVO Bar para una auditoría sensorial de la carta internacional. Evalúa cómo el Tomo III representa la diversidad cultural sin caer en clichés y solicita una cata maridada con los tequilas y whiskies más exclusivos de la casa.',
-    initialGreeting: '¡Hola! Practicaremos el nivel Pitch Three (C1-C2) del Tomo III: La Tribu Arcoíris. Elena toma asiento en el centro de la barra, examina el libro y te habla en un inglés impecable:\n\n"Good evening. I have witnessed bar partnerships across Tokyo, London, and Buenos Aires. Volume III represents an ambitious global manifesto. How do you ensure that cocktails honoring bars like Svanen in Oslo or Handshake in Mexico maintain their indigenous identity while coexisting seamlessly under LOVO’s French Art Déco aesthetic? And what top-shelf spirit flight would you curate to accompany this tasting?"',
+    initialGreeting: '¡Hola! Practicaremos el nivel Pitch Three del Tomo III: La Tribu Arcoíris. Elena toma asiento en el centro de la barra, examina el libro y te habla en un inglés impecable:\n\n"Good evening. I have witnessed bar partnerships across Tokyo, London, and Buenos Aires. Volume III represents an ambitious global manifesto. How do you ensure that cocktails honoring bars like Svanen in Oslo or Handshake in Mexico maintain their indigenous identity while coexisting seamlessly under LOVO’s French Art Déco aesthetic? And what top-shelf spirit flight would you curate to accompany this tasting?"',
     initialTranslation: 'Buenas noches. He presenciado alianzas entre bares en Tokio, Londres y Buenos Aires. El Tomo III representa un ambicioso manifiesto global. ¿Cómo garantizáis que los cócteles en honor a bares como Svanen en Oslo o Handshake en México mantengan su identidad autóctona mientras coexisten armónicamente bajo la estética Art Déco francesa de LOVO? ¿Y qué vuelo de destilados de alta gama curaríais para acompañar esta cata?',
-    initialTip: "Tip: Mantén un diálogo de alta diplomacia en inglés C1-C2. Explica que LOVO comparte la técnica de origen respetando la botánica endémica y ofrece un maridaje con destilados de colección como Don Julio 1942 (40€), Casa Dragones (35€) o Hibiki Harmony (15€): 'Good evening, Elena. Volume III is built on Honest Hospitality—we do not replicate drinks; we translate bar philosophies. For instance, Tomato & Strawberry honors Svanen\'s minimalist Nordic clarification, while Sencha embodies Handshake\'s Japanese-Mexican precision. To elevate this journey, I would pair it with a flight featuring Casa Dragones Joven and Don Julio 1942...' [Gud ív-ning, E-lé-na...]",
+    initialTip: "Tip: Mantén un diálogo de alta diplomacia en inglés Pitch Three. Explica que LOVO comparte la técnica de origen respetando la botánica endémica y ofrece un maridaje con destilados de colección como Don Julio 1942 (40€), Casa Dragones (35€) o Hibiki Harmony (15€): 'Good evening, Elena. Volume III is built on Honest Hospitality—we do not replicate drinks; we translate bar philosophies. For instance, Tomato & Strawberry honors Svanen\'s minimalist Nordic clarification, while Sencha embodies Handshake\'s Japanese-Mexican precision. To elevate this journey, I would pair it with a flight featuring Casa Dragones Joven and Don Julio 1942...' [Gud ív-ning, E-lé-na...]",
     difficulty: 'hard',
     targetEnglishLevel: 'C2',
     objectives: [
@@ -438,4 +439,154 @@ export const PRESET_SCENARIOS: Scenario[] = [
     createdAt: Date.now()
   },
 
-  ];
+  // ==========================================
+  // RESTAURANTE TEPIC (AYALA 14 · MADRID)
+  // ==========================================
+  ...TEPIC_SCENARIOS,
+
+  // ==========================================
+  // PITCHBOSS PUBLIC DEMO SCENARIOS (DEFAULT)
+  // ==========================================
+  {
+    id: 'pb-demo-b2b-sales',
+    title: 'Demo 1: Venta Consultiva B2B y Descubrimiento de Necesidades',
+    niche: 'PitchBoss Enterprise · Venta Consultiva',
+    workspaceId: 'default',
+    businessKnowledge: `
+PITCHBOSS ENTERPRISE - DEMO DE VENTA CONSULTIVA B2B
+- Producto: PitchBoss Enterprise AI Simulator para equipos comerciales y de servicio.
+- Propuesta de Valor: Acelerar la curva de aprendizaje de ventas un 300% con simulación conversacional por voz en vivo y feedback fonético en tiempo real.
+- Métricas Clave: 0 llamadas reales arriesgadas antes de la certificación; +24% en conversión de objeciones.
+    `.trim(),
+    aiCharacter: {
+      name: 'Marcus Vance (VP of Commercial Operations)',
+      role: 'Vicepresidente de Operaciones Comerciales en una multinacional de tecnología en Nueva York',
+      avatar: '👔',
+      personality: 'Ejecutivo analítico y directo. Tiene poco tiempo, valora las métricas de retorno de inversión (ROI) y exige saber por qué la simulación con IA por voz es superior a la formación tradicional con roleplay presencial.',
+      voiceGender: 'male'
+    },
+    userRole: 'Consultor de Cuentas Estratégicas de PitchBoss',
+    context: 'Reunión de descubrimiento de 15 minutos con Marcus Vance. Ha probado plataformas de e-learning tradicionales y no vio impacto en los resultados de ventas de su equipo. Quiere saber cómo PitchBoss resuelve la falta de práctica oral real.',
+    initialGreeting: '¡Hola! Practicaremos una sesión de venta consultiva B2B. Marcus se conecta a la videollamada y te saluda:\n\n"Good morning! Thanks for jumping on the call. We currently have over 40 account executives whose ramp-up time is way too long, and our managers spend half their week doing manual roleplay. Can you briefly walk me through how PitchBoss simulates real conversational pressure?"',
+    initialTranslation: '¡Buenos días! Gracias por conectarte a la llamada. Actualmente tenemos más de 40 ejecutivos de cuentas cuyo tiempo de adaptación es demasiado largo, y nuestros gerentes pasan la mitad de su semana haciendo simulaciones manuales. ¿Podrías explicarme brevemente cómo PitchBoss simula la presión conversacional real?',
+    initialTip: "Tip: Agradece la reunión, empatiza con el dolor de los gerentes y explica cómo la simulación de voz con IA entrena la improvisación y objeciones sin desgastar tiempo de gerencia: 'Good morning Marcus! Thank you for your time. Exactly—PitchBoss automates high-pressure voice simulations with real-time feedback, cutting ramp-up time by 40% without draining your managers' calendars.' [Gud mór-ning Már-cas...]",
+    difficulty: 'medium',
+    targetEnglishLevel: 'B2',
+    objectives: [
+      { id: 'b2b-obj-1', description: 'Saludar con compostura ejecutiva y validar el punto de dolor del cliente', completed: false },
+      { id: 'b2b-obj-2', description: 'Articular la ventaja de la práctica manos libres por voz frente al e-learning pasivo', completed: false },
+      { id: 'b2b-obj-3', description: 'Presentar una métrica de impacto (reducción de ramp-up o aumento en cierre de acuerdos)', completed: false },
+      { id: 'b2b-obj-4', description: 'Proponer el siguiente paso hacia un piloto corporativo de 2 semanas', completed: false }
+    ],
+    commonObjections: [
+      "Our team already uses traditional LMS video courses. Why do we need voice-based AI simulation?",
+      "How do we know our proprietary sales methodology and product catalog will remain 100% confidential and secure?",
+      "Can executive leadership track real metrics like fluency, spoken minutes, and objection pass rates per rep?"
+    ],
+    nicheVocabulary: [
+      'Ramp-up time reduction [Rámp-ap taim ri-dák-shon] (Reducción del tiempo de incorporación)',
+      'High-pressure voice simulation [Jái-pré-shur vois si-miu-léi-shon]',
+      'Real-time pedagogical feedback [Rí-al taim pe-da-gód-zhi-cal fíd-back]',
+      'Strict multi-tenant tenant isolation [Ten-ant ai-so-léi-shon] (Aislamiento confidencial)',
+      'Objection handling mastery [Ob-dchék-shon ján-dling mas-te-ri]',
+      'Executive analytics dashboard [Ek-sé-kiu-tiv a-na-lí-tics dash-bord]'
+    ],
+    createdAt: Date.now()
+  },
+  {
+    id: 'pb-demo-negotiation',
+    title: 'Demo 2: Negociación de Tarifas y Cierre de Contratos',
+    niche: 'PitchBoss Enterprise · Negociación',
+    workspaceId: 'default',
+    businessKnowledge: `
+PITCHBOSS ENTERPRISE - DEMO DE NEGOCIACIÓN DE TARIFAS
+- Contexto: Negociación de cierre de licencia anual para 25 puestos.
+- Estrategia: Evitar descuentos ciegos, defender el valor agregado, ofrecer aceleración en soporte o términos plurianuales.
+    `.trim(),
+    aiCharacter: {
+      name: 'Sarah Jenkins (Head of Procurement)',
+      role: 'Directora de Compras Corporativas en Londres',
+      avatar: '💼',
+      personality: 'Negociadora británica astuta y firme. Intenta forzar un descuento del 25% antes de firmar el contrato alegando restricciones presupuestarias de final de trimestre.',
+      voiceGender: 'female'
+    },
+    userRole: 'Director Comercial de Cuentas Estratégicas',
+    context: 'Llamada final de cierre contractual. El comité de operaciones ha aprobado la solución técnica, pero Compras solicita un 25% de descuento antes de liberar la orden de compra.',
+    initialGreeting: '¡Hola! Practicaremos una negociación de tarifas de alta presión. Sarah inicia la llamada de revisión comercial:\n\n"Hello! We’ve reviewed the annual enterprise proposal. Our operations team loves the product, but our CFO has set a strict cap for this quarter. If you can grant us an immediate 25% discount across the 25 user seats, I can sign the agreement right now. Can we make that happen?"',
+    initialTranslation: '¡Hola! Hemos revisado la propuesta anual para empresas. A nuestro equipo de operaciones le encanta el producto, pero nuestro Director Financiero ha establecido un límite estricto para este trimestre. Si pueden concedernos un descuento inmediato del 25% en los 25 puestos de usuario, puedo firmar el acuerdo ahora mismo. ¿Podemos hacerlo posible?',
+    initialTip: "Tip: Mantén la calma, no aceptes el descuento sin contrapartida y defiende el valor del retorno de inversión, ofreciendo una concesión de valor como meses adicionales o soporte premium: 'I completely understand your budget targets Sarah. Rather than diluting the scope, if you can commit to a 2-year partnership, we can include dedicated onboarding and tier-1 SLA support.' [Ai com-plíit-li an-der-stánd...]",
+    difficulty: 'hard',
+    targetEnglishLevel: 'C1',
+    objectives: [
+      { id: 'neg-obj-1', description: 'Reconocer la solicitud de descuento sin capitular de forma inmediata', completed: false },
+      { id: 'neg-obj-2', description: 'Reafirmar el valor cuantitativo del simulador para el equipo de ventas', completed: false },
+      { id: 'neg-obj-3', description: 'Proponer una contrapartida estratégica (plazo bianual o valor añadido)', completed: false },
+      { id: 'neg-obj-4', description: 'Confirmar el compromiso de firma para la orden de compra', completed: false }
+    ],
+    commonObjections: [
+      "25 seats at full price is above our immediate quarterly ceiling. Can you split the billing semi-annually?",
+      "Competitor roleplay tools offer generic subscriptions for less. Why should we invest in bespoke voice simulations?",
+      "Can we sign for 10 seats now and expand later at the same locked-in tier rate?"
+    ],
+    nicheVocabulary: [
+      'Value-based negotiation [Vá-liu beist ni-go-shi-éi-shon]',
+      'Annual commitment vs quarterly billing [Á-niual co-mít-ment]',
+      'Enterprise SLA & Dedicated Onboarding [En-ter-prais Es-El-Ei]',
+      'Locked-in corporate pricing tier [Lóckt in cór-po-reit práis-ing]',
+      'Return on Investment (ROI) justification [Ri-tórn on in-vést-ment]'
+    ],
+    createdAt: Date.now()
+  },
+  {
+    id: 'pb-demo-hospitality',
+    title: 'Demo 3: Hospitalidad Internacional y Up-Selling de Servicio',
+    niche: 'PitchBoss Enterprise · Hospitalidad',
+    workspaceId: 'default',
+    businessKnowledge: `
+PITCHBOSS ENTERPRISE - DEMO DE HOSPITALIDAD INTERNACIONAL
+- Escenario: Salón de alta gastronomía internacional.
+- Protocolo: Bienvenida cordial, identificación de preferencias, recomendación de aperitivo de autor y maridaje de mesa.
+    `.trim(),
+    aiCharacter: {
+      name: 'Oliver & Claire (Gastronomy Travellers from Melbourne)',
+      role: 'Pareja australiana aficionada a la alta cocina de viaje en Europa',
+      avatar: '🥂',
+      personality: 'Viajeros gastronómicos exigentes, amables y abiertos a sugerencias excepcionales. Les gusta conocer el origen de los ingredientes y el maridaje recomendado.',
+      voiceGender: 'male'
+    },
+    userRole: 'Capitán de Sala / Sommelier',
+    context: 'Oliver y Claire acaban de sentarse en una mesa del restaurante. Miran la carta con entusiasmo y solicitan una sugerencia de aperitivo antes de ordenar los platos principales.',
+    initialGreeting: '¡Hola! Practicaremos atención de sala y venta sugestiva en inglés. Oliver te saluda sonriente al tomar asiento:\n\n"Good evening! What an exceptional atmosphere you have here. We’ve had a long flight from Melbourne and want to start with something refreshing and distinctive. What aperitif or signature glass would you recommend while we look over the menu?"',
+    initialTranslation: '¡Buenas noches! Qué ambiente tan excepcional tienen aquí. Tuvimos un largo vuelo desde Melbourne y queremos comenzar con algo refrescante y distintivo. ¿Qué aperitivo o copa de autor nos recomendarías mientras revisamos el menú?',
+    initialTip: "Tip: Da la bienvenida con calidez, ofrece agua mineral de manantial y sugiere una copa de vino espumoso de autor o un cóctel de bienvenida de la casa, explicando las notas aromáticas: 'Good evening Oliver, Claire! Welcome. May I start you with still or sparkling water? For your aperitif, I highly recommend our signature sparkling reserve with crisp citrus notes—it prepares the palate wonderfully.' [Gud ív-ning Ó-li-ver...]",
+    difficulty: 'easy',
+    targetEnglishLevel: 'B1',
+    objectives: [
+      { id: 'hosp-obj-1', description: 'Dar la bienvenida con elegancia y preguntar por preferencia de agua (still or sparkling)', completed: false },
+      { id: 'hosp-obj-2', description: 'Recomendar un aperitivo de autor describiendo sus notas de cata', completed: false },
+      { id: 'hosp-obj-3', description: 'Sugerir un bocado de cortesía o entrante de autor como up-selling sugestivo', completed: false },
+      { id: 'hosp-obj-4', description: 'Dejar tiempo para la lectura del menú con una despedida atenta', completed: false }
+    ],
+    commonObjections: [
+      "Do you have a non-alcoholic option that is complex and not overly sugary?",
+      "Can you tell us about the local sourcing of the ingredients featured in this aperitif?",
+      "We have a slight citrus allergy; could you adapt the welcome drink for my partner?"
+    ],
+    nicheVocabulary: [
+      'Still or sparkling water? [Stil or spár-kling uó-ter?] (¿Agua natural o con gas?)',
+      'Crisp citrus botanicals [Crisp sít-ras bo-tá-ni-cals]',
+      'Palate cleanser aperitif [Pá-lat clén-ser a-pé-ri-tif]',
+      'Locally sourced provenance [Ló-ca-li sorst pró-ve-nans]',
+      'Signature reserve pairing [Síg-na-chur ri-sérv pé-ring]',
+      'Please take your time with the menu [Pliis teik iur taim...]'
+    ],
+    createdAt: Date.now()
+  }
+];
+
+export const PRESET_SCENARIOS: Scenario[] = RAW_PRESETS.map((s) => ({
+  ...s,
+  workspaceId: s.workspaceId || (s.id.startsWith('tepic-') ? 'tepic-madrid' : s.id.startsWith('lovo-') ? 'lovo-bar' : 'default')
+}));
+
+

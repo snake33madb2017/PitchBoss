@@ -29,10 +29,17 @@ export interface Scenario {
   commonObjections: string[];
   nicheVocabulary: string[]; // Specific industry jargon to use or practice
   businessKnowledge?: string; // Raw pasted menu, product list, FAQs or operational manual
+  workspaceId?: string; // Multi-tenant partition
   isCustom?: boolean;
   isHidden?: boolean; // When true, hidden from non-admin users
   createdAt: number;
   updatedAt?: number;
+}
+
+export interface Workspace {
+  id: string;
+  name: string;
+  createdAt: number;
 }
 
 export interface Message {
@@ -44,6 +51,7 @@ export interface Message {
   showTranslation?: boolean;
   audioLang?: 'es-ES' | 'en-US';
   tip?: string;
+  audioUrl?: string; // Spoken audio recording for playback
   corrections?: {
     originalText: string;
     improvedText: string;
@@ -53,6 +61,11 @@ export interface Message {
 }
 
 export interface SessionReport {
+  id?: string;
+  workspaceId?: string;
+  employeeName?: string;
+  audioRecordingUrl?: string; // Call audio recording URL
+  createdAt?: number;
   scenarioId: string;
   scenarioTitle: string;
   durationSeconds: number;
@@ -77,7 +90,11 @@ export interface AppSettings {
   autoListen: boolean; // Continuous conversational mode
   showRealtimeHints: boolean;
   hapticFeedback: boolean;
-  adminPin?: string; // Admin PIN (defaults to '1234')
+  adminPin?: string; // Admin PIN (defaults to '3319')
+  workspaceId?: string; // Current active workspace
+  employeeName?: string; // Current user / employee name
+  enableDailyReminders?: boolean;
+  reminderHour?: number;
 }
 
 export interface SavedSession {

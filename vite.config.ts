@@ -3,57 +3,35 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
+// @ts-ignore
+import { handleBackendRoute } from './server/backendLogic.mjs'
+
 /**
- * Dev server backend proxy plugin for Gemini API.
- * Keeps API keys shielded on the server side and tests backend proxy flow locally.
+ * Dev server backend proxy plugin for PitchBoss.
+ * Handles Gemini AI, Cloud Scenarios, Workspaces, Admin Auth and Team Live Audit locally.
  */
-function geminiBackendProxyPlugin(): Plugin {
+function pitchbossBackendPlugin(): Plugin {
   return {
-    name: 'gemini-backend-proxy',
+    name: 'pitchboss-backend-plugin',
     configureServer(server) {
-      server.middlewares.use('/api/gemini/chat', async (req, res) => {
-        if (req.method !== 'POST') {
-          res.statusCode = 405;
-          res.setHeader('Content-Type', 'application/json');
-          res.end(JSON.stringify({ error: 'Method Not Allowed' }));
+      server.middlewares.use(async (req, res, next) => {
+        if (req.url && req.url.startsWith('/api/')) {
+          let body = '';
+          req.on('data', (chunk) => {
+            body += chunk;
+          });
+          req.on('end', async () => {
+            try {
+              await handleBackendRoute(req, res, body);
+            } catch (err: any) {
+              res.statusCode = 500;
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ error: 'Backend error', details: err.message }));
+            }
+          });
           return;
         }
-
-        let body = '';
-        req.on('data', (chunk) => {
-          body += chunk;
-        });
-
-        req.on('end', async () => {
-          try {
-            const parsed = JSON.parse(body);
-            const serverApiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || parsed.clientApiKey || '';
-            const model = parsed.model || 'gemini-2.5-flash';
-
-            if (!serverApiKey) {
-              res.statusCode = 400;
-              res.setHeader('Content-Type', 'application/json');
-              res.end(JSON.stringify({ error: 'No GEMINI_API_KEY configured on proxy server or provided in request.' }));
-              return;
-            }
-
-            const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${serverApiKey}`;
-            const upstreamResponse = await fetch(geminiUrl, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(parsed.geminiPayload)
-            });
-
-            const data = await upstreamResponse.json();
-            res.statusCode = upstreamResponse.status;
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(data));
-          } catch (err: any) {
-            res.statusCode = 500;
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify({ error: 'Proxy internal server error', details: err.message }));
-          }
-        });
+        next();
       });
     }
   };
@@ -63,37 +41,71 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    geminiBackendProxyPlugin(),
+    pitchbossBackendPlugin(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['logo.jpg', 'logo-icon.png', 'icon-192.png', 'icon-512.png', 'favicon.svg'],
+      devOptions: {
+        enabled: true
+      },
+      includeAssets: ['logo-icon.png', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png', 'icon-maskable-512.png', 'favicon.svg'],
       manifest: {
+        id: 'pitchboss-ai-pwa',
         name: 'PitchBoss — Domina el pitch en cualquier industria',
         short_name: 'PitchBoss',
         description: 'Simulador de roleplay por voz en inglés para dominar el pitch y cerrar tratos en cualquier nicho de negocio',
-        theme_color: '#12161f',
-        background_color: '#12161f',
+        start_url: '/',
+        scope: '/',
         display: 'standalone',
         orientation: 'portrait',
+        theme_color: '#12161f',
+        background_color: '#12161f',
+        lang: 'es',
+        dir: 'ltr',
+        categories: ['business', 'education', 'productivity'],
         icons: [
           {
             src: '/icon-192.png',
             sizes: '192x192',
             type: 'image/png',
-            purpose: 'any maskable'
+            purpose: 'any'
           },
           {
             src: '/icon-512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable'
+            purpose: 'any'
+          },
+          {
+            src: '/icon-maskable-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable'
+          }
+        ],
+        shortcuts: [
+          {
+            name: 'Iniciar Simulación',
+            short_name: 'Simular',
+            description: 'Comenzar entrenamiento de pitch con IA',
+            url: '/',
+            icons: [{ src: '/icon-192.png', sizes: '192x192' }]
+          },
+          {
+            name: 'Portal Corporativo',
+            short_name: 'Empresas',
+            description: 'Acceder al portal privado de tu empresa',
+            url: '/?view=login',
+            icons: [{ src: '/icon-192.png', sizes: '192x192' }]
           }
         ]
       },
       workbox: {
         cleanupOutdatedCaches: true,
         skipWaiting: true,
-        clientsClaim: true
+        clientsClaim: true,
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+        globIgnores: ['**/logo.jpg', '**/logo.png', '**/Logopwa.jpg', '**/*.pdf'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest,jpg,webp}']
       }
     })
   ],

@@ -171,7 +171,37 @@ export class LevelEvaluationService {
   }
 
   /**
-   * Explains competency description per CEFR Level
+   * Translates internal CEFR level code to user-facing Pitch Tier name:
+   * A1, A2 -> 'Pitch One'
+   * B1, B2 -> 'Pitch Two'
+   * C1, C2 -> 'Pitch Three'
+   */
+  public static getPitchTier(level?: string): 'Pitch One' | 'Pitch Two' | 'Pitch Three' {
+    if (!level) return 'Pitch One';
+    const clean = level.toUpperCase();
+    if (clean.includes('C1') || clean.includes('C2') || clean.includes('THREE') || clean.includes('3')) {
+      return 'Pitch Three';
+    }
+    if (clean.includes('B1') || clean.includes('B2') || clean.includes('TWO') || clean.includes('2')) {
+      return 'Pitch Two';
+    }
+    return 'Pitch One';
+  }
+
+  /**
+   * Strips CEFR parenthetical codes like (A1-A2), (B1-B2), (C1-C2), (A1), etc. from scenario titles
+   */
+  public static cleanTitle(title: string): string {
+    if (!title) return '';
+    return title
+      .replace(/\s*\((?:A1-A2|B1-B2|C1-C2|A1|A2|B1|B2|C1|C2)\)/gi, '')
+      .replace(/\s*—\s*(?:A1-A2|B1-B2|C1-C2|A1|A2|B1|B2|C1|C2)/gi, '')
+      .replace(/\s*-\s*(?:A1-A2|B1-B2|C1-C2|A1|A2|B1|B2|C1|C2)/gi, '')
+      .trim();
+  }
+
+  /**
+   * Explains competency description per level
    */
   public static getLevelDescription(level: EnglishLevel): {
     title: string;
@@ -181,43 +211,43 @@ export class LevelEvaluationService {
     switch (level) {
       case 'A1':
         return {
-          title: 'Principiante Operativo (A1)',
-          profile: 'Frases de supervivencia, saludos amables, pedidos básicos e indicaciones sencillas.',
+          title: 'Pitch One (Iniciación y Saludos)',
+          profile: 'Frases de bienvenida, saludos amables, pedidos básicos y apoyo con tips fonéticos.',
           aiBehavior: 'El interlocutor habla lento y pausado. Te ofrece tips fonéticos y guía en español cuando dudas.'
         };
       case 'A2':
         return {
-          title: 'Elemental Independiente (A2)',
-          profile: 'Atención a visitas, resolución de incidencias comunes, toma de datos y correspondencia.',
-          aiBehavior: 'Interlocutor cordial que responde en frases completas. Plantea dudas sobre horarios y salas.'
+          title: 'Pitch One (Atención Operativa)',
+          profile: 'Atención a visitas, toma de pedidos, resolución de dudas comunes sobre la carta y protocolo.',
+          aiBehavior: 'Interlocutor cordial que responde en frases completas. Plantea dudas sobre horarios y recomendaciones.'
         };
       case 'B1':
         return {
-          title: 'Intermedio Profesional (B1)',
-          profile: 'Negociación de plazos, defensa de ofertas comerciales, resolución de reclamos y reuniones.',
-          aiBehavior: 'El cliente es más escéptico. Pide justificación de presupuestos y compara con competidores.'
+          title: 'Pitch Two (Fluidez y Carta Oficial)',
+          profile: 'Storytelling de productos, explicación de ingredientes, alternativas y defensa de carta.',
+          aiBehavior: 'El cliente pide recomendaciones de autor, pregunta por alérgenos y solicita detalles de preparación.'
         };
       case 'B2':
         return {
-          title: 'Intermedio Alto / Ejecutivo (B2)',
-          profile: 'Cierre de contratos corporativos, gestión de crisis y liderazgo de proyectos internacionales.',
-          aiBehavior: 'Interlocutor directivo que desafía tus premisas y analiza el retorno de inversión (ROI).'
+          title: 'Pitch Two (Argumentación y Up-Selling)',
+          profile: 'Venta sugestiva premium, maridaje de autor y resolución de objeciones comerciales.',
+          aiBehavior: 'Interlocutor directivo que desafía tus sugerencias y exige justificación de precios y valor.'
         };
       case 'C1':
         return {
-          title: 'Avanzado Directivo (C1)',
-          profile: 'Negociaciones complejas a nivel C-Suite, discursos de alto impacto y persuasión estratégica.',
-          aiBehavior: 'Inglés con modismos sofisticados, ritmo rápido y análisis exhaustivo de riesgos.'
+          title: 'Pitch Three (Alta Dirección y Negociación)',
+          profile: 'Negociaciones complejas a nivel C-Suite, auditorías críticas y persuasión estratégica.',
+          aiBehavior: 'Inglés con modismos sofisticados, ritmo rápido y análisis exhaustivo de opciones.'
         };
       case 'C2':
         return {
-          title: 'Maestría Nativa (C2)',
-          profile: 'Soltura absoluta bilingüe sin ningún tipo de barrera cultural o técnica.',
+          title: 'Pitch Three (Maestría y Diplomacia)',
+          profile: 'Soltura absoluta bilingüe sin ningún tipo de barrera cultural, técnica o de protocolo.',
           aiBehavior: 'Conversaciones al más alto nivel internacional con matices sutiles y máxima exigencia.'
         };
       default:
         return {
-          title: 'Nivel Profesional',
+          title: 'Pitch One',
           profile: 'Competencia comunicativa orientada a negocios.',
           aiBehavior: 'Interlocutor adaptativo.'
         };
