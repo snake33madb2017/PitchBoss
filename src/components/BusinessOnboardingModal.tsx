@@ -4,7 +4,6 @@ import confetti from 'canvas-confetti';
 import type { Scenario, EnglishLevel, DifficultyLevel } from '../types';
 import { AdminStorageService } from '../services/adminStorageService';
 import { CloudSyncService } from '../services/cloudSyncService';
-import { TeamAnalyticsService } from '../services/teamAnalyticsService';
 import { LOVO_BAR_MASTER_KNOWLEDGE } from '../data/lovoBarKnowledge';
 
 interface BusinessOnboardingModalProps {
@@ -92,28 +91,6 @@ export const BusinessOnboardingModal: React.FC<BusinessOnboardingModalProps> = (
     // Save scenario to storage and sync to cloud
     AdminStorageService.upsertScenario(newScenario);
     CloudSyncService.createWorkspace(businessName.trim());
-
-    // Auto-seed initial member for this company in TeamAnalytics
-    TeamAnalyticsService.addMember(
-      {
-        name: 'Empleado Piloto',
-        role: employeeRole,
-        workspaceId: wsId,
-        scenarioId: newScenario.id,
-        scenarioTitle: newScenario.title,
-        totalSessions: 0,
-        menuFluencyScore: 50,
-        pronunciationScore: 50,
-        upSellingScore: 50,
-        objectionsMastered: 0,
-        totalObjections: 4,
-        totalSpokenMinutes: 0,
-        lastActiveDate: Date.now(),
-        status: 'needs_practice',
-        executiveFeedback: `Colaborador habilitado en ${businessName}. Pendiente de iniciar su entrenamiento.`
-      },
-      wsId
-    );
 
     setCreatedScenario(newScenario);
     onScenarioCreated(newScenario);

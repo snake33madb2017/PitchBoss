@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   User,
   Check,
   X,
   Sparkles,
   BookOpen,
-  ArrowRight
+  ArrowRight,
+  Trash2,
+  Plus
 } from 'lucide-react';
 import type { TeamMember } from '../services/teamAnalyticsService';
 import { TeamAnalyticsService } from '../services/teamAnalyticsService';
@@ -20,6 +22,14 @@ interface EmployeeSelectorModalProps {
   maxSeats: number;
 }
 
+const COMMON_ROLES = [
+  'Personal de Sala',
+  'Bartender / Barra',
+  'Sumiller',
+  'Jefe de Sala / Metre',
+  'Hostess / Recepción'
+];
+
 export const EmployeeSelectorModal: React.FC<EmployeeSelectorModalProps> = ({
   isOpen,
   onClose,
@@ -32,11 +42,22 @@ export const EmployeeSelectorModal: React.FC<EmployeeSelectorModalProps> = ({
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>(() =>
     TeamAnalyticsService.getTeamMembers(workspaceId)
   );
-  const [isRegistering, setIsRegistering] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(() => teamMembers.length === 0);
   const [newName, setNewName] = useState('');
-  const [newRole, setNewRole] = useState('Camarero de Sala');
+  const [newRole, setNewRole] = useState('Personal de Sala');
   const [newEmail, setNewEmail] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      const current = TeamAnalyticsService.getTeamMembers(workspaceId);
+      setTeamMembers(current);
+      if (current.length === 0) {
+        setIsRegistering(true);
+      }
+      setErrorMsg(null);
+    }
+  }, [isOpen, workspaceId]);
 
   if (!isOpen) return null;
 
@@ -51,7 +72,7 @@ export const EmployeeSelectorModal: React.FC<EmployeeSelectorModalProps> = ({
     }
 
     if (currentCount >= maxSeats) {
-      setErrorMsg(`Se ha alcanzado el límite de ${maxSeats} cupos de tu plan. El gerente debe liberar un cupo.`);
+      setErrorMsg(`Se ha alcanzado el límite de ${maxSeats} cupos de tu plan.`);
       return;
     }
 
@@ -72,7 +93,7 @@ export const EmployeeSelectorModal: React.FC<EmployeeSelectorModalProps> = ({
         totalSpokenMinutes: 0,
         lastActiveDate: Date.now(),
         status: 'in_progress',
-        executiveFeedback: 'Nuevo colaborador registrado para turno de estudio.'
+        executiveFeedback: 'Colaborador registrado. Listo para iniciar prácticas.'
       },
       workspaceId
     );
@@ -85,6 +106,32 @@ export const EmployeeSelectorModal: React.FC<EmployeeSelectorModalProps> = ({
     setNewEmail('');
     setErrorMsg(null);
     onClose();
+  };
+
+  const handleDeleteMember = (e: React.MouseEvent, id: string, name: string) => {
+    e.stopPropagation();
+    if (window.confirm(`¿Eliminar al colaborador "${name}" y liberar su cupo?`)) {
+      TeamAnalyticsService.removeMember(id);
+      const updated = TeamAnalyticsService.getTeamMembers(workspaceId);
+      setTeamMembers(updated);
+      if (activeEmployee?.id === id) {
+        const nextActive = updated.length > 0 ? updated[0] : null;
+        if (nextActive) {
+          onSelectEmployee(nextActive);
+        } else {
+          TeamAnalyticsService.setActiveEmployeeId(workspaceId, null);
+        }
+      }
+    }
+  };
+
+  const handlePurgeAll = () => {
+    if (window.confirm(`¿Estás seguro de depurar y eliminar TODOS los colaboradores de ${workspaceName}? Podrás crearlos desde cero.`)) {
+      TeamAnalyticsService.purgeAllMembers(workspaceId);
+      setTeamMembers([]);
+      TeamAnalyticsService.setActiveEmployeeId(workspaceId, null);
+      setIsRegistering(true);
+    }
   };
 
   return (
@@ -148,73 +195,105 @@ export const EmployeeSelectorModal: React.FC<EmployeeSelectorModalProps> = ({
             </p>
           </div>
 
-          {/* List of Registered Staff */}
+          {/* List of Registered Staff or Empty State */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs font-semibold text-stone-400 px-1">
-              <span>Personal Autorizado ({teamMembers.length})</span>
-              <span>Progreso de Carta</span>
+              <span>Personal Autorizado ({teamMembers.length}/{maxSeats})</span>
+              {teamMembers.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handlePurgeAll}
+                  className="text-[11px] text-rose-400 hover:text-rose-300 font-medium transition cursor-pointer flex items-center gap-1"
+                  title="Eliminar todos los colaboradores de esta empresa"
+                >
+                  <Trash2 className="w-3 h-3" />
+                  <span>Depurar todos</span>
+                </button>
+              )}
             </div>
 
-            <div className="divide-y divide-[#2A344A] border border-[#2A344A] rounded-2xl bg-[#12161F] overflow-hidden">
-              {teamMembers.map((member) => {
-                const isCurrent = activeEmployee?.id === member.id;
-                return (
-                  <button
-                    key={member.id}
-                    onClick={() => {
-                      onSelectEmployee(member);
-                      onClose();
-                    }}
-                    className={`w-full p-3.5 flex items-center justify-between gap-3 text-left transition cursor-pointer hover:bg-[#1C2331] ${
-                      isCurrent ? 'bg-sky-500/10 border-l-4 border-l-sky-400' : ''
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-9 h-9 rounded-xl bg-[#18202F] border border-[#2A344A] flex items-center justify-center font-bold text-sky-400 text-sm shrink-0">
-                        {member.name.charAt(0)}
+            {teamMembers.length === 0 ? (
+              <div className="p-6 text-center rounded-2xl border border-dashed border-[#2A344A] bg-[#12161F]/80 space-y-3 animate-in fade-in">
+                <div className="w-12 h-12 rounded-2xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400 mx-auto">
+                  <User className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-white">Sin usuarios registrados</h4>
+                  <p className="text-xs text-stone-400 mt-1 max-w-sm mx-auto leading-relaxed">
+                    Todos los usuarios anteriores han sido depurados. Crea tus propios colaboradores a continuación para comenzar a entrenar.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="divide-y divide-[#2A344A] border border-[#2A344A] rounded-2xl bg-[#12161F] overflow-hidden">
+                {teamMembers.map((member) => {
+                  const isCurrent = activeEmployee?.id === member.id;
+                  return (
+                    <div
+                      key={member.id}
+                      onClick={() => {
+                        onSelectEmployee(member);
+                        onClose();
+                      }}
+                      className={`w-full p-3.5 flex items-center justify-between gap-3 text-left transition cursor-pointer hover:bg-[#1C2331] ${
+                        isCurrent ? 'bg-sky-500/10 border-l-4 border-l-sky-400' : ''
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-9 h-9 rounded-xl bg-[#18202F] border border-[#2A344A] flex items-center justify-center font-bold text-sky-400 text-sm shrink-0">
+                          {member.name.charAt(0)}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="text-xs font-bold text-white truncate">{member.name}</p>
+                            {isCurrent && (
+                              <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-sky-500/20 text-sky-300 font-bold border border-sky-500/40 shrink-0">
+                                Seleccionado
+                              </span>
+                            )}
+                            {member.status === 'ready' && (
+                              <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30 shrink-0">
+                                Certificado
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-stone-400 truncate mt-0.5">
+                            {member.role} • {member.totalSessions} prácticas
+                          </p>
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <p className="text-xs font-bold text-white truncate">{member.name}</p>
-                          {isCurrent && (
-                            <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-sky-500/20 text-sky-300 font-bold border border-sky-500/40">
-                              Seleccionado
-                            </span>
-                          )}
-                          {member.status === 'ready' && (
-                            <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">
-                              Certificado
-                            </span>
+
+                      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                        <div className="text-right">
+                          <span className="text-xs font-bold text-emerald-400 font-mono">
+                            {member.menuFluencyScore}%
+                          </span>
+                          <p className="text-[10px] text-stone-500">fluidez</p>
+                        </div>
+                        <div className="w-7 h-7 rounded-lg bg-[#18202F] border border-[#2A344A] flex items-center justify-center text-stone-400">
+                          {isCurrent ? (
+                            <Check className="w-4 h-4 text-emerald-400" />
+                          ) : (
+                            <ArrowRight className="w-3.5 h-3.5 text-stone-500" />
                           )}
                         </div>
-                        <p className="text-[11px] text-stone-400 truncate mt-0.5">
-                          {member.role} • {member.totalSessions} prácticas realizadas
-                        </p>
+                        <button
+                          type="button"
+                          onClick={(e) => handleDeleteMember(e, member.id, member.name)}
+                          className="p-1.5 rounded-lg text-stone-500 hover:text-rose-400 hover:bg-rose-500/10 transition cursor-pointer"
+                          title="Eliminar colaborador"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
-
-                    <div className="flex items-center gap-3 shrink-0">
-                      <div className="text-right">
-                        <span className="text-xs font-bold text-emerald-400 font-mono">
-                          {member.menuFluencyScore}%
-                        </span>
-                        <p className="text-[10px] text-stone-500">fluidez</p>
-                      </div>
-                      <div className="w-7 h-7 rounded-lg bg-[#18202F] border border-[#2A344A] flex items-center justify-center text-stone-400 group-hover:text-white">
-                        {isCurrent ? (
-                          <Check className="w-4 h-4 text-emerald-400" />
-                        ) : (
-                          <ArrowRight className="w-3.5 h-3.5 text-stone-500" />
-                        )}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
-          {/* New Employee Registration Toggle */}
+          {/* New Employee Registration Form or Toggle Button */}
           {!isRegistering ? (
             <div className="pt-2">
               <button
@@ -226,65 +305,97 @@ export const EmployeeSelectorModal: React.FC<EmployeeSelectorModalProps> = ({
                     : 'border-stone-800 bg-stone-900 text-stone-600 cursor-not-allowed'
                 }`}
               >
-                <Sparkles className="w-4 h-4 text-sky-400 shrink-0" />
+                <Plus className="w-4 h-4 text-sky-400 shrink-0" />
                 <span>
                   {seatsAvailable > 0
-                    ? `➕ Registrarme como nuevo colaborador (${seatsAvailable} cupos)`
-                    : `Plan completo (${maxSeats}/${maxSeats} cupos). Contacta a gerencia.`}
+                    ? `➕ Registrar nuevo colaborador (${seatsAvailable} cupos disponibles)`
+                    : `Plan completo (${maxSeats}/${maxSeats} cupos). Libera uno eliminando un perfil.`}
                 </span>
               </button>
             </div>
           ) : (
-            <form onSubmit={handleRegister} className="p-4 rounded-2xl border border-sky-500/40 bg-[#12161F] space-y-3 animate-in fade-in">
+            <form onSubmit={handleRegister} className="p-4 rounded-2xl border border-sky-500/40 bg-[#12161F] space-y-3.5 animate-in fade-in">
               <div className="flex items-center justify-between">
-                <h4 className="text-xs font-bold text-sky-400 uppercase tracking-wider">
-                  Alta Rápida de Colaborador
+                <h4 className="text-xs font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Crear Nuevo Colaborador</span>
                 </h4>
-                <button
-                  type="button"
-                  onClick={() => setIsRegistering(false)}
-                  className="text-stone-400 hover:text-white text-xs cursor-pointer"
-                >
-                  Cancelar
-                </button>
+                {teamMembers.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setIsRegistering(false)}
+                    className="text-stone-400 hover:text-white text-xs cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                )}
               </div>
 
-              <div className="space-y-2">
-                <input
-                  type="text"
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  placeholder="Tu Nombre y Apellido (ej. Sofía Mendoza)"
-                  className="w-full px-3 py-2 rounded-xl bg-[#1C2331] border border-[#2A344A] text-white text-xs placeholder:text-stone-500 focus:outline-none focus:border-sky-500"
-                />
+              <div className="space-y-2.5">
+                <div>
+                  <label className="block text-[11px] font-semibold text-stone-300 mb-1">Nombre Completo:</label>
+                  <input
+                    type="text"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    placeholder="Ej. Sofía Mendoza"
+                    autoFocus
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#1C2331] border border-[#2A344A] text-white text-xs placeholder:text-stone-500 focus:outline-none focus:border-sky-500"
+                  />
+                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[11px] font-semibold text-stone-300 mb-1">Puesto / Rol:</label>
+                  {/* Quick role selection chips for mobile ease */}
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {COMMON_ROLES.map((role) => (
+                      <button
+                        type="button"
+                        key={role}
+                        onClick={() => setNewRole(role)}
+                        className={`text-[10px] px-2.5 py-1 rounded-lg border transition cursor-pointer font-medium ${
+                          newRole === role
+                            ? 'bg-sky-500 text-slate-950 border-sky-400 font-bold'
+                            : 'bg-[#1C2331] text-stone-300 border-[#2A344A] hover:border-slate-500'
+                        }`}
+                      >
+                        {role}
+                      </button>
+                    ))}
+                  </div>
                   <input
                     type="text"
                     value={newRole}
                     onChange={(e) => setNewRole(e.target.value)}
-                    placeholder="Puesto (ej. Sumiller / Sala)"
-                    className="w-full px-3 py-2 rounded-xl bg-[#1C2331] border border-[#2A344A] text-white text-xs placeholder:text-stone-500 focus:outline-none focus:border-sky-500"
+                    placeholder="O escribe otro puesto personalizado"
+                    className="w-full px-3.5 py-2 rounded-xl bg-[#1C2331] border border-[#2A344A] text-white text-xs placeholder:text-stone-500 focus:outline-none focus:border-sky-500"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-stone-400 mb-1">Email Corporativo (Opcional):</label>
                   <input
                     type="email"
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
-                    placeholder="Email corporativo (opcional)"
-                    className="w-full px-3 py-2 rounded-xl bg-[#1C2331] border border-[#2A344A] text-white text-xs placeholder:text-stone-500 focus:outline-none focus:border-sky-500"
+                    placeholder="sofia@empresa.com"
+                    className="w-full px-3.5 py-2 rounded-xl bg-[#1C2331] border border-[#2A344A] text-white text-xs placeholder:text-stone-500 focus:outline-none focus:border-sky-500"
                   />
                 </div>
               </div>
 
               {errorMsg && (
-                <p className="text-[11px] text-rose-400 font-semibold">{errorMsg}</p>
+                <p className="text-[11px] text-rose-400 font-semibold bg-rose-500/10 p-2 rounded-lg border border-rose-500/20">
+                  {errorMsg}
+                </p>
               )}
 
               <button
                 type="submit"
-                className="w-full py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs transition cursor-pointer shadow-md"
+                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-[#0284C7] hover:from-sky-400 hover:to-sky-500 text-slate-950 font-black text-xs transition cursor-pointer shadow-lg shadow-sky-500/20 active:scale-98 flex items-center justify-center gap-1.5"
               >
-                Comenzar Turno de Estudio
+                <Plus className="w-4 h-4" />
+                <span>Guardar y Comenzar a Entrenar</span>
               </button>
             </form>
           )}

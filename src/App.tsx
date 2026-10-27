@@ -869,21 +869,34 @@ function AppContent() {
               </p>
 
               {/* Active Employee (Student) indicator */}
-              {hasCompanyLicense && activeEmployee && (
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-2xl border border-[#B39964]/40 bg-[#171614]/90 text-xs backdrop-blur-sm shadow-sm">
-                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-stone-400">Alumno en turno:</span>
-                  <strong className="text-white font-bold">{activeEmployee.name}</strong>
-                  <span className="text-[11px] text-[#FDE68A] font-medium">({activeEmployee.role})</span>
-                  <span className="text-stone-600">•</span>
-                  <span className="text-[11px] text-emerald-400 font-mono font-bold">{activeEmployee.totalSessions} prácticas</span>
-                  <button
-                    onClick={() => setIsEmployeeSelectorOpen(true)}
-                    className="ml-1 text-[11px] text-[#B39964] hover:text-[#FDE68A] underline font-semibold cursor-pointer"
-                  >
-                    Cambiar
-                  </button>
-                </div>
+              {hasCompanyLicense && (
+                activeEmployee ? (
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-2xl border border-[#B39964]/40 bg-[#171614]/90 text-xs backdrop-blur-sm shadow-sm flex-wrap">
+                    <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                    <span className="text-stone-400">Alumno en turno:</span>
+                    <strong className="text-white font-bold">{activeEmployee.name}</strong>
+                    <span className="text-[11px] text-[#FDE68A] font-medium">({activeEmployee.role})</span>
+                    <span className="text-stone-600">•</span>
+                    <span className="text-[11px] text-emerald-400 font-mono font-bold">{activeEmployee.totalSessions} prácticas</span>
+                    <button
+                      onClick={() => setIsEmployeeSelectorOpen(true)}
+                      className="ml-1 text-[11px] text-[#B39964] hover:text-[#FDE68A] underline font-semibold cursor-pointer"
+                    >
+                      Cambiar
+                    </button>
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-2xl border border-sky-500/40 bg-[#171614]/90 text-xs backdrop-blur-sm shadow-sm flex-wrap">
+                    <Users className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                    <span className="text-stone-300">Sin colaborador asignado</span>
+                    <button
+                      onClick={() => setIsEmployeeSelectorOpen(true)}
+                      className="px-2.5 py-1 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-[11px] cursor-pointer shadow ml-1"
+                    >
+                      ➕ Crear mi Alumno
+                    </button>
+                  </div>
+                )
               )}
 
               <div className="flex flex-wrap items-center gap-2.5 pt-2 text-xs">
@@ -943,21 +956,34 @@ function AppContent() {
               </p>
 
               {/* Active Employee (Student) indicator */}
-              {hasCompanyLicense && activeEmployee && (
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-2xl border border-[#D3A548]/40 bg-black/80 text-xs backdrop-blur-sm shadow-sm">
-                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-stone-400">Alumno en turno:</span>
-                  <strong className="text-white font-bold">{activeEmployee.name}</strong>
-                  <span className="text-[11px] text-[#D3A548] font-medium">({activeEmployee.role})</span>
-                  <span className="text-stone-600">•</span>
-                  <span className="text-[11px] text-emerald-400 font-mono font-bold">{activeEmployee.totalSessions} prácticas</span>
-                  <button
-                    onClick={() => setIsEmployeeSelectorOpen(true)}
-                    className="ml-1 text-[11px] text-[#D3A548] hover:text-white underline font-semibold cursor-pointer"
-                  >
-                    Cambiar
-                  </button>
-                </div>
+              {hasCompanyLicense && (
+                activeEmployee ? (
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-2xl border border-[#D3A548]/40 bg-black/80 text-xs backdrop-blur-sm shadow-sm flex-wrap">
+                    <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                    <span className="text-stone-400">Alumno en turno:</span>
+                    <strong className="text-white font-bold">{activeEmployee.name}</strong>
+                    <span className="text-[11px] text-[#D3A548] font-medium">({activeEmployee.role})</span>
+                    <span className="text-stone-600">•</span>
+                    <span className="text-[11px] text-emerald-400 font-mono font-bold">{activeEmployee.totalSessions} prácticas</span>
+                    <button
+                      onClick={() => setIsEmployeeSelectorOpen(true)}
+                      className="ml-1 text-[11px] text-[#D3A548] hover:text-white underline font-semibold cursor-pointer"
+                    >
+                      Cambiar
+                    </button>
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-2xl border border-sky-500/40 bg-black/80 text-xs backdrop-blur-sm shadow-sm flex-wrap">
+                    <Users className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                    <span className="text-stone-300">Sin colaborador asignado</span>
+                    <button
+                      onClick={() => setIsEmployeeSelectorOpen(true)}
+                      className="px-2.5 py-1 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-[11px] cursor-pointer shadow ml-1"
+                    >
+                      ➕ Crear mi Alumno
+                    </button>
+                  </div>
+                )
               )}
 
               <div className="flex flex-wrap items-center gap-2.5 pt-2 text-xs">

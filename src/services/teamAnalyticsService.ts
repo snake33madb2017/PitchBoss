@@ -20,166 +20,11 @@ export interface TeamMember {
   executiveFeedback: string;
 }
 
-const STORAGE_KEY = 'pitchboss_b2b_team_analytics_v2';
+const STORAGE_KEY = 'pitchboss_b2b_team_analytics_v3';
 const ACTIVE_EMPLOYEE_KEY_PREFIX = 'pitchboss_active_employee_id_';
 
-const DEFAULT_DEMO_TEAM: TeamMember[] = [
-  // --- LOVO Bar Madrid Team ---
-  {
-    id: 'emp-lovo-1',
-    name: 'Carlos Méndez',
-    role: 'Bartender Principal',
-    email: 'carlos.bar@lovobar.com',
-    workspaceId: 'lovo-bar',
-    scenarioId: 'lovo-tomo1-pitch1',
-    scenarioTitle: 'LOVO Tomo I: La Musa',
-    totalSessions: 5,
-    menuFluencyScore: 85,
-    pronunciationScore: 88,
-    upSellingScore: 82,
-    objectionsMastered: 4,
-    totalObjections: 4,
-    totalSpokenMinutes: 28,
-    lastActiveDate: Date.now() - 1000 * 60 * 45,
-    status: 'ready',
-    executiveFeedback: 'Tu empleado Carlos ha completado 5 sesiones de LOVO Bar y tiene un 85% de fluidez en la carta. Ha dominado las recomendaciones de los cócteles Bubi y Manabi y la política de cuenta no dividida.'
-  },
-  {
-    id: 'emp-lovo-2',
-    name: 'Elena Gómez',
-    role: 'Camarera de Sala & Coctelería',
-    email: 'elena.g@lovobar.com',
-    workspaceId: 'lovo-bar',
-    scenarioId: 'lovo-tomo1-pitch1',
-    scenarioTitle: 'LOVO Tomo I: La Musa',
-    totalSessions: 4,
-    menuFluencyScore: 90,
-    pronunciationScore: 92,
-    upSellingScore: 88,
-    objectionsMastered: 4,
-    totalObjections: 4,
-    totalSpokenMinutes: 22,
-    lastActiveDate: Date.now() - 1000 * 60 * 180,
-    status: 'ready',
-    executiveFeedback: 'Excelente desempeño en el protocolo de bienvenida de 40 segundos y narración del storytelling de Joséphine Baker.'
-  },
-  {
-    id: 'emp-lovo-3',
-    name: 'Marcos Varela',
-    role: 'Bartender Junior',
-    email: 'marcos.v@lovobar.com',
-    workspaceId: 'lovo-bar',
-    scenarioId: 'lovo-tomo1-pitch1',
-    scenarioTitle: 'LOVO Tomo I: La Musa',
-    totalSessions: 2,
-    menuFluencyScore: 65,
-    pronunciationScore: 70,
-    upSellingScore: 55,
-    objectionsMastered: 2,
-    totalObjections: 4,
-    totalSpokenMinutes: 12,
-    lastActiveDate: Date.now() - 1000 * 60 * 60 * 24,
-    status: 'in_progress',
-    executiveFeedback: 'Buena base. Debe reforzar el ofrecimiento de destilados premium (Bourbon/Rye) en la 2ª ronda según el protocolo.'
-  },
-  {
-    id: 'emp-lovo-4',
-    name: 'Sofía Ramos',
-    role: 'Hostess / Bienvenida',
-    email: 'sofia.r@lovobar.com',
-    workspaceId: 'lovo-bar',
-    scenarioId: 'lovo-tomo1-pitch1',
-    scenarioTitle: 'LOVO Tomo I: La Musa',
-    totalSessions: 1,
-    menuFluencyScore: 52,
-    pronunciationScore: 60,
-    upSellingScore: 45,
-    objectionsMastered: 1,
-    totalObjections: 4,
-    totalSpokenMinutes: 6,
-    lastActiveDate: Date.now() - 1000 * 60 * 60 * 48,
-    status: 'needs_practice',
-    executiveFeedback: 'Requiere más práctica en frases de recepción en barra y oferta de agua de cortesía antes del próximo servicio.'
-  },
-
-  // --- Restaurante Tepic (Ayala 14) Team ---
-  {
-    id: 'emp-tepic-1',
-    name: 'Mateo Salazar',
-    role: 'Jefe de Sala & Atención VIP',
-    email: 'mateo.sala@tepic.es',
-    workspaceId: 'tepic-madrid',
-    scenarioId: 'tepic-pitch1',
-    scenarioTitle: 'Tepic Módulo 1: El Maíz y la Tradición',
-    totalSessions: 6,
-    menuFluencyScore: 92,
-    pronunciationScore: 90,
-    upSellingScore: 88,
-    objectionsMastered: 4,
-    totalObjections: 4,
-    totalSpokenMinutes: 32,
-    lastActiveDate: Date.now() - 1000 * 60 * 30,
-    status: 'ready',
-    executiveFeedback: 'Excelente explicación en inglés del nixtamalizado y tacos de cochinita pibil. Servicio fluido con comensales internacionales.'
-  },
-  {
-    id: 'emp-tepic-2',
-    name: 'Valeria Rivas',
-    role: 'Sumiller de Mezcales & Barra',
-    email: 'valeria.mezcal@tepic.es',
-    workspaceId: 'tepic-madrid',
-    scenarioId: 'tepic-pitch2',
-    scenarioTitle: 'Tepic Módulo 2: Mezcales de Oaxaca',
-    totalSessions: 5,
-    menuFluencyScore: 89,
-    pronunciationScore: 94,
-    upSellingScore: 91,
-    objectionsMastered: 4,
-    totalObjections: 4,
-    totalSpokenMinutes: 26,
-    lastActiveDate: Date.now() - 1000 * 60 * 120,
-    status: 'ready',
-    executiveFeedback: 'Dominio impecable de las notas ahumadas de agaves silvestres (Tobalá y Tepeztate) y maridaje con mole de autor.'
-  },
-  {
-    id: 'emp-tepic-3',
-    name: 'Javier Morales',
-    role: 'Camarero de Sala Junior',
-    email: 'javier.m@tepic.es',
-    workspaceId: 'tepic-madrid',
-    scenarioId: 'tepic-pitch3',
-    scenarioTitle: 'Tepic Módulo 3: Protocolo Michelin',
-    totalSessions: 2,
-    menuFluencyScore: 68,
-    pronunciationScore: 72,
-    upSellingScore: 60,
-    objectionsMastered: 2,
-    totalObjections: 4,
-    totalSpokenMinutes: 14,
-    lastActiveDate: Date.now() - 1000 * 60 * 60 * 20,
-    status: 'in_progress',
-    executiveFeedback: 'Buen progreso. Debe reforzar la oferta de postres mexicanos (tres leches y buñuelos) al retirar los platos principales.'
-  },
-  {
-    id: 'emp-tepic-4',
-    name: 'Camila Ortiz',
-    role: 'Hostess / Recepción',
-    email: 'camila.o@tepic.es',
-    workspaceId: 'tepic-madrid',
-    scenarioId: 'tepic-pitch1',
-    scenarioTitle: 'Tepic Módulo 1: El Maíz y la Tradición',
-    totalSessions: 1,
-    menuFluencyScore: 55,
-    pronunciationScore: 62,
-    upSellingScore: 40,
-    objectionsMastered: 1,
-    totalObjections: 4,
-    totalSpokenMinutes: 8,
-    lastActiveDate: Date.now() - 1000 * 60 * 60 * 40,
-    status: 'needs_practice',
-    executiveFeedback: 'Requiere más soltura en la confirmación de alérgenos y recepción bilingüe en la entrada de Ayala 14.'
-  }
-];
+// 100% clean slate: no hardcoded mock or demo users
+const DEFAULT_DEMO_TEAM: TeamMember[] = [];
 
 export class TeamAnalyticsService {
   /**
@@ -188,10 +33,20 @@ export class TeamAnalyticsService {
   public static getTeamMembers(workspaceId?: string): TeamMember[] {
     let all: TeamMember[] = [];
     try {
+      // Purge legacy mock data keys from earlier sessions
+      if (typeof window !== 'undefined') {
+        if (localStorage.getItem('pitchboss_b2b_team_analytics_v2')) {
+          localStorage.removeItem('pitchboss_b2b_team_analytics_v2');
+        }
+        if (localStorage.getItem('pitchboss_b2b_team_analytics_v1')) {
+          localStorage.removeItem('pitchboss_b2b_team_analytics_v1');
+        }
+      }
+
       const data = localStorage.getItem(STORAGE_KEY);
       if (data) {
         const parsed = JSON.parse(data);
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        if (Array.isArray(parsed)) {
           all = parsed;
         }
       }
@@ -199,13 +54,7 @@ export class TeamAnalyticsService {
       console.error('Error loading team analytics:', e);
     }
 
-    // Default initialization
-    if (all.length === 0) {
-      all = DEFAULT_DEMO_TEAM;
-      this.saveTeamMembers(all);
-    }
-
-    if (workspaceId && workspaceId !== 'default' && workspaceId !== 'pitchboss') {
+    if (workspaceId && workspaceId !== 'default' && workspaceId !== 'pitchboss' && workspaceId !== 'all') {
       return all.filter((m) => m.workspaceId === workspaceId);
     }
 
@@ -257,11 +106,32 @@ export class TeamAnalyticsService {
   }
 
   /**
-   * Resets data to initial demo team
+   * Resets data to initial clean slate
    */
   public static resetDemoTeam(): TeamMember[] {
     this.saveTeamMembers(DEFAULT_DEMO_TEAM);
     return DEFAULT_DEMO_TEAM;
+  }
+
+  /**
+   * Purges all team members across all companies or for a specific workspace
+   */
+  public static purgeAllMembers(workspaceId?: string): void {
+    if (workspaceId && workspaceId !== 'all') {
+      const all = this.getTeamMembers();
+      const updated = all.filter((m) => m.workspaceId !== workspaceId);
+      this.saveTeamMembers(updated);
+      this.setActiveEmployeeId(workspaceId, null);
+    } else {
+      this.saveTeamMembers([]);
+      if (typeof window !== 'undefined') {
+        Object.keys(localStorage).forEach((k) => {
+          if (k.startsWith(ACTIVE_EMPLOYEE_KEY_PREFIX)) {
+            localStorage.removeItem(k);
+          }
+        });
+      }
+    }
   }
 
   /**

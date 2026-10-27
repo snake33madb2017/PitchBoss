@@ -891,6 +891,44 @@ export const Navbar: React.FC<NavbarProps> = ({
               </>
             )}
 
+            {/* SECTION 2.5: Active Employee / Student Switcher in Mobile Drawer */}
+            {hasCompanyLicense && onOpenEmployeeSelector && (
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1">
+                  Alumno / Colaborador en Turno
+                </p>
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    onOpenEmployeeSelector();
+                  }}
+                  className="w-full flex items-center justify-between p-3 rounded-2xl border border-sky-500/40 bg-gradient-to-r from-sky-500/15 via-[#161D2B] to-[#12161F] text-left transition cursor-pointer shadow-md"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-9 h-9 rounded-xl bg-sky-500/20 border border-sky-500/40 flex items-center justify-center text-sky-400 shrink-0 font-black">
+                      {activeEmployee ? activeEmployee.name.charAt(0) : <User className="w-4 h-4" />}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-[10px] text-sky-400 font-bold uppercase tracking-wider">
+                          {activeEmployee ? 'Alumno Activo' : 'Equipo & Colaboradores'}
+                        </p>
+                        <span className="text-[9px] px-1.5 py-0.2 rounded bg-sky-500/20 text-sky-300 font-mono font-bold">
+                          {teamCount ?? 0}/{maxSeats ?? 10}
+                        </span>
+                      </div>
+                      <p className="text-xs font-bold text-white truncate mt-0.5">
+                        {activeEmployee ? `${activeEmployee.name} (${activeEmployee.role})` : '➕ Crear / Seleccionar Alumno'}
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-xs font-bold text-sky-400 shrink-0 ml-2 px-2.5 py-1 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/30">
+                    {activeEmployee ? 'Cambiar' : 'Crear'}
+                  </span>
+                </button>
+              </div>
+            )}
+
             {/* SECTION 3: Progress & Profile Cards */}
             <div className="grid grid-cols-2 gap-2">
               {/* Level Card */}
