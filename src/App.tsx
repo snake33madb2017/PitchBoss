@@ -41,7 +41,10 @@ import {
   Key,
   ArrowRight,
   Lock,
-  Users
+  Users,
+  Eye,
+  Wheat,
+  Wine
 } from 'lucide-react';
 
 function AppContent() {
@@ -640,7 +643,11 @@ function AppContent() {
                 className="px-2.5 py-0.5 rounded-lg bg-[#1C2331] hover:bg-[#2A344A] text-slate-300 hover:text-white border border-[#2A344A] text-[11px] transition cursor-pointer"
                 title="Alternar entre ver solo los escenarios de esta empresa o el catálogo completo"
               >
-                {adminViewAll ? '👁️ Viendo Todos los Escenarios' : `🔒 Filtrando solo ${activeWorkspaceName}`}
+                {adminViewAll ? (
+                  <span className="flex items-center gap-1.5"><Eye className="w-3.5 h-3.5 text-sky-400" /> Viendo Todos los Escenarios</span>
+                ) : (
+                  <span className="flex items-center gap-1.5"><Lock className="w-3.5 h-3.5 text-amber-400" /> Filtrando solo {activeWorkspaceName}</span>
+                )}
               </button>
             )}
           </div>
@@ -893,7 +900,7 @@ function AppContent() {
                       onClick={() => setIsEmployeeSelectorOpen(true)}
                       className="px-2.5 py-1 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-[11px] cursor-pointer shadow ml-1"
                     >
-                      ➕ Crear mi Alumno
+                      Crear mi Alumno
                     </button>
                   </div>
                 )
@@ -910,10 +917,12 @@ function AppContent() {
                   <span>Abrir Carta Oficial Tepic</span>
                 </button>
                 <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl border bg-[#21201E] border-[#38342D] text-stone-200 font-medium">
-                  <span>🌮 100% Maíz Nixtamalizado</span>
+                  <Wheat className="w-3.5 h-3.5 text-[#B39964]" />
+                  <span>100% Maíz Nixtamalizado</span>
                 </div>
                 <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl border bg-[#21201E] border-[#38342D] text-stone-200 font-medium">
-                  <span>🍸 Mezcales de Oaxaca</span>
+                  <Wine className="w-3.5 h-3.5 text-[#B39964]" />
+                  <span>Mezcales de Oaxaca</span>
                 </div>
                 {isAdmin && (
                   <button
@@ -980,7 +989,7 @@ function AppContent() {
                       onClick={() => setIsEmployeeSelectorOpen(true)}
                       className="px-2.5 py-1 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-[11px] cursor-pointer shadow ml-1"
                     >
-                      ➕ Crear mi Alumno
+                      Crear mi Alumno
                     </button>
                   </div>
                 )
@@ -995,7 +1004,8 @@ function AppContent() {
                   <span>Abrir Carta LOVO (71 Cócteles)</span>
                 </button>
                 <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl border bg-black/60 border-[#2A344A] text-slate-200 font-medium">
-                  <span>✨ Trilogía 3 Tomos</span>
+                  <Sparkles className="w-3.5 h-3.5 text-[#D3A548]" />
+                  <span>Trilogía 3 Tomos</span>
                 </div>
                 {isAdmin && (
                   <button

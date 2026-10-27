@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { EnglishLevel, LevelProgress } from '../types';
 import { LevelEvaluationService } from '../services/levelEvaluationService';
-import { Award, X, Target } from 'lucide-react';
+import { Award, X, Target, Shield } from 'lucide-react';
 
 interface LevelAssessmentModalProps {
   isOpen: boolean;
@@ -176,8 +176,9 @@ export const LevelAssessmentModal: React.FC<LevelAssessmentModalProps> = ({
               {/* Admin quick switch override */}
               {isAdmin && (
                 <div className="p-3.5 rounded-2xl border border-sky-500/20 bg-sky-500/5 space-y-2">
-                  <span className="text-xs font-bold text-[#38BDF8] block">
-                    🛡️ Ajuste Rápido de Nivel (Modo Administrador)
+                  <span className="text-xs font-bold text-[#38BDF8] flex items-center gap-1.5">
+                    <Shield className="w-4 h-4 text-sky-400" />
+                    <span>Ajuste Rápido de Nivel (Modo Administrador)</span>
                   </span>
                   <div className="flex flex-wrap gap-2">
                     {[

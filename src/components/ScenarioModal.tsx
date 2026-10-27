@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import type { Scenario, DifficultyLevel, EnglishLevel, Objective } from '../types';
 import { GeminiService } from '../services/geminiService';
 import { CloudSyncService } from '../services/cloudSyncService';
-import { X, Sparkles, Plus, Trash2, Loader2, Wand2, Edit3, BookOpen, MessageSquare, Check, FileText, Zap } from 'lucide-react';
+import { X, Sparkles, Plus, Trash2, Loader2, Wand2, Edit3, BookOpen, MessageSquare, Check, FileText, Zap, Wine, Building, Coffee } from 'lucide-react';
 import { useTranslation } from '../i18n/LanguageContext';
 import { LOVO_BAR_MASTER_KNOWLEDGE } from '../data/lovoBarKnowledge';
+import { CorporateAvatar } from './CorporateAvatar';
 
 interface ScenarioModalProps {
   isOpen: boolean;
@@ -13,7 +14,24 @@ interface ScenarioModalProps {
   scenarioToEdit?: Scenario | null;
 }
 
-const DEFAULT_AVATARS = ['🍸', '💼', '👔', '👩‍💼', '👨‍💼', '🍹', '🧑‍🍳', '🤝', '🎯', '✈️', '🏨', '🩺'];
+const DEFAULT_AVATARS = [
+  'target',
+  'briefcase',
+  'tie',
+  'trophy',
+  'crown',
+  'handshake',
+  'cocktail',
+  'chef',
+  'gem',
+  'sparkles',
+  'hotel',
+  'plane',
+  'health',
+  'globe',
+  'bot',
+  'user'
+];
 
 export const ScenarioModal: React.FC<ScenarioModalProps> = ({
   isOpen,
@@ -33,7 +51,7 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
   const [niche, setNiche] = useState('');
   const [aiName, setAiName] = useState('');
   const [aiRole, setAiRole] = useState('');
-  const [aiAvatar, setAiAvatar] = useState('🍸');
+  const [aiAvatar, setAiAvatar] = useState('briefcase');
   const [aiPersonality, setAiPersonality] = useState('');
   const [voiceGender, setVoiceGender] = useState<'male' | 'female'>('male');
   const [userRole, setUserRole] = useState('');
@@ -68,7 +86,7 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
         setNiche(scenarioToEdit.niche || '');
         setAiName(scenarioToEdit.aiCharacter?.name || '');
         setAiRole(scenarioToEdit.aiCharacter?.role || '');
-        setAiAvatar(scenarioToEdit.aiCharacter?.avatar || '🍸');
+        setAiAvatar(scenarioToEdit.aiCharacter?.avatar || 'briefcase');
         setAiPersonality(scenarioToEdit.aiCharacter?.personality || '');
         setVoiceGender(scenarioToEdit.aiCharacter?.voiceGender || 'male');
         setUserRole(scenarioToEdit.userRole || '');
@@ -101,7 +119,7 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
         setNiche('');
         setAiName('');
         setAiRole('');
-        setAiAvatar('🍸');
+        setAiAvatar('briefcase');
         setAiPersonality('');
         setVoiceGender('male');
         setUserRole('');
@@ -143,7 +161,7 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
     if (!aiName.trim()) {
       setAiName('James & Sarah (Clientes Internacionales)');
       setAiRole('Clientes extranjeros en barra');
-      setAiAvatar('🍸');
+      setAiAvatar('cocktail');
       setAiPersonality('Clientes internacionales curiosos por probar cócteles de autor, pedir recomendaciones y disfrutar de la experiencia del local.');
       setVoiceGender('male');
     }
@@ -183,7 +201,7 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
         setNiche(generated.niche || '');
         setAiName(generated.aiCharacter?.name || '');
         setAiRole(generated.aiCharacter?.role || '');
-        setAiAvatar(generated.aiCharacter?.avatar || '🍸');
+        setAiAvatar(generated.aiCharacter?.avatar || 'briefcase');
         setAiPersonality(generated.aiCharacter?.personality || '');
         setVoiceGender(generated.aiCharacter?.voiceGender || 'male');
         setUserRole(generated.userRole || '');
@@ -228,7 +246,7 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
       aiCharacter: {
         name: aiName.trim(),
         role: aiRole.trim() || 'Cliente Internacional',
-        avatar: aiAvatar.trim() || '🍸',
+        avatar: aiAvatar.trim() || 'briefcase',
         personality: aiPersonality.trim() || 'Amable y natural',
         voiceGender
       },
@@ -294,8 +312,8 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
             }`}
           >
             <Wand2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span className="hidden sm:inline">✨ Inyector Maestro de Carta / IA</span>
-            <span className="sm:hidden">✨ Inyector Carta / IA</span>
+            <span className="hidden sm:inline">Inyector Maestro de Carta / IA</span>
+            <span className="sm:hidden">Inyector Carta / IA</span>
           </button>
           <button
             onClick={() => setActiveTab('manual')}
@@ -400,7 +418,7 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
                     }}
                     className="text-xs p-2.5 rounded-xl text-left border transition-all cursor-pointer bg-[#18202F] hover:bg-[#222B3D] border-[#2A344A] text-[#E2E8F0] hover:border-sky-400/50 flex items-center gap-2"
                   >
-                    <span>🍸</span>
+                    <Wine className="w-4 h-4 text-amber-400 shrink-0" />
                     <span className="font-medium">Coctelería LOVO Bar (Carta Oficial Completa + Protocolo 8 Pasos)</span>
                   </button>
 
@@ -413,7 +431,7 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
                     }}
                     className="text-xs p-2.5 rounded-xl text-left border transition-all cursor-pointer bg-[#18202F] hover:bg-[#222B3D] border-[#2A344A] text-[#E2E8F0] hover:border-sky-400/50 flex items-center gap-2"
                   >
-                    <span>🏢</span>
+                    <Building className="w-4 h-4 text-sky-400 shrink-0" />
                     <span className="font-medium">Oficinas / Recepción & Mensajería</span>
                   </button>
 
@@ -426,7 +444,7 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
                     }}
                     className="text-xs p-2.5 rounded-xl text-left border transition-all cursor-pointer bg-[#18202F] hover:bg-[#222B3D] border-[#2A344A] text-[#E2E8F0] hover:border-sky-400/50 flex items-center gap-2"
                   >
-                    <span>☕</span>
+                    <Coffee className="w-4 h-4 text-amber-300 shrink-0" />
                     <span className="font-medium">Cafetería de Especialidad & Brunch</span>
                   </button>
 
@@ -439,7 +457,7 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
                     }}
                     className="text-xs p-2.5 rounded-xl text-left border transition-all cursor-pointer bg-[#18202F] hover:bg-[#222B3D] border-[#2A344A] text-[#E2E8F0] hover:border-sky-400/50 flex items-center gap-2"
                   >
-                    <span>🛎️</span>
+                    <Building className="w-4 h-4 text-indigo-300 shrink-0" />
                     <span className="font-medium">Hotel / Recepción & Conserjería</span>
                   </button>
                 </div>
@@ -461,7 +479,7 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
                   ) : (
                     <>
                       <Sparkles className="w-4 h-4 text-white" />
-                      <span>✨ Calibrar Diálogos & Objetivos con IA</span>
+                      <span>Calibrar Diálogos & Objetivos con IA</span>
                     </>
                   )}
                 </button>
@@ -474,7 +492,7 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
                   title="Inyecta todo el texto en bruto a la memoria de la IA de inmediato"
                 >
                   <Zap className="w-4 h-4 text-sky-400" />
-                  <span>⚡ Inyectar a Memoria Directamente (1 Clic)</span>
+                  <span>Inyectar a Memoria Directamente (1 Clic)</span>
                 </button>
               </div>
             </div>
@@ -577,13 +595,14 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
                         key={emoji}
                         type="button"
                         onClick={() => setAiAvatar(emoji)}
-                        className={`text-xl p-2 rounded-xl border transition-all cursor-pointer ${
+                        className={`p-1 rounded-2xl border transition-all cursor-pointer ${
                           aiAvatar === emoji
-                            ? 'bg-sky-500/20 border-sky-500/60 scale-110 shadow-sm'
-                            : 'bg-[#18202F] border-[#2A344A] hover:bg-[#222B3D] opacity-80'
+                            ? 'ring-2 ring-sky-400 scale-105 shadow-md'
+                            : 'opacity-70 hover:opacity-100'
                         }`}
+                        title={emoji}
                       >
-                        {emoji}
+                        <CorporateAvatar avatar={emoji} size="md" />
                       </button>
                     ))}
                   </div>

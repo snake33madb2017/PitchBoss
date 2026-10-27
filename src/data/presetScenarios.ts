@@ -14,7 +14,7 @@ const RAW_PRESETS: Scenario[] = [
     aiCharacter: {
       name: 'Emma (Tourist visiting Madrid)',
       role: 'Turista angloparlante en su primera visita a Madrid',
-      avatar: '🌟',
+      avatar: 'sparkles',
       personality: 'Viajera amable y relajada. No es experta en cócteles y busca algo fácil de beber (dulce o afrutado). Hace preguntas sencillas sobre los ingredientes y necesita recomendaciones claras.',
       voiceGender: 'female'
     },
@@ -56,7 +56,7 @@ const RAW_PRESETS: Scenario[] = [
     aiCharacter: {
       name: 'Charlotte & Pierre (Art & Cocktail Lovers from Paris)',
       role: 'Clientes parisinos entusiastas del Art Déco y la historia de Josephine Baker',
-      avatar: '🎭',
+      avatar: 'theater',
       personality: 'Viajeros cultos apasionados por la cultura parisina de los años 20. Preguntan por la conexión de los cócteles con la vida de Josephine Baker, los 4 estadios (Amarga y Seca, Ácida, Dulce, Códex) y las técnicas de clarificado.',
       voiceGender: 'female'
     },
@@ -98,7 +98,7 @@ const RAW_PRESETS: Scenario[] = [
     aiCharacter: {
       name: 'Julian Montgomery (Cocktail Historian & Spirits Journalist)',
       role: 'Historiador de coctelería internacional y articulista de Tales of the Cocktail',
-      avatar: '🕵️',
+      avatar: 'detective',
       personality: 'Experto en coctelería histórica y técnicas botánicas avanzadas. Analiza la consistencia conceptual del menú, hace preguntas minuciosas sobre las tintas invisibles y busca un nivel de elocuencia y precisión técnica nativo.',
       voiceGender: 'male'
     },
@@ -144,7 +144,7 @@ const RAW_PRESETS: Scenario[] = [
     aiCharacter: {
       name: 'Oliver (Curious Traveler from London)',
       role: 'Turista británico paseando por el Barrio de las Letras',
-      avatar: '🐺',
+      avatar: 'wolf',
       personality: 'Curioso y conversador. Le llama la atención el nombre del bar "LOVO" y quiere saber por qué está decorado con lobos. Pide un cóctel fresco con ginebra o ron.',
       voiceGender: 'male'
     },
@@ -186,7 +186,7 @@ const RAW_PRESETS: Scenario[] = [
     aiCharacter: {
       name: 'Liam & Marcus (Foodies & Gastronomic Travelers)',
       role: 'Aficionados a la alta gastronomía y restaurantes con Estrella Michelin',
-      avatar: '🥩',
+      avatar: 'food',
       personality: 'Viajeros culinarios que buscan experiencias gastronómicas líquidas. Les fascinan los ingredientes inusuales como hoja de ostra, salmueras, caldos clarificados y ahumados.',
       voiceGender: 'male'
     },
@@ -228,7 +228,7 @@ const RAW_PRESETS: Scenario[] = [
     aiCharacter: {
       name: 'Lord Alistair Sterling (Master of Spirits & Private Collector)',
       role: 'Sommelier internacional y juez de destilados espirituosos',
-      avatar: '👑',
+      avatar: 'crown',
       personality: 'Coleccionista de whiskies Islay y destilados de terroir. Exige análisis de fenoles en partes por millón (PPM), crianza en barrica y una articulación filosófica profunda de la identidad del lobo.',
       voiceGender: 'male'
     },
@@ -274,7 +274,7 @@ const RAW_PRESETS: Scenario[] = [
     aiCharacter: {
       name: 'Chloe (Student traveler from Sydney)',
       role: 'Joven viajera australiana en ruta por Europa',
-      avatar: '🌈',
+      avatar: 'palette',
       personality: 'Alegre, entusiasta y abierta a nuevos sabores. Le atraen las presentaciones visuales coloridas y los sabores tropicales de América Latina y África.',
       voiceGender: 'female'
     },
@@ -316,7 +316,7 @@ const RAW_PRESETS: Scenario[] = [
     aiCharacter: {
       name: 'Sofia & Alex (Global Travelers from New York)',
       role: 'Turistas internacionales que frecuentan los mejores bares del mundo (Handshake, Employees Only)',
-      avatar: '🌍',
+      avatar: 'globe',
       personality: 'Clientes neoyorquinos cosmopolitas que conocen bares internacionales como Handshake (#1 del Mundo 2024) y Employees Only. Preguntan por los cócteles hermanados del Tomo III y uno de ellos tiene alergia severa a los cacahuetes y frutos secos.',
       voiceGender: 'female'
     },
@@ -358,7 +358,7 @@ const RAW_PRESETS: Scenario[] = [
     aiCharacter: {
       name: 'Elena Rostova (International 50 Best Academy Chair & Luxury Consultant)',
       role: 'Presidenta de jurado de The World’s 50 Best Bars y consultora de alta hospitalidad',
-      avatar: '💎',
+      avatar: 'gem',
       personality: 'Máxima autoridad global en bares de vanguardia. Evalúa hospitalidad honesta, diplomacia cultural, trazabilidad de ingredientes endémicos y capacidad de upselling con destilados ultra-premium.',
       voiceGender: 'female'
     },
@@ -404,7 +404,7 @@ const RAW_PRESETS: Scenario[] = [
     aiCharacter: {
       name: 'Victoria & Richard (Corporate Executives celebrating a deal)',
       role: 'Directivos internacionales de finanzas celebrando un cierre de negocio en Madrid',
-      avatar: '💎',
+      avatar: 'gem',
       personality: 'Clientes de alto poder adquisitivo buscando destilados excepcionales (Don Julio 1942, Hibiki Harmony, Macallan, Casa Dragones, Zacapa 23) y un servicio de barra impecable sin importar el precio.',
       voiceGender: 'female'
     },
@@ -461,7 +461,7 @@ PITCHBOSS ENTERPRISE - DEMO DE VENTA CONSULTIVA B2B
     aiCharacter: {
       name: 'Marcus Vance (VP of Commercial Operations)',
       role: 'Vicepresidente de Operaciones Comerciales en una multinacional de tecnología en Nueva York',
-      avatar: '👔',
+      avatar: 'tie',
       personality: 'Ejecutivo analítico y directo. Tiene poco tiempo, valora las métricas de retorno de inversión (ROI) y exige saber por qué la simulación con IA por voz es superior a la formación tradicional con roleplay presencial.',
       voiceGender: 'male'
     },
@@ -506,7 +506,7 @@ PITCHBOSS ENTERPRISE - DEMO DE NEGOCIACIÓN DE TARIFAS
     aiCharacter: {
       name: 'Sarah Jenkins (Head of Procurement)',
       role: 'Directora de Compras Corporativas en Londres',
-      avatar: '💼',
+      avatar: 'briefcase',
       personality: 'Negociadora británica astuta y firme. Intenta forzar un descuento del 25% antes de firmar el contrato alegando restricciones presupuestarias de final de trimestre.',
       voiceGender: 'female'
     },
@@ -550,7 +550,7 @@ PITCHBOSS ENTERPRISE - DEMO DE HOSPITALIDAD INTERNACIONAL
     aiCharacter: {
       name: 'Oliver & Claire (Gastronomy Travellers from Melbourne)',
       role: 'Pareja australiana aficionada a la alta cocina de viaje en Europa',
-      avatar: '🥂',
+      avatar: 'wine',
       personality: 'Viajeros gastronómicos exigentes, amables y abiertos a sugerencias excepcionales. Les gusta conocer el origen de los ingredientes y el maridaje recomendado.',
       voiceGender: 'male'
     },

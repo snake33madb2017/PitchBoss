@@ -4,6 +4,7 @@ import { Phone, Target, Trash2, Building2, User, Edit3, Copy, Eye, EyeOff, Play,
 import { SessionHistoryService } from '../services/sessionHistoryService';
 import { LevelEvaluationService } from '../services/levelEvaluationService';
 import { useTranslation } from '../i18n/LanguageContext';
+import { CorporateAvatar } from './CorporateAvatar';
 
 interface ScenarioCardProps {
   scenario: Scenario;
@@ -209,9 +210,7 @@ export const ScenarioCard: React.FC<ScenarioCardProps> = ({
         {/* AI Character & User Role */}
         <div className="rounded-2xl p-3.5 border mb-3.5 space-y-2 bg-[#12161F]/90 border-[#2A344A]">
           <div className="flex items-center gap-2.5">
-            <span className="text-2xl" role="img" aria-label="avatar">
-              {scenario.aiCharacter.avatar}
-            </span>
+            <CorporateAvatar avatar={scenario.aiCharacter.avatar} name={scenario.aiCharacter.name} size="md" />
             <div className="min-w-0 flex-1">
               <p className="text-xs font-bold truncate text-[#E2E8F0]">
                 {scenario.aiCharacter.name}

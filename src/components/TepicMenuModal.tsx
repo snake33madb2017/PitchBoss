@@ -13,7 +13,8 @@ import {
   Wine,
   GlassWater,
   Info,
-  ExternalLink
+  ExternalLink,
+  Volume2
 } from 'lucide-react';
 import { TEPIC_MENU_ITEMS, type TepicMenuItem } from '../data/tepicMenuData';
 
@@ -187,7 +188,8 @@ export const TepicMenuModal: React.FC<TepicMenuModalProps> = ({
                   : 'bg-[#282622] text-stone-300 border-[#38342D] hover:border-[#B39964]/50 hover:text-white'
               }`}
             >
-              🥑 Antojitos & Entrantes
+              <Flame className="w-4 h-4 text-amber-400" />
+              <span>Antojitos & Entrantes</span>
             </button>
             <button
               onClick={() => setActiveCategory('tacos')}
@@ -197,7 +199,8 @@ export const TepicMenuModal: React.FC<TepicMenuModalProps> = ({
                   : 'bg-[#282622] text-stone-300 border-[#38342D] hover:border-[#B39964]/50 hover:text-white'
               }`}
             >
-              🌮 Tacos de Autor (Maíz Nixtamalizado)
+              <Wheat className="w-4 h-4 text-amber-300" />
+              <span>Tacos de Autor (Maíz Nixtamalizado)</span>
             </button>
             <button
               onClick={() => setActiveCategory('principales')}
@@ -436,8 +439,9 @@ export const TepicMenuModal: React.FC<TepicMenuModalProps> = ({
                         "{item.pairing_tip_en}"
                       </p>
                       {item.phonetic_pitch_es && (
-                        <p className="text-[11px] text-[#FDE68A] font-mono mt-2 bg-[#25221B] border border-[#B39964]/30 p-2 rounded-lg leading-snug">
-                          🗣️ {item.phonetic_pitch_es}
+                        <p className="text-[11px] text-[#FDE68A] font-mono mt-2 bg-[#25221B] border border-[#B39964]/30 p-2 rounded-lg leading-snug flex items-center gap-1.5">
+                          <Volume2 className="w-3.5 h-3.5 text-[#B39964] shrink-0" />
+                          <span>{item.phonetic_pitch_es}</span>
                         </p>
                       )}
                     </div>

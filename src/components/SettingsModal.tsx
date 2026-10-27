@@ -4,7 +4,7 @@ import { SpeechService } from '../services/speechService';
 import { CloudSyncService } from '../services/cloudSyncService';
 import { NotificationService } from '../services/notificationService';
 import { useTranslation } from '../i18n/LanguageContext';
-import { Settings, Volume2, Mic, Check, X, Download, User, Bell } from 'lucide-react';
+import { Settings, Volume2, Mic, Check, X, Download, User, Bell, Shield } from 'lucide-react';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -238,7 +238,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <div className="p-3 sm:p-3.5 rounded-2xl border border-[#2A344A] bg-[#12161F] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
               <div className="space-y-0.5 min-w-0">
                 <span className="text-xs font-bold text-[#FBBF24] flex items-center gap-1.5">
-                  🛡️ Administración de la PWA
+                  <Shield className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Administración de la PWA</span>
                 </span>
                 <p className="text-[11px] text-[#94A3B8]">
                   Editar escenarios, exportar/importar y cambiar PIN.

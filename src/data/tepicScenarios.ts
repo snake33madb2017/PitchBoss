@@ -10,7 +10,7 @@ export const TEPIC_SCENARIOS: Scenario[] = [
     aiCharacter: {
       name: 'Oliver & Emma (Pareja de Londres)',
       role: 'Clientes ingleses en Tepic Madrid (Ayala 14)',
-      avatar: '🥑',
+      avatar: 'chef',
       personality: 'Turistas amables y con apetito, recién llegados del Barrio de Salamanca. Quieren probar comida mexicana auténtica pero necesitan guía con las opciones y bebidas.',
       voiceGender: 'female'
     },
@@ -52,7 +52,7 @@ export const TEPIC_SCENARIOS: Scenario[] = [
     aiCharacter: {
       name: 'Marcus & Chloe (Directores de Silicon Valley)',
       role: 'Ejecutivos gastronómicos exigentes cenando en Tepic',
-      avatar: '🌮',
+      avatar: 'food',
       personality: 'Clientes cosmopolitas y apasionados de los destilados de agave. Preguntan en detalle por las técnicas culinarias, los pescados frescos de los tacos y los alérgenos.',
       voiceGender: 'male'
     },
@@ -93,7 +93,7 @@ export const TEPIC_SCENARIOS: Scenario[] = [
     aiCharacter: {
       name: 'Chef Julian & Sommelier Beatrice',
       role: 'Críticos gastronómicos de Nueva York visitando Madrid',
-      avatar: '🍷',
+      avatar: 'wine',
       personality: 'Muy sofisticados, conocedores de la alta cocina internacional y la Guía Michelin. Buscan la complejidad del Mole Poblano tradicional, la carta de vinos y destilados añejos.',
       voiceGender: 'female'
     },

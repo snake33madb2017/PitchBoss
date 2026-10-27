@@ -12,7 +12,11 @@ import {
   Play,
   Trash2,
   FileText,
-  Calendar
+  Calendar,
+  CheckCircle2,
+  Bot,
+  User,
+  Lightbulb
 } from 'lucide-react';
 
 interface SessionHistoryModalProps {
@@ -228,7 +232,17 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
                         : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
                     }`}
                   >
-                    {selectedSessionForTranscript.status === 'in_progress' ? '🟢 En Curso' : '✅ Completada'}
+                    {selectedSessionForTranscript.status === 'in_progress' ? (
+                      <span className="flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] animate-pulse" />
+                        En Curso
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1.5">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                        Completada
+                      </span>
+                    )}
                   </span>
                 </div>
                 <div className="flex flex-wrap items-center gap-4 text-xs text-[#94A3B8]">
@@ -268,8 +282,9 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
                         }`}
                       >
                         <div className="flex items-center justify-between text-[11px] font-bold">
-                          <span className={isAi ? 'text-[#38BDF8]' : 'text-[#94A3B8]'}>
-                            {isAi ? '🤖 Interlocutor IA' : '👤 Tú (Voz)'}
+                          <span className={`flex items-center gap-1.5 ${isAi ? 'text-[#38BDF8]' : 'text-[#94A3B8]'}`}>
+                            {isAi ? <Bot className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
+                            <span>{isAi ? 'Interlocutor IA' : 'Tú (Voz)'}</span>
                           </span>
                           <span className="text-[#94A3B8] font-mono text-[10px]">
                             {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -288,7 +303,10 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
                         {/* Grammar / Vocabulary Corrections */}
                         {msg.corrections && msg.corrections.length > 0 && (
                           <div className="p-2.5 rounded-xl bg-[#1C2331] border border-amber-500/30 text-[11px] space-y-1 mt-1.5">
-                            <span className="font-bold text-[#FBBF24] block">💡 Sugerencia Ejecutiva:</span>
+                            <span className="font-bold text-[#FBBF24] flex items-center gap-1.5">
+                              <Lightbulb className="w-3.5 h-3.5" />
+                              <span>Sugerencia Ejecutiva:</span>
+                            </span>
                             {msg.corrections.map((c, ci) => (
                               <div key={ci} className="space-y-0.5">
                                 <p className="text-[#E2E8F0]">
@@ -337,7 +355,17 @@ export const SessionHistoryModal: React.FC<SessionHistoryModalProps> = ({
                               : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
                           }`}
                         >
-                          {isInProgress ? '🟢 En Curso' : '✅ Completada'}
+                          {isInProgress ? (
+                            <span className="flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] animate-pulse" />
+                              En Curso
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-1.5">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                              Completada
+                            </span>
+                          )}
                         </span>
                         <span className="text-xs font-bold text-[#94A3B8] truncate">{s.scenarioNiche}</span>
                       </div>

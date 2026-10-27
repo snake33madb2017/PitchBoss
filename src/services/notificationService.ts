@@ -35,7 +35,7 @@ export class NotificationService {
       if (permission === 'granted') {
         localStorage.setItem(NOTIFICATION_PERMISSION_KEY, 'true');
         this.sendImmediateNotification(
-          '¡Recordatorios PitchBoss activados! 🚀',
+          'Recordatorios PitchBoss activados',
           'Recibirás un aviso diario para hacer tu simulación de 3 minutos antes de tu turno.'
         );
         this.scheduleDailyCheck();
@@ -86,7 +86,7 @@ export class NotificationService {
 
       if (currentHour === targetHour && localStorage.getItem(lastSentKey) !== todayStr) {
         this.sendImmediateNotification(
-          '🎯 PitchBoss — Tu turno de práctica',
+          'PitchBoss Enterprise — Turno de práctica',
           'Tómate 3 minutos para afinar tu inglés de ventas antes de atender clientes hoy.'
         );
         localStorage.setItem(lastSentKey, todayStr);

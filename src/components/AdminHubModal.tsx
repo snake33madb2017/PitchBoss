@@ -7,6 +7,7 @@ import { CloudSyncService } from '../services/cloudSyncService';
 import { BusinessOnboardingModal } from './BusinessOnboardingModal';
 import { SessionReportModal } from './SessionReportModal';
 import { LevelEvaluationService } from '../services/levelEvaluationService';
+import { CorporateAvatar } from './CorporateAvatar';
 import {
   ShieldCheck,
   X,
@@ -508,7 +509,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
             }`}
           >
             <BarChart3 className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>📊 {isSuperAdmin ? 'Analítica Dirección' : 'Reportes & Cupos'} ({teamMembers.length}/{maxSeats})</span>
+            <span>{isSuperAdmin ? 'Analítica Dirección' : 'Reportes & Cupos'} ({teamMembers.length}/{maxSeats})</span>
           </button>
           <button
             onClick={() => setActiveTab('scenarios')}
@@ -566,7 +567,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
               className="ml-auto hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-500/20 to-emerald-500/20 hover:from-sky-500/30 hover:to-emerald-500/30 border border-sky-400/40 text-sky-300 font-bold text-xs cursor-pointer transition-all active:scale-95 shrink-0 my-1"
             >
               <Sparkles className="w-3.5 h-3.5 text-sky-400" />
-              <span>🚀 Nueva Empresa (3 Pasos)</span>
+              <span>Nueva Empresa (3 Pasos)</span>
             </button>
           )}
         </div>
@@ -694,7 +695,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                     className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-500/20 to-sky-500/20 hover:from-emerald-500/30 hover:to-sky-500/30 border border-emerald-500/40 text-emerald-300 cursor-pointer transition-all"
                   >
                     <Sparkles className="w-4 h-4 text-emerald-400" />
-                    <span>🚀 Asistente Nueva Empresa (3 Pasos)</span>
+                    <span>Asistente Nueva Empresa (3 Pasos)</span>
                   </button>
                 )}
               </div>
@@ -973,9 +974,7 @@ export const AdminHubModal: React.FC<AdminHubModalProps> = ({
                       className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#202838]/50 transition-colors"
                     >
                       <div className="flex items-start gap-3 min-w-0">
-                        <span className="text-2xl shrink-0 p-2 rounded-xl bg-[#1C2331] border border-[#2A344A]">
-                          {scenario.aiCharacter.avatar || '💼'}
-                        </span>
+                        <CorporateAvatar avatar={scenario.aiCharacter.avatar} name={scenario.aiCharacter.name} size="md" />
                         <div className="min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
                             <h4 className="text-xs sm:text-sm font-bold text-[#E2E8F0] truncate">

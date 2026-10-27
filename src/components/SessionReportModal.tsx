@@ -18,7 +18,8 @@ import {
   Play,
   Pause,
   X,
-  MessageCircle
+  MessageCircle,
+  Check
 } from 'lucide-react';
 
 interface SessionReportModalProps {
@@ -48,7 +49,7 @@ export const SessionReportModal: React.FC<SessionReportModalProps> = ({
   };
 
   const copyToClipboard = () => {
-    const text = `🎯 Performance Debrief - ${report.scenarioTitle}
+    const text = `[Performance Debrief] - ${report.scenarioTitle}
 Business Score: ${report.businessScore}%
 English Score: ${report.englishScore}%
 Duration: ${formatTime(report.durationSeconds)}
@@ -62,17 +63,17 @@ ${report.executiveSummary}`;
 
   const shareToWhatsApp = () => {
     const employee = CloudSyncService.getEmployeeName();
-    const text = `🎯 *Reporte PitchBoss - ${report.scenarioTitle}*
-👤 Colaborador: *${employee}*
-🏆 Business Score: *${report.businessScore}%*
-🗣 Fluidez Inglés: *${report.englishScore}%*
-⏱ Duración: ${formatTime(report.durationSeconds)}
-✅ Objetivos: ${report.completedObjectives.length} logrados
+    const text = `*[REPORTE EJECUTIVO PITCHBOSS]* - ${report.scenarioTitle}
+• Colaborador: *${employee}*
+• Business Score: *${report.businessScore}%*
+• Fluidez Inglés: *${report.englishScore}%*
+• Duración: ${formatTime(report.durationSeconds)}
+• Objetivos: ${report.completedObjectives.length} logrados
 
-📋 *Resumen Ejecutivo:*
+*[Resumen Ejecutivo]*
 ${report.executiveSummary}
 
-🌟 *PitchBoss Enterprise*`;
+*PitchBoss Enterprise*`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
@@ -141,8 +142,9 @@ ${report.executiveSummary}
                   <strong className="text-white print:text-black font-bold">{report.employeeName}</strong>
                 </span>
               </div>
-              <span className="text-[10px] px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40 shrink-0 self-start sm:self-auto print:text-emerald-700">
-                ✓ Reportado a Gerencia
+              <span className="text-[10px] px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40 shrink-0 self-start sm:self-auto print:text-emerald-700 flex items-center gap-1">
+                <Check className="w-3 h-3 text-emerald-400" />
+                <span>Reportado a Gerencia</span>
               </span>
             </div>
           )}

@@ -23,8 +23,11 @@ import {
   Keyboard,
   Languages,
   Radio,
-  BookOpen
+  BookOpen,
+  Trophy,
+  Zap
 } from 'lucide-react';
+import { CorporateAvatar } from './CorporateAvatar';
 
 interface CallScreenProps {
   scenario: Scenario;
@@ -273,7 +276,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
         } else {
           setCallState('idle');
           if (holdDuration < 320) {
-            setWalkieTalkieTip('💡 Mantén presionado mientras hablas y suelta al terminar');
+            setWalkieTalkieTip('Mantén presionado mientras hablas y suelta al terminar');
             setTimeout(() => setWalkieTalkieTip(null), 3500);
           }
         }
@@ -614,9 +617,16 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
                   : 'border-[#2A344A] group-hover:border-[#38BDF8]'
               }`}
             >
-              <span className="text-xl sm:text-3xl" role="img">
-                {isHoldingMic ? '🎙️' : scenario.aiCharacter.avatar}
-              </span>
+              {isHoldingMic ? (
+                <Mic className="w-6 h-6 sm:w-8 sm:h-8 text-rose-400 animate-pulse" />
+              ) : (
+                <CorporateAvatar
+                  avatar={scenario.aiCharacter.avatar}
+                  name={scenario.aiCharacter.name}
+                  size="lg"
+                  className="w-full h-full rounded-full border-0 shadow-none bg-transparent"
+                />
+              )}
             </div>
           </div>
         </div>
@@ -641,7 +651,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
           {callState === 'user_listening' && (
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/50 animate-pulse shadow-lg">
               <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-              <span>{isHoldingMic ? '🎙️ Habla ahora • ¡Suelta para enviar!' : 'Escuchando en inglés...'}</span>
+              <span>{isHoldingMic ? 'Habla ahora • Suelta para enviar' : 'Escuchando en inglés...'}</span>
             </div>
           )}
 
@@ -682,7 +692,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
           messages.filter((m) => m.sender === 'user').length >= 3 && (
             <div className="w-full rounded-2xl p-3.5 bg-gradient-to-r from-amber-500/15 via-[#1C2331] to-sky-500/15 border border-amber-500/30 shadow-lg text-xs animate-in fade-in slide-in-from-top-2 flex flex-col sm:flex-row items-center justify-between gap-2.5 shrink-0">
               <div className="flex items-center gap-2.5">
-                <span className="text-xl">⚡</span>
+                <Zap className="w-5 h-5 text-amber-400 shrink-0" />
                 <div>
                   <p className="font-bold text-[#FBBF24]">¡Excelente dominio de este escenario!</p>
                   <p className="text-[#94A3B8] text-[11px] leading-snug">
@@ -701,9 +711,10 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
                 <button
                   type="button"
                   onClick={handleHangUp}
-                  className="px-3 py-1.5 rounded-xl text-[11px] font-bold bg-[#FBBF24] hover:bg-amber-300 text-slate-950 transition-all shadow-md shadow-amber-500/20 cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl text-[11px] font-bold bg-[#FBBF24] hover:bg-amber-300 text-slate-950 transition-all shadow-md shadow-amber-500/20 cursor-pointer flex items-center gap-1.5"
                 >
-                  Colgar y Subir Nivel 🏆
+                  <span>Colgar y Subir Nivel</span>
+                  <Trophy className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
@@ -733,7 +744,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
                 }`}
               >
                 <Languages className="w-3 h-3 text-[#38BDF8]" />
-                <span>{showTranslation ? 'Ocultar traducción' : '🇪🇸 Ver traducción'}</span>
+                <span>{showTranslation ? 'Ocultar traducción' : 'Ver traducción'}</span>
               </button>
             )}
 
@@ -748,7 +759,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
                 }`}
               >
                 <Lightbulb className="w-3 h-3 text-[#FBBF24]" />
-                <span>{showTip ? 'Ocultar sugerencia' : '💡 ¿Cómo responder?'}</span>
+                <span>{showTip ? 'Ocultar sugerencia' : '¿Cómo responder?'}</span>
               </button>
             )}
 
@@ -771,7 +782,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
               ) : (
                 <>
                   <Volume2 className="w-3 h-3 text-[#38BDF8]" />
-                  <span>🔊 Escuchar de nuevo</span>
+                  <span>Escuchar de nuevo</span>
                 </>
               )}
             </button>
@@ -789,7 +800,7 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
                 title="Ver carta de productos y vocabulario clave"
               >
                 <BookOpen className="w-3 h-3 text-emerald-400" />
-                <span>{showVocabulary ? 'Ocultar carta' : `📋 Carta & Léxico (${scenario.nicheVocabulary.length})`}</span>
+                <span>{showVocabulary ? 'Ocultar carta' : `Carta & Léxico (${scenario.nicheVocabulary.length})`}</span>
               </button>
             )}
           </div>
@@ -847,8 +858,9 @@ export const CallScreen: React.FC<CallScreenProps> = ({ scenario, initialSession
                     >
                       <span className="leading-snug text-[11px] font-mono">{term}</span>
                       {isMentioned && (
-                        <span className="text-emerald-400 text-[10px] font-bold shrink-0 bg-emerald-500/20 px-1.5 py-0.5 rounded-md">
-                          ✓ Usado
+                        <span className="text-emerald-400 text-[10px] font-bold shrink-0 bg-emerald-500/20 px-1.5 py-0.5 rounded-md flex items-center gap-1">
+                          <CheckCircle2 className="w-2.5 h-2.5" />
+                          <span>Usado</span>
                         </span>
                       )}
                     </div>

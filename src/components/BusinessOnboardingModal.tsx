@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Sparkles, ArrowRight, ArrowLeft, Check, Copy, Share2, ShieldCheck, FileText } from 'lucide-react';
+import { X, Sparkles, ArrowRight, ArrowLeft, Check, Copy, Share2, ShieldCheck, FileText, Wine, Building, Lightbulb, BarChart3, Zap } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { Scenario, EnglishLevel, DifficultyLevel } from '../types';
 import { AdminStorageService } from '../services/adminStorageService';
@@ -55,7 +55,7 @@ export const BusinessOnboardingModal: React.FC<BusinessOnboardingModalProps> = (
       aiCharacter: {
         name: characterName,
         role: `Clientes internacionales en ${businessName}`,
-        avatar: '🍸',
+        avatar: 'cocktail',
         personality: 'Tutor interactivo y cliente internacional. Habla en inglés según la carta oficial y te guía en español con apoyo fonético paso a paso.',
         voiceGender: 'male'
       },
@@ -160,7 +160,7 @@ export const BusinessOnboardingModal: React.FC<BusinessOnboardingModalProps> = (
             }`}
           >
             <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center text-[9px] sm:text-[10px] font-bold border border-current shrink-0">
-              {step > 1 ? '✓' : '1'}
+              {step > 1 ? <Check className="w-2.5 h-2.5" /> : '1'}
             </span>
             <span className="hidden sm:inline">1. Pega tu Menú / Carta</span>
             <span className="sm:hidden text-[11px]">1. Menú</span>
@@ -172,7 +172,7 @@ export const BusinessOnboardingModal: React.FC<BusinessOnboardingModalProps> = (
             }`}
           >
             <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center text-[9px] sm:text-[10px] font-bold border border-current shrink-0">
-              {step > 2 ? '✓' : '2'}
+              {step > 2 ? <Check className="w-2.5 h-2.5" /> : '2'}
             </span>
             <span className="hidden sm:inline">2. Calibra Dificultad</span>
             <span className="sm:hidden text-[11px]">2. Nivel</span>
@@ -256,9 +256,10 @@ export const BusinessOnboardingModal: React.FC<BusinessOnboardingModalProps> = (
                     setNicheCategory('Coctelería & Hospitalidad');
                     setMenuDocument(LOVO_BAR_MASTER_KNOWLEDGE);
                   }}
-                  className="px-2.5 py-1 text-xs rounded-lg border border-[#2A344A] bg-[#18202F] hover:bg-[#222B3D] text-sky-400 cursor-pointer transition-colors"
+                  className="px-2.5 py-1 text-xs rounded-lg border border-[#2A344A] bg-[#18202F] hover:bg-[#222B3D] text-sky-400 cursor-pointer transition-colors flex items-center gap-1.5"
                 >
-                  🍸 LOVO Bar Oficial
+                  <Wine className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>LOVO Bar Oficial</span>
                 </button>
                 <button
                   type="button"
@@ -267,9 +268,10 @@ export const BusinessOnboardingModal: React.FC<BusinessOnboardingModalProps> = (
                     setNicheCategory('Hotel & Alojamiento de Lujo');
                     setMenuDocument(`MANUAL DE ATENCIÓN EN RECEPCIÓN DE HOTEL:\n- Check-in: A partir de las 15:00. Pedir pasaportes a todos los huéspedes.\n- Desayuno buffet: De 07:30 a 11:00 en la planta baja.\n- Check-out: Máximo a las 12:00 mediodía.\n- Consigna de equipaje gratuita.\n- Taxis y traslados al aeropuerto: Tarifa fija 33€.`);
                   }}
-                  className="px-2.5 py-1 text-xs rounded-lg border border-[#2A344A] bg-[#18202F] hover:bg-[#222B3D] text-slate-300 cursor-pointer transition-colors"
+                  className="px-2.5 py-1 text-xs rounded-lg border border-[#2A344A] bg-[#18202F] hover:bg-[#222B3D] text-slate-300 cursor-pointer transition-colors flex items-center gap-1.5"
                 >
-                  🛎️ Hotel Boutique
+                  <Building className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                  <span>Hotel Boutique</span>
                 </button>
               </div>
             </div>
@@ -278,8 +280,9 @@ export const BusinessOnboardingModal: React.FC<BusinessOnboardingModalProps> = (
           {/* STEP 2: Calibra dificultad */}
           {step === 2 && (
             <div className="space-y-4 animate-in fade-in">
-              <div className="p-4 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-xs text-sky-300 leading-relaxed">
-                💡 <strong>Calibración pedagógica:</strong> La IA adaptará la velocidad de habla, la longitud de las oraciones y el vocabulario según el nivel de tus trabajadores.
+              <div className="p-4 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-xs text-sky-300 leading-relaxed flex items-center gap-2.5">
+                <Lightbulb className="w-4 h-4 text-sky-400 shrink-0" />
+                <span><strong>Calibración pedagógica:</strong> La IA adaptará la velocidad de habla, la longitud de las oraciones y el vocabulario según el nivel de tus trabajadores.</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -360,8 +363,8 @@ export const BusinessOnboardingModal: React.FC<BusinessOnboardingModalProps> = (
           {step === 3 && (
             <div className="space-y-5 animate-in zoom-in-95 text-center sm:text-left">
               <div className="p-5 rounded-3xl bg-gradient-to-r from-emerald-500/15 to-sky-500/15 border border-emerald-500/30 flex flex-col sm:flex-row items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 text-2xl">
-                  🚀
+                <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                  <Sparkles className="w-7 h-7 text-emerald-400" />
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-bold text-white">
@@ -415,7 +418,8 @@ export const BusinessOnboardingModal: React.FC<BusinessOnboardingModalProps> = (
                     }}
                     className="p-3.5 rounded-2xl bg-[#18202F] hover:bg-[#222B3D] border border-sky-400/40 text-sky-400 hover:text-sky-300 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.99]"
                   >
-                    <span>📊 Abrir Panel de Analítica del Director</span>
+                    <BarChart3 className="w-4 h-4 text-sky-400" />
+                    <span>Abrir Panel de Analítica del Director</span>
                   </button>
                 )}
               </div>
@@ -435,7 +439,7 @@ export const BusinessOnboardingModal: React.FC<BusinessOnboardingModalProps> = (
           {step > 1 && step < 3 ? (
             <button
               type="button"
-              onClick={() => setStep((s) => (s - 1) as any)}
+              onClick={() => setStep((s: 1 | 2 | 3) => (s - 1) as 1 | 2 | 3)}
               className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -464,7 +468,8 @@ export const BusinessOnboardingModal: React.FC<BusinessOnboardingModalProps> = (
                 onClick={handleCreateAndGenerateLink}
                 className="px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-gradient-to-r from-sky-500 to-emerald-500 hover:from-sky-400 hover:to-emerald-400 text-white shadow-lg shadow-sky-500/25 flex items-center gap-2 cursor-pointer transition-all active:scale-95"
               >
-                <span>Generar Simulador & Enlace 🚀</span>
+                <span>Generar Simulador & Enlace</span>
+                <Zap className="w-4 h-4" />
               </button>
             )}
 

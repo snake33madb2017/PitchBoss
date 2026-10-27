@@ -308,7 +308,7 @@ export const EmployeeSelectorModal: React.FC<EmployeeSelectorModalProps> = ({
                 <Plus className="w-4 h-4 text-sky-400 shrink-0" />
                 <span>
                   {seatsAvailable > 0
-                    ? `➕ Registrar nuevo colaborador (${seatsAvailable} cupos disponibles)`
+                    ? `Registrar nuevo colaborador (${seatsAvailable} cupos disponibles)`
                     : `Plan completo (${maxSeats}/${maxSeats} cupos). Libera uno eliminando un perfil.`}
                 </span>
               </button>

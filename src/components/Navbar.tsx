@@ -20,7 +20,10 @@ import {
   User,
   MoreHorizontal,
   Globe,
-  Key
+  Key,
+  BookOpen,
+  Wine,
+  UtensilsCrossed
 } from 'lucide-react';
 import type { EnglishLevel } from '../types';
 import type { TeamMember } from '../services/teamAnalyticsService';
@@ -484,7 +487,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#2A344A] bg-[#161D2B] hover:bg-[#1F2738] text-xs font-bold text-slate-200 transition cursor-pointer shadow-sm shrink-0"
                 title="Explorar cartas gastronómicas oficiales"
               >
-                <span>📖</span>
+                <BookOpen className="w-3.5 h-3.5 text-sky-400" />
                 <span>Cartas Oficiales</span>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
               </button>
@@ -499,7 +502,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       }}
                       className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-left hover:bg-amber-500/15 text-amber-300 font-bold transition cursor-pointer"
                     >
-                      <span className="text-base">🍸</span>
+                      <Wine className="w-4 h-4 text-amber-400 shrink-0" />
                       <div className="min-w-0">
                         <p>Carta Trilogía LOVO Bar</p>
                         <p className="text-[10px] text-slate-400 font-normal">71 Cócteles & Josephine Baker</p>
@@ -514,7 +517,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       }}
                       className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-left hover:bg-stone-700 text-white font-bold transition cursor-pointer border-t border-[#2A344A]"
                     >
-                      <span className="text-base">🥑</span>
+                      <UtensilsCrossed className="w-4 h-4 text-emerald-400 shrink-0" />
                       <div className="min-w-0">
                         <p>Carta Restaurante Tepic</p>
                         <p className="text-[10px] text-slate-400 font-normal">Tacos, Mezcales & Bib Gourmand</p>
@@ -785,7 +788,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                             : 'text-slate-300 hover:text-white'
                         }`}
                       >
-                        🌮 Tepic
+                        Tepic
                       </button>
                       <button
                         onClick={() => handleCompanySelect('lovo-bar')}
@@ -795,7 +798,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                             : 'text-slate-300 hover:text-white'
                         }`}
                       >
-                        🍸 LOVO
+                        LOVO
                       </button>
                     </div>
                   </div>
@@ -918,7 +921,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         </span>
                       </div>
                       <p className="text-xs font-bold text-white truncate mt-0.5">
-                        {activeEmployee ? `${activeEmployee.name} (${activeEmployee.role})` : '➕ Crear / Seleccionar Alumno'}
+                        {activeEmployee ? `${activeEmployee.name} (${activeEmployee.role})` : 'Crear / Seleccionar Alumno'}
                       </p>
                     </div>
                   </div>

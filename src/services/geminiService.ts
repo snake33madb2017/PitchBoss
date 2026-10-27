@@ -694,7 +694,7 @@ Provide an executive performance review in Spanish evaluating business outcomes 
       aiCharacter: {
         name: 'Marcus Sterling',
         role: 'Director de Operaciones & Decisor de Compra',
-        avatar: '🎯',
+        avatar: 'target',
         personality: 'Pragmático, analítico, busca claridad y exige datos de rentabilidad.',
         voiceGender: 'male'
       },
